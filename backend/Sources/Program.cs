@@ -20,6 +20,7 @@ internal class Program
             app.UseDeveloperExceptionPage()
                 .UseHsts();
         }
+        app.UseHttpsRedirection();
         app.MapGet("/", () => "Hello World!");
         app.Run();
     }
