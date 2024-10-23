@@ -22,8 +22,16 @@ follow these steps:
    `MYSQL_PASSWORD`](https://github.com/docker-library/docs/tree/master/mysql#environment-variables).
    You can check if you have one by running `docker volume ls` and see if the
    output contains `mysql-data`, or by using the Docker Desktop GUI.
-7. Open the backend project solution file with Visual Studio and click on the
-   green play button. The backend app should now be able to communicate with the
-   DB. The reason why we have to use VS separately instead of using `docker
-   compose` is because VS uses special optimizations with Docker containers.
-   This is called "fast mode". It also makes debugging easier.
+7. Open the backend project solution file with Visual Studio. Right click on the
+   CitizenProposalApp project in the Solution Explorer and click on Manage User
+   Secrets. Add the following line to the JSON file that shows up:
+
+   ```json
+   "ConnectionStrings:CitizenProposalApp": "server=localhost;port=37591;database=CitizenProposalApp;uid=<your username>;pwd=<your password>"
+   ```
+
+8. Click on the green play button. The backend app should now be able to
+   communicate with the DB. The reason why we have to use VS separately instead
+   of using `docker compose` is because VS uses special optimizations with
+   Docker containers. This is called "fast mode". It also makes debugging
+   easier.

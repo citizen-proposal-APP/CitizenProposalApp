@@ -12,7 +12,7 @@
       "useSSL": true,
       "httpPort": 80,
       "sslPort": 443,
-      "containerRunArguments": "--network citizen-proposal-app"
+      "dockerfileRunArguments": "--network citizen-proposal-app"
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json"
