@@ -1,16 +1,5 @@
-import { AppShell } from '@mantine/core';
-import { HeaderMenu } from '@/components/HeaderMenu/HeaderMenu';
-import { Welcome } from '../components/Welcome/Welcome';
+import { Layout } from '@/components/Layout/Layout';
 
 export default function HomePage() {
-  return (
-    <AppShell>
-      <AppShell.Header withBorder={false}>
-        <HeaderMenu />
-      </AppShell.Header>
-      <AppShell.Main>
-        <Welcome />
-      </AppShell.Main>
-    </AppShell>
-  );
+  return <Layout>Ur mom fat LOL</Layout>;
 }

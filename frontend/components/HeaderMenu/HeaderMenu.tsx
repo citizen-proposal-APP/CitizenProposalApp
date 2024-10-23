@@ -1,15 +1,16 @@
 import { IconChevronDown } from '@tabler/icons-react';
-import { Box, Burger, Button, Center, Container, Group, Menu } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { Burger, Button, Center, Container, Group, Menu } from '@mantine/core';
 import { ActionToggle } from '@/components/ActionToggle/ActionToggle';
 import { Logo } from '@/components/Logo/Logo';
-import { NavbarNested } from '@/components/NavbarNested/NavbarNested';
 import { links } from '@/data/links';
 import classes from './HeaderMenu.module.css';
 
-export function HeaderMenu() {
-  const [opened, { toggle }] = useDisclosure(false);
+interface HeaderMenuProps {
+  opened: boolean;
+  toggle: () => void;
+}
 
+export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
   const items = links.map((link) => {
     const menuItems = link.links?.map((item) => (
       <Menu.Item key={item.link} component="a" href={item.link}>
@@ -50,25 +51,19 @@ export function HeaderMenu() {
   });
 
   return (
-    <>
-      <header className={classes.header}>
-        <Container size="md">
-          <div className={classes.inner}>
-            <Burger opened={opened} onClick={toggle} size="sm" hiddenFrom="sm" />
-            <Logo size={28} />
-            <Group gap={5} visibleFrom="sm">
-              {items}
-            </Group>
-            <Group visibleFrom="sm">
-              <Button variant="default">Log in</Button>
-              <Button>Sign up</Button>
-            </Group>
-            <ActionToggle />
-          </div>
-        </Container>
-      </header>
-
-      <Box hiddenFrom="sm">{opened && <NavbarNested />}</Box>
-    </>
+    <Container size="md">
+      <div className={classes.inner}>
+        <Burger opened={opened} onClick={toggle} size="sm" hiddenFrom="sm" />
+        <Logo size={28} />
+        <Group gap={5} visibleFrom="sm">
+          {items}
+        </Group>
+        <Group visibleFrom="sm">
+          <Button variant="default">Log in</Button>
+          <Button>Sign up</Button>
+        </Group>
+        <ActionToggle />
+      </div>
+    </Container>
   );
 }

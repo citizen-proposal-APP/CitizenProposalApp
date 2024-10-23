@@ -8,7 +8,7 @@ export function NavbarNested() {
 
   // TODO change the header
   return (
-    <nav className={classes.navbar}>
+    <>
       <div className={classes.header}>
         <Group justify="space-between">
           您尚未登入 您好！伊隆馬。
@@ -29,6 +29,6 @@ export function NavbarNested() {
         {/* <UserButton /> */}
         {/* </Group> */}
       </div>
-    </nav>
+    </>
   );
 }
