@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +12,6 @@ internal class Program
     private static void Main(string[] args)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-        Debug.WriteLine($"aaaaa {builder.Configuration.GetConnectionString("CitizenProposalApp")}");
         builder.Services
             .AddHsts(options =>
             {
