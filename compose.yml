@@ -1,5 +1,6 @@
 services:
   backend:
+    container_name: CitizenProposalApp
     build: backend
     networks:
       - citizen-proposal-app
@@ -7,6 +8,7 @@ services:
       - 80:8080
       - 443:8081
   db:
+    container_name: CitizenProposalAppDb
     image: mysql:8.0.36 # The current latest supported version by Pomelo.EntityFrameworkCore.MySql
     networks:
       - citizen-proposal-app

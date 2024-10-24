@@ -27,7 +27,7 @@ follow these steps:
    Secrets. Add the following line to the JSON file that shows up:
 
    ```json
-   "ConnectionStrings:CitizenProposalApp": "server=localhost;port=37591;database=CitizenProposalApp;uid=<your username>;pwd=<your password>"
+   "ConnectionStrings:CitizenProposalApp": "server=CitizenProposalAppDb;database=CitizenProposalApp;uid=<your username>;pwd=<your password>"
    ```
 
 8. Click on the green play button. The backend app should now be able to

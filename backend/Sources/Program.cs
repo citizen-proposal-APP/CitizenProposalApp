@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +13,7 @@ internal class Program
     private static void Main(string[] args)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+        Debug.WriteLine($"aaaaa {builder.Configuration.GetConnectionString("CitizenProposalApp")}");
         builder.Services
             .AddHsts(options =>
             {
@@ -22,10 +24,14 @@ internal class Program
                 options.UseMySql(builder.Configuration.GetConnectionString("CitizenProposalApp"), new MySqlServerVersion(new Version(8, 0, 36)))
             );
         WebApplication app = builder.Build();
-        if (!app.Environment.IsDevelopment())
+        if (app.Environment.IsProduction())
         {
             app.UseDeveloperExceptionPage()
                 .UseHsts();
+        }
+        if (app.Environment.IsDevelopment())
+        {
+            app.EnsureMigration<CitizenProposalAppDbContext>();
         }
         app.UseHttpsRedirection();
         app.MapGet("/", () => "Hello World!");
