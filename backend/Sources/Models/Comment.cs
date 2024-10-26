@@ -4,7 +4,7 @@ namespace CitizenProposalApp;
 
 internal class Comment
 {
-    public int Id { get; set; }
+    public int Id { get; private set; }
     public required Post ParentPost { get; set; }
     public required User Author { get; set; }
 

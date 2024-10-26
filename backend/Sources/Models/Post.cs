@@ -5,7 +5,7 @@ namespace CitizenProposalApp;
 
 internal class Post
 {
-    public int Id { get; set; }
+    public int Id { get; private set; }
 
     [StringLength(100)]
     public required string Title { get; set; }
