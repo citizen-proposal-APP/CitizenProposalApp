@@ -24,12 +24,12 @@ internal class Program
         WebApplication app = builder.Build();
         if (app.Environment.IsProduction())
         {
-            app.UseDeveloperExceptionPage()
-                .UseHsts();
+            app.UseHsts();
         }
         if (app.Environment.IsDevelopment())
         {
-            app.EnsureMigration<CitizenProposalAppDbContext>();
+            app.UseDeveloperExceptionPage()
+                .EnsureMigration<CitizenProposalAppDbContext>();
         }
         app.UseHttpsRedirection();
         app.MapGet("/", () => "Hello World!");
