@@ -1,0 +1,5 @@
+.disperse {
+  text-align: justify;
+  text-justify: distribute-all-lines;
+  text-align-last: justify;
+}
