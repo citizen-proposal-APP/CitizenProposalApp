@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -12,6 +13,7 @@ internal class Post
 
     [StringLength(2000)]
     public required string Content { get; set; }
+    public DateTime PostedTime { get; set; }
     public required ICollection<Tag> Tags { get; set; }
     public required ICollection<Comment> Comments { get; set; }
 }
