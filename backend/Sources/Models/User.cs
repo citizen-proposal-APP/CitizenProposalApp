@@ -1,7 +1,9 @@
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace CitizenProposalApp;
 
+[Index(nameof(Username), IsUnique = true)]
 internal class User
 {
     public int Id { get; private set; }
