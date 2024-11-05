@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace CitizenProposalApp;
@@ -37,4 +38,7 @@ internal class User
     /// </summary>
     [MaxLength(64)]
     public required byte[] PasswordHash { get; set; }
+    public required ICollection<Post> Posts { get; set; }
+    public required ICollection<Session> Sessions { get; set; }
+    public required ICollection<Comment> Comments { get; set; }
 }

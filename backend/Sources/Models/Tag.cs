@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace CitizenProposalApp;
@@ -13,4 +14,5 @@ internal class Tag
     /// </summary>
     [StringLength(32)]
     public required string Name { get; init; }
+    public required ICollection<Post> Posts { get; set; }
 }
