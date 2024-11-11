@@ -28,8 +28,7 @@ internal class Program
         }
         if (app.Environment.IsDevelopment())
         {
-            app.UseDeveloperExceptionPage()
-                .EnsureMigration<CitizenProposalAppDbContext>();
+            app.UseDeveloperExceptionPage();
         }
         app.UseHttpsRedirection();
         app.MapGet("/", () => "Hello World!");
