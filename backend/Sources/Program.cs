@@ -1,7 +1,5 @@
 using System;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -18,9 +16,7 @@ internal class Program
                 options.MaxAge = TimeSpan.FromDays(365);
                 options.IncludeSubDomains = true;
             })
-            .AddDbContext<CitizenProposalAppDbContext>(options =>
-                options.UseMySql(builder.Configuration.GetConnectionString("CitizenProposalApp"), new MySqlServerVersion(new Version(8, 0, 36)))
-            );
+            .AddDbContext<CitizenProposalAppDbContext>();
         WebApplication app = builder.Build();
         if (app.Environment.IsProduction())
         {

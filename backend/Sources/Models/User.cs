@@ -7,7 +7,7 @@ namespace CitizenProposalApp;
 [Index(nameof(Username), IsUnique = true)]
 internal class User
 {
-    public int Id { get; private set; }
+    public int Id { get; init; }
 
     [StringLength(32)]
     public required string Username { get; set; }
