@@ -1,6 +1,6 @@
 import { Button, Code, Group, ScrollArea } from '@mantine/core';
-import { LinksGroup } from '@/components/NavbarLinksGroup/NavbarLinksGroup';
 import { links } from '@/data/links';
+import { LinksGroup } from './LinksGroup';
 import classes from './NavbarNested.module.css';
 
 export function NavbarNested() {
