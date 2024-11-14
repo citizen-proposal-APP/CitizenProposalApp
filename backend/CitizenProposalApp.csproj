@@ -25,4 +25,10 @@
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="DevelopmentCertificateDoNotUseForProduction.pfx">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
