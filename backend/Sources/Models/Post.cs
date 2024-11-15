@@ -16,4 +16,5 @@ internal class Post
     public DateTime PostedTime { get; set; }
     public required ICollection<Tag> Tags { get; set; }
     public required ICollection<Comment> Comments { get; set; }
+    public required User Author { get; set; }
 }

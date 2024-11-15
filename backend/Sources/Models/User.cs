@@ -38,6 +38,12 @@ internal class User
     /// </summary>
     [MaxLength(64)]
     public required byte[] PasswordHash { get; set; }
+
+    /// <summary>
+    /// If this is <see langword="false"/>, then all password and hashing related properties are ignored and any login attempt immediately fails.
+    /// </summary>
+    public bool Loginable { get; set; }
+
     public required ICollection<Post> Posts { get; set; }
     public required ICollection<Session> Sessions { get; set; }
     public required ICollection<Comment> Comments { get; set; }

@@ -25,6 +25,7 @@ internal class CitizenProposalAppDbContext(IConfiguration config) : DbContext
     {
         builder.Entity<Post>().HasData(DataSeeds.PostSeed);
         builder.Entity<Tag>().HasData(DataSeeds.TagSeed);
+        builder.Entity<User>().HasData(DataSeeds.UserSeed);
         builder.Entity("PostTag").HasData(DataSeeds.PostTagSeed);
     }
 }
