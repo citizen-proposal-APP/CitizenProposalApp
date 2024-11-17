@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CitizenProposalApp;
 
-internal class Comment
+public class Comment
 {
     public int Id { get; init; }
     public DateTime PostedTime { get; set; }

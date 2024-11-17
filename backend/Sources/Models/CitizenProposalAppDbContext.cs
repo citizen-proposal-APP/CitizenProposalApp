@@ -4,7 +4,7 @@ using System;
 
 namespace CitizenProposalApp;
 
-internal class CitizenProposalAppDbContext(IConfiguration config) : DbContext
+public class CitizenProposalAppDbContext(IConfiguration config) : DbContext
 {
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Post> Posts { get; set; }
@@ -12,20 +12,20 @@ internal class CitizenProposalAppDbContext(IConfiguration config) : DbContext
     public DbSet<Tag> Tags { get; set; }
     public DbSet<User> Users { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder builder)
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        if (builder.IsConfigured)
+        if (optionsBuilder.IsConfigured)
         {
             return;
         }
-        builder.UseMySql(config.GetConnectionString("CitizenProposalApp"), new MySqlServerVersion(new Version(8, 0, 36)));
+        optionsBuilder.UseMySql(config.GetConnectionString("CitizenProposalApp"), new MySqlServerVersion(new Version(8, 0, 36)));
     }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        builder.Entity<Post>().HasData(DataSeeds.PostSeed);
-        builder.Entity<Tag>().HasData(DataSeeds.TagSeed);
-        builder.Entity<User>().HasData(DataSeeds.UserSeed);
-        builder.Entity("PostTag").HasData(DataSeeds.PostTagSeed);
+        modelBuilder.Entity<Post>().HasData(DataSeeds.PostSeed);
+        modelBuilder.Entity<Tag>().HasData(DataSeeds.TagSeed);
+        modelBuilder.Entity<User>().HasData(DataSeeds.UserSeed);
+        modelBuilder.Entity("PostTag").HasData(DataSeeds.PostTagSeed);
     }
 }

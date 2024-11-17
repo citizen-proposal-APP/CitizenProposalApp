@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CitizenProposalApp;
 
-internal class Post
+public class Post
 {
     public int Id { get; init; }
 
@@ -14,7 +14,7 @@ internal class Post
     [StringLength(2000)]
     public required string Content { get; set; }
     public DateTime PostedTime { get; set; }
-    public required ICollection<Tag> Tags { get; set; }
-    public required ICollection<Comment> Comments { get; set; }
+    public required ICollection<Tag> Tags { get; init; }
+    public required ICollection<Comment> Comments { get; init; }
     public required User Author { get; set; }
 }

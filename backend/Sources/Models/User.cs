@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace CitizenProposalApp;
 
 [Index(nameof(Username), IsUnique = true)]
-internal class User
+public class User
 {
     public int Id { get; init; }
 
@@ -44,7 +44,7 @@ internal class User
     /// </summary>
     public bool Loginable { get; set; }
 
-    public required ICollection<Post> Posts { get; set; }
-    public required ICollection<Session> Sessions { get; set; }
-    public required ICollection<Comment> Comments { get; set; }
+    public required ICollection<Post> Posts { get; init; }
+    public required ICollection<Session> Sessions { get; init; }
+    public required ICollection<Comment> Comments { get; init; }
 }

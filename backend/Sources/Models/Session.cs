@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CitizenProposalApp;
 
-internal class Session
+public class Session
 {
     public int Id { get; init; }
     public required User User { get; set; }

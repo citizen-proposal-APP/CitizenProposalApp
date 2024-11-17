@@ -16,7 +16,10 @@ internal class Program
                 options.MaxAge = TimeSpan.FromDays(365);
                 options.IncludeSubDomains = true;
             })
-            .AddDbContext<CitizenProposalAppDbContext>();
+            .AddDbContext<CitizenProposalAppDbContext>()
+            .AddProblemDetails()
+            .AddAutoMapper(config => config.AddProfile<AutoMapperProfile>())
+            .AddControllers();
         WebApplication app = builder.Build();
         if (app.Environment.IsProduction())
         {
@@ -24,10 +27,13 @@ internal class Program
         }
         if (app.Environment.IsDevelopment())
         {
-            app.UseDeveloperExceptionPage();
+            app.UseDeveloperExceptionPage()
+                .AssertAutoMapperConfigurationIsValid();
         }
-        app.UseHttpsRedirection();
-        app.MapGet("/", () => "Hello World!");
+        app.UseStatusCodePages()
+            .UseHttpsRedirection();
+        app.MapControllers();
+        app.MapGet("/api", () => "Welcome to the Citizen Proposal App API!");
         app.Run();
     }
 }
