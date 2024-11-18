@@ -118,3 +118,7 @@ and debugging. In that case, follow these steps:
    <http://localhost> or <https://localhost>. If your app is running inside a
    container, however, you'll need to use <http://CitizenProposalApp> (HTTPS is
    not supported and not needed when connecting from a container).
+
+Note that `docker compose up` won't automatically rebuild images, unlike VS's
+container tools. If you have updated the source code of the backend and want to
+test it, be sure to supply the `--build` option to `docker compose up`.

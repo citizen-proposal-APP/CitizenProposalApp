@@ -5,8 +5,8 @@ services:
     networks:
       - citizen-proposal-app
     ports:
-      - 80:8080
-      - 443:8081
+      - 8080:8080
+      - 8081:8081
     environment:
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
