@@ -12,7 +12,7 @@ export const links = [
       { link: 'https://youtu.be/dQw4w9WgXcQ?si=5u9AE9FgJMvLcuZ3', label: '立山黑部' },
     ],
   },
-  { link: '/manual', label: '使用說明', icon: IconBook },
+  { link: '/Manual/Manual', label: '使用說明', icon: IconBook },
   {
     link: '#2',
     label: '關於',
