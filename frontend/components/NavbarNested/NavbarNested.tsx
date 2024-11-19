@@ -1,19 +1,33 @@
-import { Button, Code, Group, ScrollArea } from '@mantine/core';
+import { useState } from 'react';
+import { Button, Code, Group, ScrollArea, Modal } from '@mantine/core';
 import { LinksGroup } from '@/components/NavbarLinksGroup/NavbarLinksGroup';
 import { links } from '@/data/links';
+import { AuthenticationTitle } from '@/pages/Auth/SignIn/SignIn';
+import { SignUp } from '@/pages/Auth/SignUp/SignUp';
 import classes from './NavbarNested.module.css';
+import Link from 'next/link';
 
 export function NavbarNested() {
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false); // 狀態用於切換登入或註冊頁面
+
   const items = links.map((item) => <LinksGroup {...item} key={item.label} />);
 
-  // TODO change the header
+  // 打開登入或註冊 Modal，並設定模式
+  const openAuthModal = (signUp = false) => {
+    setIsSignUp(signUp);
+    setAuthModalOpen(true);
+  };
+
+  const toggleAuthPage = () => {
+    setIsSignUp((prev) => !prev);
+  };
+
   return (
     <>
       <div className={classes.header}>
         <Group justify="space-between">
           您尚未登入 您好！伊隆馬。
-          {/* <Logo size={30} /> */}
-          {/* <Logo style={{ width: rem(120) }} /> */}
           <Code fw={700}>v3.1.2</Code>
         </Group>
       </div>
@@ -23,12 +37,25 @@ export function NavbarNested() {
       </ScrollArea>
 
       <div className={classes.footer}>
-        {/* <Group justify="space-betweexn"> */}
-        <Button variant="default">Log in</Button>
-        <Button>Sign up</Button>
-        {/* <UserButton /> */}
-        {/* </Group> */}
+        <Button variant="default" onClick={() => openAuthModal(false)}>Log in</Button>
+        <Button onClick={() => openAuthModal(true)}>Sign up</Button>
       </div>
+
+      <Link href="/SiteMap/SiteMap" passHref>
+        <Button component="a" variant="outline">
+          網站導覽
+        </Button>
+      </Link>
+
+      {/* Modal 彈出介面，根據 isSignUp 狀態顯示不同內容 */}
+      <Modal
+        opened={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+
+      // title={isSignUp ? "Sign Up" : "Authentication"}
+      >
+        {isSignUp ? <SignUp onToggle={toggleAuthPage} /> : <AuthenticationTitle onToggle={toggleAuthPage} />} {/* 根據 isSignUp 顯示不同內容 */}
+      </Modal>
     </>
   );
 }
