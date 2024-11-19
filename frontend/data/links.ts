@@ -19,8 +19,8 @@ export const links = [
     icon: IconInfoCircle,
     links: [
       { link: '/FAQ/FAQ', label: '常見問題' },
-      { link: '/contact', label: '聯絡我們' },
-      { link: '/about_us', label: '關於我們' },
+      { link: '/ContactUs/ContactUs', label: '聯絡我們' },
+      { link: '/AboutUs/AboutUs', label: '關於我們' },
     ],
   },
 ];
