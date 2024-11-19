@@ -1,0 +1,55 @@
+/* 標題文字樣式 */
+.textAlignCenter {
+    text-align: center; /* 水平居中 */
+    font-size: 1.8rem; /* 標題字體大小 */
+    font-weight: bold; /* 加粗標題 */
+    color: #333; /* 深灰色文字 */
+}
+
+/* 輔助說明文字樣式 */
+.textAlignCenter.dimmed {
+    text-align: center;
+    font-size: 1rem;
+    color: #6c757d; /* 淡灰色，適合作為輔助文字 */
+}
+
+/* 折疊項目標題樣式 */
+.accordionLabel {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #4a90e2; /* 主色系，例如藍色 */
+    cursor: pointer; /* 滑鼠變成手型，表明可點擊 */
+    transition: color 0.3s ease;
+}
+
+.accordionLabel:hover {
+    color: #2a6fb0; /* 滑鼠懸停時變深色 */
+}
+
+/* 折疊面板文字樣式 */
+.accordionPanel {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.6; /* 行高增加，易於閱讀 */
+}
+
+/* 連結樣式 */
+.anchorLink {
+    color: #4a90e2; /* 藍色連結 */
+    text-decoration: none; /* 移除下劃線 */
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.anchorLink:hover {
+    color: #2a6fb0; /* 滑鼠懸停時變深色 */
+    text-decoration: underline; /* 加下劃線 */
+}
+
+/* 全局容器樣式 */
+.container {
+    padding: 20px;
+    background-color: #f9f9f9; /* 淡灰背景，讓頁面更有層次 */
+    border-radius: 8px; /* 圓角邊框 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 陰影效果 */
+}
