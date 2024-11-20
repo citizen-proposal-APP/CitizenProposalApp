@@ -200,9 +200,6 @@ csharp_preserve_single_line_statements = true
 # IDE0058: Expression value is never used
 dotnet_diagnostic.IDE0058.severity = silent
 
-# CS1591: Missing XML comment for publicly visible type or member
-dotnet_diagnostic.CS1591.severity = silent
-
 # CA1819: Properties should not return arrays
 dotnet_diagnostic.CA1819.severity = silent
 

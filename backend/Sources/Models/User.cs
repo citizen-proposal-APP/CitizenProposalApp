@@ -4,11 +4,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CitizenProposalApp;
 
+/// <summary>
+/// Represents a registered user in this app.
+/// </summary>
 [Index(nameof(Username), IsUnique = true)]
 public class User
 {
+    /// <summary>
+    /// The primary key.
+    /// </summary>
     public int Id { get; init; }
 
+    /// <summary>
+    /// The username.
+    /// </summary>
     [StringLength(32)]
     public required string Username { get; set; }
 
@@ -44,7 +53,18 @@ public class User
     /// </summary>
     public bool Loginable { get; set; }
 
+    /// <summary>
+    /// The <see cref="Post"/>s posted by this user.
+    /// </summary>
     public required ICollection<Post> Posts { get; init; }
+
+    /// <summary>
+    /// The <see cref="Session"/>s that authenticate this user.
+    /// </summary>
     public required ICollection<Session> Sessions { get; init; }
+
+    /// <summary>
+    /// The <see cref="Comment"/>s made by this user.
+    /// </summary>
     public required ICollection<Comment> Comments { get; init; }
 }

@@ -19,6 +19,7 @@ internal class Program
             .AddDbContext<CitizenProposalAppDbContext>()
             .AddProblemDetails()
             .AddAutoMapper(config => config.AddProfile<AutoMapperProfile>())
+            .AddOpenApiDocument()
             .AddControllers();
         WebApplication app = builder.Build();
         if (app.Environment.IsProduction())
@@ -31,7 +32,9 @@ internal class Program
                 .AssertAutoMapperConfigurationIsValid();
         }
         app.UseStatusCodePages()
-            .UseHttpsRedirection();
+            .UseHttpsRedirection()
+            .UseOpenApi()
+            .UseSwaggerUi();
         app.MapControllers();
         app.MapGet("/api", () => "Welcome to the Citizen Proposal App API!");
         app.Run();

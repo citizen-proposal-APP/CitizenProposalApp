@@ -1,11 +1,13 @@
 namespace CitizenProposalApp;
 
+/// <summary>
+/// Represents a tag that can be used to tag a post.
+/// </summary>
 public class TagDto
 {
+    /// <inheritdoc cref="Tag.Id"/>
     public int Id { get; init; }
 
-    /// <summary>
-    /// This property is <see langword="init"/>-only because it doesn't make sense for <see cref="Post"/>s with a <see cref="Tag"/> to change its <see cref="Name"/>.
-    /// </summary>
+    /// <inheritdoc cref="Tag.Name"/>
     public required string Name { get; init; }
 }
