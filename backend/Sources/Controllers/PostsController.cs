@@ -28,6 +28,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     {
         Post? post = context.Posts
             .Include(post => post.Tags)
+                .ThenInclude(tag => tag.TagType)
             .Include(post => post.Author)
             .FirstOrDefault(post => post.Id == id);
         if (post is null)

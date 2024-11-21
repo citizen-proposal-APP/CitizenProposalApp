@@ -8,6 +8,7 @@ internal class AutoMapperProfile : Profile
     {
         CreateMap<Post, PostDto>();
         CreateMap<User, UserDto>();
-        CreateMap<Tag, TagDto>();
+        CreateMap<Tag, TagDto>()
+            .ForMember(dest => dest.TagType, options => options.MapFrom(src => src.TagType.Name));
     }
 }
