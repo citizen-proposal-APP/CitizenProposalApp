@@ -6,7 +6,7 @@ export interface Proposal {
   id: number;
   status: string;
   title: string;
-  thumbnail: string; // base64
+  thumbnail: string; // url
   // content: string;
   postedTime: string;
   tags: Tag[];
