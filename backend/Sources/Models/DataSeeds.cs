@@ -1,4 +1,5 @@
 using System;
+using static CitizenProposalApp.TagTypeId;
 
 namespace CitizenProposalApp;
 
@@ -84,163 +85,203 @@ internal static class DataSeeds
     public static object[] TagSeed { get; } = [
         new {
             Id = 1,
-            Name = "農業資訊"
+            Name = "農業資訊",
+            TagTypeId = Topic
         },
         new {
             Id = 2,
-            Name = "價格透明化"
+            Name = "價格透明化",
+            TagTypeId = Topic
         },
         new {
             Id = 3,
-            Name = "農業政策"
+            Name = "農業政策",
+            TagTypeId = Topic
         },
         new {
             Id = 4,
-            Name = "交通部"
+            Name = "交通部",
+            TagTypeId = Department
         },
         new {
             Id = 5,
-            Name = "中小企業"
+            Name = "中小企業",
+            TagTypeId = Topic
         },
         new {
             Id = 6,
-            Name = "反壟斷"
+            Name = "反壟斷",
+            TagTypeId = Topic
         },
         new {
             Id = 7,
-            Name = "經濟多元化"
+            Name = "經濟多元化",
+            TagTypeId = Topic
         },
         new {
             Id = 8,
-            Name = "公平交易委員會"
+            Name = "公平交易委員會",
+            TagTypeId = Department
         },
         new {
             Id = 9,
-            Name = "老年人福利"
+            Name = "老年人福利",
+            TagTypeId = Topic
         },
         new {
             Id = 10,
-            Name = "醫療資源"
+            Name = "醫療資源",
+            TagTypeId = Topic
         },
         new {
             Id = 11,
-            Name = "健康管理"
+            Name = "健康管理",
+            TagTypeId = Topic
         },
         new {
             Id = 12,
-            Name = "衛生福利部"
+            Name = "衛生福利部",
+            TagTypeId = Department
         },
         new {
             Id = 13,
-            Name = "交通安全"
+            Name = "交通安全",
+            TagTypeId = Topic
         },
         new {
             Id = 14,
-            Name = "酒駕防治"
+            Name = "酒駕防治",
+            TagTypeId = Topic
         },
         new {
             Id = 15,
-            Name = "公共安全"
+            Name = "公共安全",
+            TagTypeId = Topic
         },
         new {
             Id = 16,
-            Name = "行政院主計總處"
+            Name = "行政院主計總處",
+            TagTypeId = Department
         },
         new {
             Id = 17,
-            Name = "文化創意"
+            Name = "文化創意",
+            TagTypeId = Topic
         },
         new {
             Id = 18,
-            Name = "經濟成長"
+            Name = "經濟成長",
+            TagTypeId = Topic
         },
         new {
             Id = 19,
-            Name = "國際市場"
+            Name = "國際市場",
+            TagTypeId = Topic
         },
         new {
             Id = 20,
-            Name = "文化部"
+            Name = "文化部",
+            TagTypeId = Department
         },
         new {
             Id = 21,
-            Name = "國防科技"
+            Name = "國防科技",
+            TagTypeId = Topic
         },
         new {
             Id = 22,
-            Name = "人才培育"
+            Name = "人才培育",
+            TagTypeId = Topic
         },
         new {
             Id = 23,
-            Name = "人工智慧"
+            Name = "人工智慧",
+            TagTypeId = Topic
         },
         new {
             Id = 24,
-            Name = "國防部"
+            Name = "國防部",
+            TagTypeId = Department
         },
         new {
             Id = 25,
-            Name = "無障礙設施"
+            Name = "無障礙設施",
+            TagTypeId = Topic
         },
         new {
             Id = 26,
-            Name = "公共建設"
+            Name = "公共建設",
+            TagTypeId = Topic
         },
         new {
             Id = 27,
-            Name = "包容性社會"
+            Name = "包容性社會",
+            TagTypeId = Topic
         },
         new {
             Id = 28,
-            Name = "內政部"
+            Name = "內政部",
+            TagTypeId = Department
         },
         new {
             Id = 29,
-            Name = "環境友善農業"
+            Name = "環境友善農業",
+            TagTypeId = Topic
         },
         new {
             Id = 30,
-            Name = "生態平衡"
+            Name = "生態平衡",
+            TagTypeId = Topic
         },
         new {
             Id = 31,
-            Name = "農業技術"
+            Name = "農業技術",
+            TagTypeId = Topic
         },
         new {
             Id = 32,
-            Name = "農業部"
+            Name = "農業部",
+            TagTypeId = Department
         },
         new {
             Id = 33,
-            Name = "數位政務"
+            Name = "數位政務",
+            TagTypeId = Topic
         },
         new {
             Id = 34,
-            Name = "資安防護"
+            Name = "資安防護",
+            TagTypeId = Topic
         },
         new {
             Id = 35,
-            Name = "個人資料保護"
+            Name = "個人資料保護",
+            TagTypeId = Topic
         },
         new {
             Id = 36,
-            Name = "國家通訊傳播委員會"
+            Name = "國家通訊傳播委員會",
+            TagTypeId = Department
         },
         new {
             Id = 37,
-            Name = "青少年心理健康"
+            Name = "青少年心理健康",
+            TagTypeId = Topic
         },
         new {
             Id = 38,
-            Name = "心理支持"
+            Name = "心理支持",
+            TagTypeId = Topic
         },
         new {
             Id = 39,
-            Name = "教育推廣"
+            Name = "教育推廣",
+            TagTypeId = Topic
         },
         new {
             Id = 40,
-            Name = "教育部"
+            Name = "教育部",
+            TagTypeId = Department
         }
     ];
 

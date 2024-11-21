@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Linq;
 
 namespace CitizenProposalApp;
 
@@ -36,6 +37,11 @@ public class CitizenProposalAppDbContext(IConfiguration config) : DbContext
     public DbSet<User> Users { get; set; }
 
     /// <summary>
+    /// Represents a table that contains all the available tag types a <see cref="Tag"/> can have.
+    /// </summary>
+    public DbSet<TagType> TagTypes { get; set; }
+
+    /// <summary>
     /// Used to configure EF Core to use MySQL with a connection string.
     /// </summary>
     /// <param name="optionsBuilder">The <see cref="DbContextOptionsBuilder"/> to configure.</param>
@@ -58,5 +64,13 @@ public class CitizenProposalAppDbContext(IConfiguration config) : DbContext
         modelBuilder.Entity<Tag>().HasData(DataSeeds.TagSeed);
         modelBuilder.Entity<User>().HasData(DataSeeds.UserSeed);
         modelBuilder.Entity("PostTag").HasData(DataSeeds.PostTagSeed);
+        modelBuilder.Entity<TagType>().HasData(
+            Enum.GetValues<TagTypeId>()
+                .Select(id => new TagType
+                {
+                    Id = id,
+                    Name = id.ToString().ToLowerInvariant()
+                })
+        );
     }
 }
