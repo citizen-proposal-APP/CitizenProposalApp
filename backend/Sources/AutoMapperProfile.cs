@@ -2,7 +2,7 @@ using AutoMapper;
 
 namespace CitizenProposalApp;
 
-internal class AutoMapperProfile : Profile
+internal sealed class AutoMapperProfile : Profile
 {
     public AutoMapperProfile()
     {

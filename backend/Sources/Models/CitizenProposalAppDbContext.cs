@@ -14,32 +14,32 @@ public class CitizenProposalAppDbContext(IConfiguration config) : DbContext
     /// <summary>
     /// Represents a table that stores all the comments of all the posts in the app.
     /// </summary>
-    public DbSet<Comment> Comments { get; set; }
+    public required DbSet<Comment> Comments { get; set; }
 
     /// <summary>
     /// Represents a table that stores all the posts in the app.
     /// </summary>
-    public DbSet<Post> Posts { get; set; }
+    public required DbSet<Post> Posts { get; set; }
 
     /// <summary>
     /// Represents a table that stores all the session tokens used to authenticate users.
     /// </summary>
-    public DbSet<Session> Sessions { get; set; }
+    public required DbSet<Session> Sessions { get; set; }
 
     /// <summary>
     /// Represents a table that stores all the tags that can be added to posts.
     /// </summary>
-    public DbSet<Tag> Tags { get; set; }
+    public required DbSet<Tag> Tags { get; set; }
 
     /// <summary>
     /// Represents a table that stores all user account related information.
     /// </summary>
-    public DbSet<User> Users { get; set; }
+    public required DbSet<User> Users { get; set; }
 
     /// <summary>
     /// Represents a table that contains all the available tag types a <see cref="Tag"/> can have.
     /// </summary>
-    public DbSet<TagType> TagTypes { get; set; }
+    public required DbSet<TagType> TagTypes { get; set; }
 
     /// <summary>
     /// Used to configure EF Core to use MySQL with a connection string.

@@ -209,6 +209,15 @@ dotnet_diagnostic.CA1062.severity = silent
 # CA1308: Normalize strings to uppercase
 dotnet_diagnostic.CA1308.severity = silent
 
+# CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.CA2007.severity = silent
+
+# CA1724: Type names should not match namespaces
+dotnet_diagnostic.CA1724.severity = silent
+
+# CA1515: Consider making public types internal
+dotnet_diagnostic.CA1515.severity = silent
+
 [*.{cs,vb}]
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 tab_width = 4
@@ -242,3 +251,6 @@ dotnet_style_qualification_for_method = false:suggestion
 dotnet_style_qualification_for_event = false:suggestion
 
 dotnet_code_quality.api_surface = all
+
+[Migrations/**]
+generated_code = true

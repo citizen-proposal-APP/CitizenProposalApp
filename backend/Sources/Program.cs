@@ -1,11 +1,12 @@
 using System;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace CitizenProposalApp;
 
-internal class Program
+internal sealed class Program
 {
     private static void Main(string[] args)
     {
@@ -20,7 +21,8 @@ internal class Program
             .AddProblemDetails()
             .AddAutoMapper(config => config.AddProfile<AutoMapperProfile>())
             .AddOpenApiDocument()
-            .AddControllers();
+            .AddControllers()
+            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         WebApplication app = builder.Build();
         if (app.Environment.IsProduction())
         {
