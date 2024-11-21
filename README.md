@@ -66,6 +66,7 @@ You should now be able to access the frontend at `localhost:80`.
 | ActionToggle | Color scheme toggle              |                                                                   |
 | HeaderMenu   | Desktop navigation               | This component should not be used directly. Use `Layout` instead. |
 | Layout       | Default layout structure         |                                                                   |
+| LinkCard     | External link                    | Use with `SimpleGrid` or `Container` is recommended.              |
 | Logo         | Logo of the application          |                                                                   |
 | NavbarNested | Mobile navigation                | This component should not be used directly. Use `Layout` instead. |
 | ProposalCard | Unified way to display proposals | Use with `SimpleGrid` or `Container` is recommended.              |
