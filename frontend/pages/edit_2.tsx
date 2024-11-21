@@ -149,7 +149,7 @@ export default function EditPage_2() {
               </Combobox>
               <Group justify="space-between" gap={"xl"} grow>
                 <Button variant="filled" size="lg" onClick={openSaveModal}>保留草稿</Button>
-                <Button variant="filled" size="lg" onClick={openSaveModal}>回上一步</Button>
+                <Button component="a" href="/edit_1" variant="filled" size="lg">回上一步</Button>
                 <Button variant="filled" size="lg" onClick={openPublishModal}>送出提案</Button>
               </Group>
             </Stack>

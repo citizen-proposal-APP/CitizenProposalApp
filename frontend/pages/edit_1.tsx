@@ -22,11 +22,11 @@ export default function EditPage_1() {
     true
   );
   const [fileValue, setFileValue] = useState<File[]>([]);
-  const [publishModalOpened, { open: openPublishModal, close: closePublishModal }] = useDisclosure(false);
+  const [nextStepModalOpened, { open: openNextStepModal, close: closeNextStepModal }] = useDisclosure(false);
   const [saveModalOpened, { open: openSaveModal, close: closeSaveModal }] = useDisclosure(false);
 
   const inputValidation = () =>
-		(titleValue.length > 0 && contentValue.length > 0 && titleValid && contentValid) ? openPublishModal() : invalidNotification()
+		(titleValue.length > 0 && contentValue.length > 0 && titleValid && contentValid) ? openNextStepModal() : invalidNotification()
 
   const invalidNotification = () => notifications.show({
 	  title: '無法送出',
@@ -40,11 +40,11 @@ export default function EditPage_1() {
       <MantineProvider>
         <Container>
           <Notifications position="top-right" zIndex={1000}/>
-          <Modal opened={publishModalOpened} onClose={closePublishModal} title="送出確認" centered>
-            <Text size="sm">確認送出提案？</Text>
+          <Modal opened={nextStepModalOpened} onClose={closeNextStepModal} title="完成確認" centered>
+            <Text size="sm">進行至下一步？</Text>
             <Group justify="flex-end" gap={"xl"}>
-              <Button variant="filled" size="sm">是</Button>
-              <Button variant="default" size="sm" onClick={closePublishModal}>否</Button>
+              <Button component="a" href="/edit_2" variant="filled" size="sm">是</Button>
+              <Button variant="default" size="sm" onClick={closeNextStepModal}>否</Button>
             </Group>
           </Modal>
           <Modal opened={saveModalOpened} onClose={closeSaveModal} title="保存成功" centered>
