@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
 
 namespace CitizenProposalApp;
@@ -9,24 +8,24 @@ namespace CitizenProposalApp;
 public record GetPostsQueryParameters
 {
     /// <summary>
-    /// The start index of the <see cref="Post"/> to get.
+    /// The start index of the <see cref="Post"/> to get. The default value is 0.
     /// </summary>
-    [BindRequired]
     [Range(0, int.MaxValue)]
-    public int Start { get; init; }
+    public int Start { get; init; } = 0;
 
     /// <summary>
-    /// How many <see cref="Post"/>s to get.
+    /// How many <see cref="Post"/>s to get. The default value is 10.
     /// </summary>
-    [BindRequired]
     [Range(0, int.MaxValue)]
-    public int Range { get; init; }
+    public int Range { get; init; } = 10;
 
     /// <summary>
-    /// How to order the queried <see cref="Post"/>s.
+    /// How to order the queried <see cref="Post"/>s. The default value is ById.
     /// </summary>
-    public PostSortKey SortBy { get; init; }
+    public PostSortKey SortBy { get; init; } = PostSortKey.ById;
 
-    /// <inheritdoc cref="CitizenProposalApp.SortDirection"/>
-    public SortDirection SortDirection { get; init; }
+    /// <summary>
+    /// Whether to sort ascendingly or descendingly. The default value is Ascending.
+    /// </summary>
+    public SortDirection SortDirection { get; init; } = SortDirection.Ascending;
 }
