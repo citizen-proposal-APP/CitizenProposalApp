@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -6,6 +7,7 @@ namespace CitizenProposalApp;
 /// <summary>
 /// Represents a session token that is used to authenticate a user.
 /// </summary>
+[Index(nameof(Token), IsUnique = true)]
 public class Session
 {
     /// <summary>
