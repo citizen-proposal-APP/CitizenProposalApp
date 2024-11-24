@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -38,7 +40,13 @@ internal sealed class Program
         app.UseStatusCodePages()
             .UseHttpsRedirection()
             .UseOpenApi()
-            .UseSwaggerUi();
+            .UseSwaggerUi()
+            .UseCookiePolicy(new()
+            {
+                HttpOnly = HttpOnlyPolicy.Always,
+                Secure = CookieSecurePolicy.Always,
+                MinimumSameSitePolicy = SameSiteMode.Strict
+            });
         app.MapControllers();
         app.MapGet("/api", () => "Welcome to the Citizen Proposal App API!");
         app.Run();

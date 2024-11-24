@@ -38,6 +38,13 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
             return Problem($"Username \"{registerRequest.Username}\" already exists.", statusCode: Status409Conflict);
         }
         using RandomNumberGenerator rng = RandomNumberGenerator.Create();
+        User newUser = await AddUser(registerRequest, rng);
+        await AddSession(newUser, rng);
+        return CreatedAtAction(nameof(GetUserById), new { id = newUser.Id }, null);
+    }
+
+    private async Task<User> AddUser(RegisterRequestDto registerRequest, RandomNumberGenerator rng)
+    {
         byte[] salt = new byte[64];
         rng.GetBytes(salt);
         using Argon2id argon2Id = new(Encoding.UTF8.GetBytes(registerRequest.Password))
@@ -63,7 +70,22 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
         };
         context.Users.Add(newUser);
         await context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetUserById), new { id = newUser.Id }, null);
+        return newUser;
+    }
+
+    private async Task AddSession(User user, RandomNumberGenerator rng)
+    {
+        byte[] sessionToken = new byte[64];
+        rng.GetBytes(sessionToken);
+        HttpContext.Response.Cookies.Append("session", Convert.ToBase64String(sessionToken));
+        Session newSession = new()
+        {
+            User = user,
+            Token = sessionToken,
+            ExpirationTime = timeProvider.GetUtcNow().AddDays(1)
+        };
+        context.Sessions.Add(newSession);
+        await context.SaveChangesAsync();
     }
 
     /// <summary>
