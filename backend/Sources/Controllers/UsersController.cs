@@ -70,17 +70,17 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
     /// Gets the info of a <see cref="User"/> using its ID.
     /// </summary>
     /// <param name="id">The ID of the user to query.</param>
-    /// <returns>A <see cref="UserDto"/> containing info about the user.</returns>
+    /// <returns>A <see cref="UserQueryDto"/> containing info about the user.</returns>
     [HttpGet("{id}")]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status404NotFound)]
-    public async Task<ActionResult<UserDto>> GetUserById(int id)
+    public async Task<ActionResult<UserQueryDto>> GetUserById(int id)
     {
         User? user = await context.Users.FirstOrDefaultAsync(user => user.Id == id);
         if (user is null)
         {
             return Problem($"No user with ID \"{id}\" exists.", statusCode: Status404NotFound);
         }
-        return mapper.Map<User, UserDto>(user);
+        return mapper.Map<User, UserQueryDto>(user);
     }
 }

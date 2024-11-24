@@ -3,28 +3,30 @@ using System.Collections.Generic;
 
 namespace CitizenProposalApp;
 
-/// <inheritdoc cref="Post"/>
-public class PostDto
+/// <summary>
+/// The DTO used as the response body of <see cref="Post"/> queries.
+/// </summary>
+public record PostQueryDto
 {
     /// <inheritdoc cref="Post.Id"/>
     public int Id { get; init; }
 
     /// <inheritdoc cref="Post.Title"/>
-    public required string Title { get; set; }
+    public required string Title { get; init; }
 
     /// <inheritdoc cref="Post.Content"/>
-    public required string Content { get; set; }
+    public required string Content { get; init; }
 
     /// <inheritdoc cref="Post.PostedTime"/>
-    public DateTimeOffset PostedTime { get; set; }
+    public DateTimeOffset PostedTime { get; init; }
 
     /// <summary>
     /// The tags on this post.
     /// </summary>
-    public required IList<TagDto> Tags { get; init; }
+    public required IList<TagQueryDto> Tags { get; init; }
 
     /// <summary>
     /// The user who made this post.
     /// </summary>
-    public required UserDto Author { get; set; }
+    public required UserQueryDto Author { get; init; }
 }

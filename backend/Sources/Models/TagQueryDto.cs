@@ -1,9 +1,9 @@
 namespace CitizenProposalApp;
 
 /// <summary>
-/// Represents a tag that can be used to tag a post.
+/// The DTO used as the response body of <see cref="Tag"/> queries.
 /// </summary>
-public class TagDto
+public record TagQueryDto
 {
     /// <inheritdoc cref="Tag.Id"/>
     public int Id { get; init; }
