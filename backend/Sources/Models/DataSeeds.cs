@@ -8,7 +8,7 @@ namespace CitizenProposalApp;
 /// </summary>
 internal static class DataSeeds
 {
-    private static readonly DateTime placeholderTime = new(2024, 6, 9, 4, 2, 0);
+    private static readonly DateTimeOffset placeholderTime = new(2024, 6, 9, 4, 2, 0, TimeSpan.Zero);
     public static object[] PostSeed { get; } = [
         new {
             Id = 1,

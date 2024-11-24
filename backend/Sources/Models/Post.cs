@@ -29,7 +29,7 @@ public class Post
     /// <summary>
     /// The date when this post was posted.
     /// </summary>
-    public DateTime PostedTime { get; set; }
+    public DateTimeOffset PostedTime { get; set; }
 
     /// <summary>
     /// The <see cref="Tag"/>s on this post.

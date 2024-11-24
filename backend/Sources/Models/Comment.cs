@@ -16,7 +16,7 @@ public class Comment
     /// <summary>
     /// The date when this comment was posted.
     /// </summary>
-    public DateTime PostedTime { get; set; }
+    public DateTimeOffset PostedTime { get; set; }
 
     /// <summary>
     /// The <see cref="Post"/> that this comment belongs to.

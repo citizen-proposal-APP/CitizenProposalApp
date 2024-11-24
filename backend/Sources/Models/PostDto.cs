@@ -16,7 +16,7 @@ public class PostDto
     public required string Content { get; set; }
 
     /// <inheritdoc cref="Post.PostedTime"/>
-    public DateTime PostedTime { get; set; }
+    public DateTimeOffset PostedTime { get; set; }
 
     /// <summary>
     /// The tags on this post.

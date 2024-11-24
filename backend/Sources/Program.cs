@@ -21,8 +21,10 @@ internal sealed class Program
             .AddProblemDetails()
             .AddAutoMapper(config => config.AddProfile<AutoMapperProfile>())
             .AddOpenApiDocument()
+            .AddSingleton(TimeProvider.System)
             .AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+        builder.Services.AddAuthentication().AddCookie();
         WebApplication app = builder.Build();
         if (app.Environment.IsProduction())
         {

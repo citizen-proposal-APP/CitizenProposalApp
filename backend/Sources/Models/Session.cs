@@ -29,5 +29,5 @@ public class Session
     /// <summary>
     /// The date after which <see cref="Token"/> is no longer valid.
     /// </summary>
-    public DateTime ExpirationTime { get; set; }
+    public DateTimeOffset ExpirationTime { get; set; }
 }
