@@ -77,12 +77,13 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
     {
         byte[] sessionToken = new byte[64];
         rng.GetBytes(sessionToken);
-        HttpContext.Response.Cookies.Append("session", Convert.ToBase64String(sessionToken));
+        DateTimeOffset expirationTime = timeProvider.GetUtcNow().AddDays(1);
+        HttpContext.Response.Cookies.Append("session", Convert.ToBase64String(sessionToken), new() { Expires = expirationTime });
         Session newSession = new()
         {
             User = user,
             Token = sessionToken,
-            ExpirationTime = timeProvider.GetUtcNow().AddDays(1)
+            ExpirationTime = expirationTime
         };
         context.Sessions.Add(newSession);
         await context.SaveChangesAsync();
