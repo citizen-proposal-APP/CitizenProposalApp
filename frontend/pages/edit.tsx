@@ -145,18 +145,15 @@ export default function EditPage() {
   ));
 
   const scrollAreaRef = useRef(null);
-  // 滾輪事件處理
   const handleWheel = (event: any) => {
-    event.preventDefault(); // 阻止垂直滾動的默認行為
+    event.preventDefault();
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollBy({
-        left: event.deltaY, // 使用垂直滾輪動量來控制橫向滾動
-        behavior: "smooth", // 平滑滾動
+        left: event.deltaY,
+        behavior: "smooth",
       });
     }
   };
-
-
 
   const options = tags
     .filter((item) => item.toLowerCase().includes(tagSearch.trim().toLowerCase()))
@@ -190,7 +187,7 @@ export default function EditPage() {
       <MantineProvider>
         <Container>
           <Group justify="space-between" gap={"xl"} >
-            <Stack w={(width - WIDTH_OFFSET) < 600 ? (width - WIDTH_OFFSET) : 600}>
+            <Stack>
               <Text fw={700} size="lg">輕鬆提案三步驟</Text>
               <Timeline title="輕鬆提案三步驟" active={timelineProgress} bulletSize={24} lineWidth={4}>
                 <Timeline.Item title="第一步：填寫資料">          
@@ -211,7 +208,7 @@ export default function EditPage() {
               </Timeline>
             </Stack>
             {onFirstStep &&
-            <Stack w={(width - WIDTH_OFFSET) < 600 ? (width - WIDTH_OFFSET) : 600} gap={"xl"}>
+            <Stack w={width < 990 ? (width - WIDTH_OFFSET) : 600} gap={"xl"}>
               <Textarea 
                 label="主題（必填）"
                 placeholder="請輸入主題，30字以內，必填" 
@@ -287,7 +284,7 @@ export default function EditPage() {
             </Stack>
             }
             {onSecondStep &&
-            <Stack w={(width - WIDTH_OFFSET) < 600 ? (width - WIDTH_OFFSET) : 600} gap={"xl"}>
+            <Stack w={width < 990 ? (width - WIDTH_OFFSET) : 600} gap={"xl"}>
               <Combobox store={combobox} onOptionSubmit={handleTagValueSelect}>
                 <Combobox.DropdownTarget>
                   <PillsInput onClick={() => combobox.openDropdown()} label="標籤選擇" radius={"lg"}>
@@ -327,8 +324,8 @@ export default function EditPage() {
                 style={{ width: "100%", overflowX: "auto" }}
                 scrollbarSize={8}
                 type="hover"
-                viewportRef={scrollAreaRef} // 將 ScrollArea 的可視區域綁定到 ref
-                onWheel={handleWheel} // 綁定滾輪事件
+                viewportRef={scrollAreaRef}
+                onWheel={handleWheel}
               >
                 <Group gap={"md"} style={{ display: "flex", flexWrap: "nowrap" }}>
                   {cardsData.map((card, index) => (
