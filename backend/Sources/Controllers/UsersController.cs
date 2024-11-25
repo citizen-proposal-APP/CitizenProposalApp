@@ -77,6 +77,31 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
         return NoContent();
     }
 
+    /// <summary>
+    /// Deletes the session cookie if it exists.
+    /// </summary>
+    /// <returns>Nothing if successful.</returns>
+    /// <response code="204">The session cookie has been deleted if it existed.</response>
+    [HttpDelete("logout")]
+    [ProducesResponseType(Status204NoContent)]
+    public async Task<NoContentResult> Logout()
+    {
+        string? sessionTokenString = HttpContext.Request.Cookies["session"];
+        if (sessionTokenString is null)
+        {
+            return NoContent();
+        }
+        byte[] originalToken = Convert.FromBase64String(sessionTokenString);
+        Session? sessionToRemove = context.Sessions.Where(session => session.Token.SequenceEqual(originalToken)).FirstOrDefault();
+        if (sessionToRemove is not null)
+        {
+            context.Sessions.Remove(sessionToRemove);
+            await context.SaveChangesAsync();
+        }
+        HttpContext.Response.Cookies.Append("session", "", new() { Expires = timeProvider.GetUtcNow().AddDays(-1) });
+        return NoContent();
+    }
+
     private static async Task<byte[]> HashPassword(string password, byte[] salt, int memorySize, int iterations, int degreeOfParallelism)
     {
         using Argon2id argon2Id = new(Encoding.UTF8.GetBytes(password))
@@ -116,7 +141,8 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
         byte[] sessionToken = new byte[64];
         rng.GetBytes(sessionToken);
         DateTimeOffset expirationTime = timeProvider.GetUtcNow().AddDays(1);
-        HttpContext.Response.Cookies.Append("session", Convert.ToBase64String(sessionToken), new() { Expires = expirationTime, Path = "/" });
+        // The default constructor of CookieOptions already sets the path to /
+        HttpContext.Response.Cookies.Append("session", Convert.ToBase64String(sessionToken), new() { Expires = expirationTime });
         Session newSession = new()
         {
             User = user,
