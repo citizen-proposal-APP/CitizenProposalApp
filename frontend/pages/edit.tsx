@@ -1,13 +1,13 @@
 import { Layout } from '@/components/Layout/Layout';
 import React, { useState, useRef } from 'react';
 import { IconUpload, IconX } from '@tabler/icons-react';
-import { Badge, Button, Card, CheckIcon, Combobox, Container, FileInput, Group, Image, MantineProvider, Modal, Pill, PillsInput, rem, ScrollArea, Stack, Text, Textarea, Timeline, useCombobox } from '@mantine/core';
+import { Badge, Button, Card, CheckIcon, Combobox, Container, FileInput, Grid, Group, Image, MantineProvider, Modal, Pill, PillsInput, rem, ScrollArea, Stack, Text, Textarea, Timeline, useCombobox } from '@mantine/core';
 import { useDisclosure, useValidatedState, useViewportSize } from '@mantine/hooks';
 import { Dropzone } from '@mantine/dropzone';
 import '@mantine/dropzone/styles.css';
 import { Notifications, notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
-
+import { IconPhoto, IconVideo } from '@tabler/icons-react';
 
 export default function EditPage() {
 	const [{ value: titleValue, valid: titleValid }, setTitleValue] = useValidatedState(
@@ -124,6 +124,18 @@ export default function EditPage() {
       message: '請依照要求填寫必填欄位!'
     })
   }
+  function uploadFile(newFiles:File[]) {
+    if (newFiles.length == 0) 
+    {
+      setFileValue(newFiles)
+      console.log('cleared files')
+    }
+    else
+    {
+      setFileValue(fileValue.concat(newFiles))
+      console.log('accepted files', newFiles)
+    }
+  }
 
 	const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -234,19 +246,20 @@ export default function EditPage() {
               <FileInput
                 label="上傳附件（支援圖片、影像格式）"
                 placeholder="選擇檔案或將檔案拖至此處（支援圖片、影像格式）"
-                accept="image/png,image/jpeg,video/mp4"
+                accept="image/png, image/gif, image/jpeg, image/svg+xml, image/webp, image/avif, image/heic, image/heif, video/mp4"
                 radius="lg"
                 clearable
                 multiple
                 value={fileValue} 
-                onChange={setFileValue}
+                onChange={uploadFile}
               />
               <Dropzone
-                onDrop={(files) => console.log('accepted files', files)}
+                onDrop={(files) => uploadFile(files)}
                 onReject={(files) => console.log('rejected files', files)}
                 maxSize={5 * 1024 ** 2}
                 accept={['image/png', 'image/gif', 'image/jpeg', 'image/svg+xml', 'image/webp', 'image/avif', 'image/heic', 'image/heif', 'video/mp4']}
               >
+                {fileValue.length == 0 &&
                 <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: 'none' }}>
                   <Dropzone.Accept>
                     <IconUpload
@@ -269,13 +282,44 @@ export default function EditPage() {
 
                   <div>
                     <Text size="xl" inline>
-                      Drag images here or click to select files
+                      將圖片/影像檔拖至此處或點擊以選取檔案
                     </Text>
                     <Text size="sm" c="dimmed" inline mt={7}>
-                      Attach as many files as you like, each file should not exceed 5mb
+                      檔案總數不限，每份檔案大小不應超過5mb
+                    </Text>
+                    <Text size="sm" c="dimmed" inline mt={7}>
+                      可接受png/gif/jpeg/svg/xml/webp/avif/heic/heif/mp4等格式
                     </Text>
                   </div>
                 </Group>
+                }
+                {(fileValue.length != 0) &&
+                <Grid gutter="md">
+                  {fileValue.map((file, index) => (
+                    <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
+                      <Stack justify="center">
+                        {file.type != "video/mp4" &&
+                        <IconPhoto
+                          style={{ width: rem(80), height: rem(80) }}
+                          stroke={1.5}
+                          color="var(--mantine-color-blue-filled)"
+                        />
+                        }
+                        {file.type == "video/mp4" &&
+                        <IconVideo
+                          style={{ width: rem(80), height: rem(80) }}
+                          stroke={1.5}
+                          color="var(--mantine-color-blue-filled)"
+                        />
+                        }
+                        <Text>
+                          {file.name}
+                        </Text>
+                      </Stack>
+                    </Grid.Col>
+                  ))}
+                </Grid>
+                }
               </Dropzone>
               <Group justify="space-between" gap={"xl"} grow>
                 <Button variant="filled" size="lg" onClick={openSaveModal}>保留草稿</Button>
