@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using static Microsoft.AspNetCore.Http.StatusCodes;
 using static CitizenProposalApp.SortDirection;
 using static CitizenProposalApp.PostSortKey;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.Globalization;
 
 namespace CitizenProposalApp;
 
@@ -17,8 +20,9 @@ namespace CitizenProposalApp;
 /// </summary>
 /// <param name="context">The injected <see cref="CitizenProposalAppDbContext"/>.</param>
 /// <param name="mapper">The AutoMapper mapper.</param>
+/// <param name="timeProvider">A <see cref="TimeProvider"/> that will be used to provide the current UTC time.</param>
 [Route("api/[controller]")]
-public class PostsController(CitizenProposalAppDbContext context, IMapper mapper) : ControllerBase
+public class PostsController(CitizenProposalAppDbContext context, IMapper mapper, TimeProvider timeProvider) : ControllerBase
 {
     /// <summary>
     /// Quries a post by its ID.
@@ -26,9 +30,11 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     /// <param name="id">The ID of the post to query.</param>
     /// <returns>A <see cref="PostQueryDto"/> instance that contains the content, tags, and author of the queried post.</returns>
     /// <response code="200">A post with the specified ID.</response>
+    /// <response code="400">The provided ID is not a valid integer.</response>
     /// <response code="404">No post with the specified ID exists.</response>
     [HttpGet("{id}")]
     [ProducesResponseType(Status200OK)]
+    [ProducesResponseType(Status400BadRequest)]
     [ProducesResponseType(Status404NotFound)]
     public async Task<ActionResult<PostQueryDto>> GetPostById(int id)
     {
@@ -73,5 +79,47 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
             _ => throw new NotImplementedException("Impossible situation")
         };
         return Ok(mapper.Map<IEnumerable<Post>, IEnumerable<PostQueryDto>>(await sortedPosts.Skip(parameters.Start).Take(parameters.Range).ToListAsync()));
+    }
+
+    /// <summary>
+    /// Submits a new <see cref="Post"/>.
+    /// </summary>
+    /// <param name="post">The post to submit.</param>
+    /// <returns>Nothing if successful.</returns>
+    /// <response code="201">The new post has been successfully created.</response>
+    /// <response code="400">The request body is malformed or lacks required fields, or the logged-in user's account has been deleted.</response>
+    /// <response code="401">The user has not logged in.</response>
+    /// <response code="500">Something went wrong with the authentication process.</response>
+    [HttpPost]
+    [ProducesResponseType(Status201Created)]
+    [ProducesResponseType(Status400BadRequest)]
+    [ProducesResponseType(Status401Unauthorized)]
+    [ProducesResponseType(Status500InternalServerError)]
+    [Authorize]
+    public async Task<IActionResult> AddPost([FromForm] PostSubmissionDto post)
+    {
+        Claim? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim is null)
+        {
+            return Problem("Something went wrong with the authentication process.", statusCode: Status500InternalServerError);
+        }
+        User? author = await context.Users.FindAsync(int.Parse(userIdClaim.Value, CultureInfo.InvariantCulture));
+        if (author is null)
+        {
+            return Problem("The account of the currently logged in user has been deleted.", statusCode: Status400BadRequest);
+        }
+        ICollection<Tag> tags = await context.Tags.Where(tag => post.Tags.Contains(tag.Name)).ToListAsync();
+        Post newPost = new()
+        {
+            Author = author,
+            Comments = [],
+            Content = post.Content,
+            PostedTime = timeProvider.GetUtcNow(),
+            Tags = tags,
+            Title = post.Title
+        };
+        context.Posts.Add(newPost);
+        await context.SaveChangesAsync();
+        return CreatedAtAction(nameof(GetPostById), new { id = newPost.Id }, null);
     }
 }

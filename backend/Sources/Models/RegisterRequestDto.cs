@@ -11,7 +11,6 @@ public record RegisterRequestDto
     /// <summary>
     /// The username to use.
     /// </summary>
-    [MinLength(1)]
     [MaxLength(32)]
     [BindRequired]
     public required string Username { get; init; }
@@ -19,7 +18,6 @@ public record RegisterRequestDto
     /// <summary>
     /// The password to use.
     /// </summary>
-    [MinLength(1)]
     [BindRequired]
     public required string Password { get; init; }
 }

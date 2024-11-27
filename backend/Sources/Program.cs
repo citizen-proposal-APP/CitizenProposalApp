@@ -26,7 +26,7 @@ internal sealed class Program
             .AddSingleton(TimeProvider.System)
             .AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-        builder.Services.AddAuthentication().AddCookie();
+        builder.Services.AddAuthentication().AddScheme<SessionTokenAuthenticationHandlerOptions, SessionTokenAuthenticationHandler>("session", "Session token authentication handler", null);
         WebApplication app = builder.Build();
         if (app.Environment.IsProduction())
         {
