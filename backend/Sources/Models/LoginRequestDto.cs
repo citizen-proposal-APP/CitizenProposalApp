@@ -6,7 +6,7 @@ namespace CitizenProposalApp;
 /// <summary>
 /// The request body used for logging in.
 /// </summary>
-public record LoginrRequestDto
+public record LoginRequestDto
 {
     /// <summary>
     /// The username to use.

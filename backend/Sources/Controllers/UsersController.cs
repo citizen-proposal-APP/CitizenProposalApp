@@ -60,7 +60,7 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
     [ProducesResponseType(Status204NoContent)]
     [ProducesResponseType(Status400BadRequest)]
     [ProducesResponseType(Status401Unauthorized)]
-    public async Task<IActionResult> Login([FromForm] LoginrRequestDto loginrRequest)
+    public async Task<IActionResult> Login([FromForm] LoginRequestDto loginrRequest)
     {
         User? user = await context.Users.FirstOrDefaultAsync(user => user.Username == loginrRequest.Username);
         if (user == null)
