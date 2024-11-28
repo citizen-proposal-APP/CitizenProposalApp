@@ -15,6 +15,6 @@ public class TagType
     /// <summary>
     /// The name of the tag type.
     /// </summary>
-    [StringLength(32)]
+    [MaxLength(32)]
     public required string Name { get; init; }
 }

@@ -17,13 +17,13 @@ public class Post
     /// <summary>
     /// The title of this post.
     /// </summary>
-    [StringLength(100)]
+    [MaxLength(100)]
     public required string Title { get; set; }
 
     /// <summary>
     /// The text of this post.
     /// </summary>
-    [StringLength(2000)]
+    [MaxLength(2000)]
     public required string Content { get; set; }
 
     /// <summary>

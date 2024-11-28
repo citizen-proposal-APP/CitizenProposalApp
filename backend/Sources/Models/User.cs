@@ -18,7 +18,7 @@ public class User
     /// <summary>
     /// The username.
     /// </summary>
-    [StringLength(32)]
+    [MaxLength(32)]
     public required string Username { get; set; }
 
     /// <summary>

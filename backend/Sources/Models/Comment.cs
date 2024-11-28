@@ -31,6 +31,6 @@ public class Comment
     /// <summary>
     /// The text of this comment.
     /// </summary>
-    [StringLength(200)]
+    [MaxLength(200)]
     public required string Content { get; set; }
 }

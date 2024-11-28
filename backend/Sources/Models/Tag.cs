@@ -18,7 +18,7 @@ public class Tag
     /// <summary>
     /// The name of this tag.
     /// </summary>
-    [StringLength(32)]
+    [MaxLength(32)]
     public required string Name { get; init; }
 
     /// <summary>
