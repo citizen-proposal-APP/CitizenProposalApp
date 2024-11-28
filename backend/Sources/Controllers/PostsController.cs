@@ -87,8 +87,8 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     /// <param name="post">The post to submit.</param>
     /// <returns>Nothing if successful.</returns>
     /// <response code="201">The new post has been successfully created.</response>
-    /// <response code="400">The request body is malformed or lacks required fields, or the logged-in user's account has been deleted.</response>
-    /// <response code="401">The user has not logged in.</response>
+    /// <response code="400">The request body is malformed or lacks required fields.</response>
+    /// <response code="401">The user has not logged in, the logged-in user's account has been deleted, or the session has expired.</response>
     /// <response code="500">Something went wrong with the authentication process.</response>
     [HttpPost]
     [ProducesResponseType(Status201Created)]
@@ -104,9 +104,10 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
             return Problem("Something went wrong with the authentication process.", statusCode: Status500InternalServerError);
         }
         User? author = await context.Users.FindAsync(int.Parse(userIdClaim.Value, CultureInfo.InvariantCulture));
+        // Handles the possible race condition where the account has been deleted after the authentication and before this line.
         if (author is null)
         {
-            return Problem("The account of the currently logged in user has been deleted.", statusCode: Status400BadRequest);
+            return Problem("The account of the currently logged in user has been deleted.", statusCode: Status401Unauthorized);
         }
         ICollection<Tag> tags = await context.Tags.Where(tag => post.Tags.Contains(tag.Name)).ToListAsync();
         Post newPost = new()
