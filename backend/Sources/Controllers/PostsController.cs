@@ -96,7 +96,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status500InternalServerError)]
     [Authorize]
-    public async Task<IActionResult> AddPost([FromForm] PostSubmissionDto post)
+    public async Task<IActionResult> AddPost(PostSubmissionDto post)
     {
         Claim? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (userIdClaim is null)
@@ -109,6 +109,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         {
             return Problem("The account of the currently logged in user has been deleted.", statusCode: Status401Unauthorized);
         }
+        await AddMissingTagsToDb(post.Tags);
         ICollection<Tag> tags = await context.Tags.Where(tag => post.Tags.Contains(tag.Name)).ToListAsync();
         Post newPost = new()
         {
@@ -122,5 +123,16 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         context.Posts.Add(newPost);
         await context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetPostById), new { id = newPost.Id }, null);
+    }
+
+    private async Task AddMissingTagsToDb(ICollection<string> tagsToAddToNewPost)
+    {
+        IEnumerable<string> existingTagNames = context.Tags.Where(tag => tagsToAddToNewPost.Contains(tag.Name)).Select(tag => tag.Name);
+        IEnumerable<string> missingTagNames = tagsToAddToNewPost.Except(existingTagNames);
+        TagType topicTagType = new() { Id = TagTypeId.Topic, Name = "topic" };
+        context.TagTypes.Attach(topicTagType);
+        IEnumerable<Tag> newTags = missingTagNames.Select(missingTagName => new Tag { Name = missingTagName, Posts = [], TagType = topicTagType });
+        await context.Tags.AddRangeAsync(newTags);
+        await context.SaveChangesAsync();
     }
 }

@@ -26,5 +26,6 @@ public record PostSubmissionDto
     /// <summary>
     /// The names of the <see cref="Tag"/>s to use.
     /// </summary>
+    [ElementMaxLength(32)]
     public required ICollection<string> Tags { get; init; }
 }

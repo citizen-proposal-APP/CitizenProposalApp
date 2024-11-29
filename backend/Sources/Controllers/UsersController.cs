@@ -67,7 +67,7 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
         {
             return Problem("The username or password is incorrect.", statusCode: Status401Unauthorized);
         }
-        byte[] passwordHash = await HashPassword(loginrRequest.Password, user.Salt, hashingMemorySizeKib, hashingIterations, hashingDegreeOfParallelism);
+        byte[] passwordHash = await HashPassword(loginrRequest.Password, user.Salt, user.MemorySizeKib, user.IterationCount, user.DegreeOfParallelism);
         if (!passwordHash.SequenceEqual(user.PasswordHash))
         {
             return Problem("The username or password is incorrect.", statusCode: Status401Unauthorized);
@@ -123,9 +123,9 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
             Username = registerRequest.Username,
             PasswordHash = await HashPassword(registerRequest.Password, salt, hashingMemorySizeKib, hashingIterations, hashingDegreeOfParallelism),
             Salt = salt,
-            MemorySizeKib = 19 * 1024,
-            IterationCount = 2,
-            DegreeOfParallelism = 1,
+            MemorySizeKib = hashingMemorySizeKib,
+            IterationCount = hashingIterations,
+            DegreeOfParallelism = hashingDegreeOfParallelism,
             Loginable = true,
             Posts = [],
             Sessions = [],
