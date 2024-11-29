@@ -3,7 +3,7 @@ namespace CitizenProposalApp;
 /// <summary>
 /// The DTO used as the response body of <see cref="User"/> queries.
 /// </summary>
-public class UserQueryDto
+public class UserQueryResponseDto
 {
     /// <inheritdoc cref="User.Id"/>
     public int Id { get; init; }

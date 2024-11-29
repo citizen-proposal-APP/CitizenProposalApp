@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 namespace CitizenProposalApp;
 
 /// <summary>
-/// Used for query parameter validation purposes with <see cref="PostsController.GetPostsByParameters(GetPostsQueryParameters)"/>.
+/// Used for query parameter validation purposes with <see cref="PostsController.GetPostsByParameters(PostQueryRequestDto)"/>.
 /// </summary>
-public record GetPostsQueryParameters
+public record PostQueryRequestDto
 {
     /// <summary>
     /// The start index of the <see cref="Post"/> to get. The default value is 0.

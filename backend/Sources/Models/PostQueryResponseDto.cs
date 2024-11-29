@@ -6,7 +6,7 @@ namespace CitizenProposalApp;
 /// <summary>
 /// The DTO used as the response body of <see cref="Post"/> queries.
 /// </summary>
-public record PostQueryDto
+public record PostQueryResponseDto
 {
     /// <inheritdoc cref="Post.Id"/>
     public int Id { get; init; }
@@ -23,10 +23,10 @@ public record PostQueryDto
     /// <summary>
     /// The tags on this post.
     /// </summary>
-    public required IList<TagQueryDto> Tags { get; init; }
+    public required IList<TagQueryResponseDto> Tags { get; init; }
 
     /// <summary>
     /// The user who made this post.
     /// </summary>
-    public required UserQueryDto Author { get; init; }
+    public required UserQueryResponseDto Author { get; init; }
 }
