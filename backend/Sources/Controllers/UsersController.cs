@@ -51,7 +51,7 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
     /// <summary>
     /// Logs in using a username and a password.
     /// </summary>
-    /// <param name="loginrRequest">Contains the username and password to log in with.</param>
+    /// <param name="loginRequest">Contains the username and password to log in with.</param>
     /// <returns>Nothing if successful.</returns>
     /// <response code="204">Successfully logged in.</response>
     /// <response code="400">The request body is malformed or lacks required fields.</response>
@@ -60,14 +60,14 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
     [ProducesResponseType(Status204NoContent)]
     [ProducesResponseType(Status400BadRequest)]
     [ProducesResponseType(Status401Unauthorized)]
-    public async Task<IActionResult> Login([FromForm] LoginRequestDto loginrRequest)
+    public async Task<IActionResult> Login([FromForm] LoginRequestDto loginRequest)
     {
-        User? user = await context.Users.FirstOrDefaultAsync(user => user.Username == loginrRequest.Username);
+        User? user = await context.Users.FirstOrDefaultAsync(user => user.Username == loginRequest.Username);
         if (user == null)
         {
             return Problem("The username or password is incorrect.", statusCode: Status401Unauthorized);
         }
-        byte[] passwordHash = await HashPassword(loginrRequest.Password, user.Salt, user.MemorySizeKib, user.IterationCount, user.DegreeOfParallelism);
+        byte[] passwordHash = await HashPassword(loginRequest.Password, user.Salt, user.MemorySizeKib, user.IterationCount, user.DegreeOfParallelism);
         if (!passwordHash.SequenceEqual(user.PasswordHash))
         {
             return Problem("The username or password is incorrect.", statusCode: Status401Unauthorized);
