@@ -1,7 +1,7 @@
 namespace CitizenProposalApp;
 
 /// <summary>
-/// The DTO used as the response body of <see cref="Tag"/> queries.
+/// The DTO used as the response body of tag queries.
 /// </summary>
 public record TagQueryResponseDto
 {

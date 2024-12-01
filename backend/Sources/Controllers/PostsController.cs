@@ -28,7 +28,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     /// Quries a post by its ID.
     /// </summary>
     /// <param name="id">The ID of the post to query.</param>
-    /// <returns>A <see cref="PostQueryResponseDto"/> instance that contains the content, tags, and author of the queried post.</returns>
+    /// <returns>A <see cref="PostQueryResponsePostDto"/> instance that contains the content, tags, and author of the queried post.</returns>
     /// <response code="200">A post with the specified ID.</response>
     /// <response code="400">The provided ID is not a valid integer.</response>
     /// <response code="404">No post with the specified ID exists.</response>
@@ -36,7 +36,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status400BadRequest)]
     [ProducesResponseType(Status404NotFound)]
-    public async Task<ActionResult<PostQueryResponseDto>> GetPostById(int id)
+    public async Task<ActionResult<PostQueryResponsePostDto>> GetPostById(int id)
     {
         Post? post = await context.Posts
             .Include(post => post.Tags)
@@ -47,20 +47,20 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         {
             return Problem($"No post with the ID {id} exists.", statusCode: Status404NotFound);
         }
-        return mapper.Map<Post, PostQueryResponseDto>(post);
+        return mapper.Map<Post, PostQueryResponsePostDto>(post);
     }
 
     /// <summary>
     /// Queries posts by various query parameters.
     /// </summary>
-    /// <param name="parameters">Contains the conditions about which <see cref="Post"/>s to query.</param>
-    /// <returns>The <see cref="Post"/>s that meet the conditions speficied by <paramref name="parameters"/>.</returns>
-    /// <response code="200">An array of posts that satisify the given parameters. The array can be empty if no post satisfy the given parameters.</response>
+    /// <param name="parameters">Contains the conditions about which posts to query.</param>
+    /// <returns>The posts that meet the conditions speficied by <paramref name="parameters"/>.</returns>
+    /// <response code="200">An object that contains the total number of posts in the database and an array of posts that satisify the given parameters. The array can be empty if no post satisfy the given parameters.</response>
     /// <response code="400">The query parameters are malformed.</response>
     [HttpGet]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType(Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<PostQueryResponseDto>>> GetPostsByParameters([FromQuery] PostQueryRequestDto parameters)
+    public async Task<ActionResult<PostQueryResponseDto>> GetPostsByParameters([FromQuery] PostQueryRequestDto parameters)
     {
         if (!Enum.IsDefined(parameters.SortDirection) || !Enum.IsDefined(parameters.SortBy))
         {
@@ -78,11 +78,16 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
             (Descending, ByDate) => unsortedPosts.OrderByDescending(post => post.PostedTime).ThenByDescending(post => post.Id),
             _ => throw new NotImplementedException("Impossible situation")
         };
-        return Ok(mapper.Map<IEnumerable<Post>, IEnumerable<PostQueryResponseDto>>(await sortedPosts.Skip(parameters.Start).Take(parameters.Range).ToListAsync()));
+        PostQueryResponseDto result = new()
+        {
+            Count = await context.Posts.CountAsync(),
+            Posts = mapper.Map<IEnumerable<Post>, IEnumerable<PostQueryResponsePostDto>>(await sortedPosts.Skip(parameters.Start).Take(parameters.Range).ToListAsync())
+        };
+        return Ok(result);
     }
 
     /// <summary>
-    /// Submits a new <see cref="Post"/>.
+    /// Submits a new post. Tags that were not known by the DB are automatically added to it as "topic" tags.
     /// </summary>
     /// <param name="post">The post to submit.</param>
     /// <returns>Nothing if successful.</returns>

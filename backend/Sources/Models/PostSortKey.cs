@@ -1,7 +1,7 @@
 namespace CitizenProposalApp;
 
 /// <summary>
-/// What key to sort <see cref="Post"/>s with when querying multiple <see cref="Post"/>s.
+/// What key to sort posts with when querying multiple posts.
 /// </summary>
 public enum PostSortKey
 {

@@ -8,19 +8,19 @@ namespace CitizenProposalApp;
 public record PostQueryRequestDto
 {
     /// <summary>
-    /// The start index of the <see cref="Post"/> to get. The default value is 0.
+    /// The start index of the post to get. The default value is 0.
     /// </summary>
     [Range(0, int.MaxValue)]
     public int Start { get; init; } = 0;
 
     /// <summary>
-    /// How many <see cref="Post"/>s to get. The default value is 10.
+    /// How many posts to get. The default value is 10.
     /// </summary>
     [Range(0, int.MaxValue)]
     public int Range { get; init; } = 10;
 
     /// <summary>
-    /// How to order the queried <see cref="Post"/>s. The default value is ById.
+    /// How to order the queried posts. The default value is ById.
     /// </summary>
     public PostSortKey SortBy { get; init; } = PostSortKey.ById;
 

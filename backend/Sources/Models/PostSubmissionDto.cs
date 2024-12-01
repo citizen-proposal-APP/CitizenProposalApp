@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,22 +11,27 @@ namespace CitizenProposalApp;
 public record PostSubmissionDto
 {
     /// <summary>
-    /// The title of the new <see cref="Post"/>.
+    /// The title of the new post.
     /// </summary>
     [MaxLength(100)]
     [BindRequired]
     public required string Title { get; init; }
 
     /// <summary>
-    /// The content of the new <see cref="Post"/>.
+    /// The content of the new post.
     /// </summary>
     [MaxLength(2000)]
     [BindRequired]
     public required string Content { get; init; }
 
     /// <summary>
-    /// The names of the <see cref="Tag"/>s to use.
+    /// The names of the tags to use.
     /// </summary>
     [ElementMaxLength(32)]
     public required ICollection<string> Tags { get; init; }
+
+    /// <summary>
+    /// The files to add as attachments.
+    /// </summary>
+    public IFormFileCollection? Attachments { get; init; }
 }

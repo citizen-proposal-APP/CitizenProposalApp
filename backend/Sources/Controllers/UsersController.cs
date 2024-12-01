@@ -25,7 +25,7 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
     private const int hashingDegreeOfParallelism = 1;
 
     /// <summary>
-    /// Registers a new <see cref="User"/>. If the registration is successful, also logs in the just-registered <see cref="User"/>.
+    /// Registers a new user. If the registration is successful, also logs in the just-registered user.
     /// </summary>
     /// <param name="registerRequest">Contains the username and password to use.</param>
     /// <returns>Nothing if successful.</returns>
@@ -154,7 +154,7 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
     }
 
     /// <summary>
-    /// Gets the info of a <see cref="User"/> using its ID.
+    /// Gets the info of a user using its ID.
     /// </summary>
     /// <param name="id">The ID of the user to query.</param>
     /// <returns>A <see cref="UserQueryResponseDto"/> containing info about the user.</returns>
