@@ -22,7 +22,7 @@ internal sealed class Program
             .AddDbContext<CitizenProposalAppDbContext>()
             .AddProblemDetails()
             .AddAutoMapper(config => config.AddProfile<AutoMapperProfile>())
-            .AddOpenApiDocument()
+            .AddOpenApiDocument(options => options.Title = "Citizen Proposal App")
             .AddSingleton(TimeProvider.System)
             .AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));

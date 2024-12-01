@@ -96,7 +96,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     [ProducesResponseType(Status401Unauthorized)]
     [ProducesResponseType(Status500InternalServerError)]
     [Authorize]
-    public async Task<IActionResult> AddPost(PostSubmissionDto post)
+    public async Task<IActionResult> AddPost([FromForm] PostSubmissionDto post)
     {
         Claim? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (userIdClaim is null)
@@ -109,8 +109,12 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         {
             return Problem("The account of the currently logged in user has been deleted.", statusCode: Status401Unauthorized);
         }
-        await AddMissingTagsToDb(post.Tags);
-        ICollection<Tag> tags = await context.Tags.Where(tag => post.Tags.Contains(tag.Name)).ToListAsync();
+        // This is a compatibility fix for a bug in Swagger UI where if you use OpenAPI 3, arrays sent as form fields are sent as comma-separated lists instead of one element per field.
+        // https://github.com/swagger-api/swagger-ui/issues/10221
+        IEnumerable<string> tagsString = post.Tags.SelectMany(tag => tag.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+        await AddMissingTagsToDb(tagsString);
+        // Since AddMissingTagsToDb never adds duplicate tags to the DB, this part will also not have duplicate tags.
+        ICollection<Tag> tags = await context.Tags.Where(tag => tagsString.Contains(tag.Name)).ToListAsync();
         Post newPost = new()
         {
             Author = author,
@@ -125,9 +129,10 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         return CreatedAtAction(nameof(GetPostById), new { id = newPost.Id }, null);
     }
 
-    private async Task AddMissingTagsToDb(ICollection<string> tagsToAddToNewPost)
+    private async Task AddMissingTagsToDb(IEnumerable<string> tagsToAddToNewPost)
     {
         IEnumerable<string> existingTagNames = context.Tags.Where(tag => tagsToAddToNewPost.Contains(tag.Name)).Select(tag => tag.Name);
+        // Except only returns unique elements, so we will never add duplicate tags.
         IEnumerable<string> missingTagNames = tagsToAddToNewPost.Except(existingTagNames);
         TagType topicTagType = new() { Id = TagTypeId.Topic, Name = "topic" };
         context.TagTypes.Attach(topicTagType);
