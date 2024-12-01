@@ -6,7 +6,7 @@ namespace CitizenProposalApp;
 public record TagQueryResponseDto
 {
     /// <inheritdoc cref="Tag.Id"/>
-    public int Id { get; init; }
+    public required int Id { get; init; }
 
     /// <inheritdoc cref="Tag.Name"/>
     public required string Name { get; init; }

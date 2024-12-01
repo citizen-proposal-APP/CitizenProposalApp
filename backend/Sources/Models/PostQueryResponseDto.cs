@@ -9,7 +9,7 @@ namespace CitizenProposalApp;
 public record PostQueryResponseDto
 {
     /// <inheritdoc cref="Post.Id"/>
-    public int Id { get; init; }
+    public required int Id { get; init; }
 
     /// <inheritdoc cref="Post.Title"/>
     public required string Title { get; init; }
@@ -18,7 +18,7 @@ public record PostQueryResponseDto
     public required string Content { get; init; }
 
     /// <inheritdoc cref="Post.PostedTime"/>
-    public DateTimeOffset PostedTime { get; init; }
+    public required DateTimeOffset PostedTime { get; init; }
 
     /// <summary>
     /// The tags on this post.

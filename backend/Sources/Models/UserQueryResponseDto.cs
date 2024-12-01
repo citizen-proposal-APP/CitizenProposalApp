@@ -6,7 +6,7 @@ namespace CitizenProposalApp;
 public class UserQueryResponseDto
 {
     /// <inheritdoc cref="User.Id"/>
-    public int Id { get; init; }
+    public required int Id { get; init; }
 
     /// <inheritdoc cref="User.Username"/>
     public required string Username { get; init; }
