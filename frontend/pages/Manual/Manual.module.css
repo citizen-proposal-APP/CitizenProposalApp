@@ -1,4 +1,19 @@
 .textAlignCenter {
-    text-align: center;
-  }
-  
+  text-align: center;
+  text-indent: 4pt;
+}
+
+.accordionLabel {
+  font-size: large;
+  font-weight: bold;
+}
+
+.littleTitle {
+  padding-left: 2em;
+  font-weight: bold;
+}
+
+.indent {
+  padding-left: 4em;
+  /* 或 text-indent: 2em; */
+}
