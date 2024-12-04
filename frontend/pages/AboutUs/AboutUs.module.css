@@ -42,7 +42,6 @@
 /* 普通段落文字 */
 .textBlock {
     font-size: 1rem;
-    color: #444; /* 略深的灰色 */
     line-height: 1.8;
     margin-top: 10px;
     text-align: justify; /* 兩端對齊 */

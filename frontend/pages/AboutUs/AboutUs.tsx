@@ -1,49 +1,49 @@
 import React from 'react';
-import { Container, Title, Text, Group, Image } from '@mantine/core';
-import styles from './AboutUs.module.css';
+import { Container, Title, Text, Center, Space, List } from '@mantine/core';
 import { Layout } from '@/components/Layout/Layout';
 
 export default function AboutUs() {
-    return (
-        <Layout>
-            <Container size="lg" py="md" className={styles.aboutCard}>
-                {/* 頁面標題 */}
-                <Title
-                    order={2}
-                    className={styles.aboutTitle}
-                >
-                    
-                </Title>
+  return (
+    <Layout>
+      <Container size="lg" py="md">
+        {/* 頁面標題 */}
+        <Center>
+          <Title order={1}>關於我們</Title>
+        </Center>
 
-                {/* 說明文字 */}
-                <Text color="dimmed" mb="lg" className={styles.description}>
-                    我們只是學分小狗，不要好奇🙂🙂
-                </Text>
+        {/* 領域間距 */}
+        <Space h="xl" />
 
-                {/* 圖片展示 */}
-                <Group style={{ justifyContent: 'center', marginTop: 'var(--mantine-spacing-lg)' }} mb="lg">
-                    {/* <Image
-                        src="/images/team.jpg"
-                        alt="我們的團隊"
-                        className={styles.teamImage}
-                    /> */}
-                </Group>
+        {/* 系統簡介 */}
+        <Text size="lg" weight={500} align="center">
+          國民參與國家規劃 APP 致力於打造一個簡單、透明且高效的平台，
+          讓國民能夠輕鬆參與國家政策的討論與規劃。
+          我們的願景是透過技術創新，提升公共政策的參與度，讓每個人的聲音都能被聽見。
+        </Text>
 
-                {/* 使命與願景
-                <Title order={3} className={styles.sectionTitle}>
-                    我們的使命
-                </Title>
-                <Text className={styles.textBlock}>
-                    提供最專業的數位工具，幫助用戶更有效率地完成工作。我們相信科技可以改變世界，因此我們致力於創造真正有影響力的產品。
-                </Text>
+        {/* 領域間距 */}
+        <Space h="lg" />
 
-                <Title order={3} className={styles.sectionTitle}>
-                    我們的願景
-                </Title>
-                <Text className={styles.textBlock}>
-                    成為全球領先的數位服務提供商，透過技術與創新驅動社會進步，為用戶帶來全新的價值與可能性。
-                </Text> */}
-            </Container>
-        </Layout>
-    );
+        {/* 主要功能 */}
+        <Title order={2} mt="lg">主要功能</Title>
+        <List withPadding>
+          <List.Item>註冊並登入個人帳戶，提交您的意見提案</List.Item>
+          <List.Item>瀏覽最新熱門議題，了解國民的關注點</List.Item>
+          <List.Item>使用關鍵字與 AI 自動分類功能，快速找到您感興趣的提案</List.Item>
+          <List.Item>系統自動推薦相關提案，提升參與效率</List.Item>
+        </List>
+
+        {/* 領域間距 */}
+        <Space h="lg" />
+
+        {/* 我們的團隊 */}
+        <Title order={2} mt="lg">我們的團隊</Title>
+        <Text size="lg">
+          我們來自中正大學資訊工程學系，是一支充滿熱情的團隊，專注於後端開發、AI 技術整合與前端設計。
+          我們的每一步努力，都是為了讓國民參與變得更簡單、更高效。
+        </Text>
+
+      </Container>
+    </Layout>
+  );
 }

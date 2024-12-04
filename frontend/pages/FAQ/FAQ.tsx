@@ -2,6 +2,8 @@ import React from 'react';
 import { Accordion, Container, Title, Text } from '@mantine/core';
 import styles from './FAQ.module.css';
 import { Layout } from '@/components/Layout/Layout';
+import { LinkCard } from '@/components/LinkCard/LinkCard';
+
 
 export default function FAQ() {
     return (
@@ -32,13 +34,13 @@ export default function FAQ() {
                             <Text>
                                 <strong>1-1. 我該如何註冊帳號？</strong>
                                 <br />
-                                請前往註冊頁面，填寫您的電子郵件與密碼後提交申請，並完成驗證即可。
+                                請前往頂部的「註冊」頁面，填寫您的電子郵件與密碼後提交申請，並完成驗證即可。
                             </Text>
                             <br />
                             <Text>
                                 <strong>1-2. 忘記密碼該怎麼辦？</strong>
                                 <br />
-                                您可以在登入頁面點選「忘記密碼」，按照指示重設密碼。
+                                您可以在頂部的「登入」頁面點選「忘記密碼」，按照指示重設密碼。
                             </Text>
                         </Accordion.Panel>
                     </Accordion.Item>

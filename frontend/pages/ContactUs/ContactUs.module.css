@@ -1,101 +1,122 @@
 /* 標題文字樣式 */
 .textAlignCenter {
-    text-align: center; /* 水平居中 */
-    font-size: 1.8rem; /* 標題字體大小 */
-    font-weight: bold; /* 加粗標題 */
-    color: #333; /* 深灰色文字 */
+    text-align: center;
+    /* 水平居中 */
+    font-size: 1.8rem;
+    /* 標題字體大小 */
+    font-weight: bold;
+    /* 加粗標題 */
 }
 
 /* 表單容器樣式 */
 .contactForm {
-    max-width: 600px;
-    margin: 0 auto; /* 置中 */
-    background-color: #f9f9f9; /* 淡灰背景 */
+    /* max-width: 600px; */
+    /* margin: 0 auto; */
+    /* background-color: #f9f9f9; */
     padding: 20px;
-    border-radius: 8px; /* 圓角邊框 */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 陰影效果 */
+    border-radius: 8px;
+    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
 }
 
 /* 輔助說明文字樣式 */
 .textAlignCenter.dimmed {
     text-align: center;
-    font-size: 1rem;
-    color: #6c757d; /* 淡灰色 */
 }
 
 /* 電子郵件連結樣式 */
 .emailLink {
-    color: #4a90e2; /* 主色系 */
+    color: #4a90e2;
+    /* 主色系 */
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s ease;
 }
 
 .emailLink:hover {
-    color: #2a6fb0; /* 滑鼠懸停時變深色 */
-    text-decoration: underline; /* 加下劃線 */
+    color: #2a6fb0;
+    /* 滑鼠懸停時變深色 */
+    text-decoration: underline;
+    /* 加下劃線 */
 }
 
 /* 外框卡片樣式 */
 .contactCard {
-    background-color: #f9f9f9; /* 淡灰背景 */
+    background-color: #f9f9f9;
+    /* 淡灰背景 */
     padding: 40px;
-    border-radius: 12px; /* 圓角 */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 陰影效果 */
-    text-align: center; /* 內容居中 */
+    border-radius: 12px;
+    /* 圓角 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    /* 陰影效果 */
+    text-align: center;
+    /* 內容居中 */
 }
 
 /* 標題樣式 */
 .contactTitle {
-    font-size: 2rem; /* 標題字體大小 */
+    font-size: 2rem;
+    /* 標題字體大小 */
     font-weight: bold;
-    color: #333; /* 深灰色字體 */
+    /* color: #333; */
+    /* 深灰色字體 */
     margin-bottom: 20px;
 }
 
 /* 說明文字樣式 */
 .description {
+    text-align: center;
     font-size: 1.1rem;
-    color: #666; /* 中灰色字體 */
+    /* color: #666; */
+    /* 中灰色字體 */
     margin-bottom: 30px;
     line-height: 1.6;
 }
 
 /* 聯絡資訊樣式 */
 .emailGroup {
-    justify-content: center; /* 水平居中 */
-    align-items: center; /* 垂直居中 */
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
     margin-top: 20px;
-    gap: 10px; /* 標籤和按鈕之間的間距 */
+    gap: 10px;
+    /* 標籤和按鈕之間的間距 */
 }
 
 /* 聯絡標籤樣式 */
 .contactLabel {
     font-size: 1.2rem;
     font-weight: 600;
-    color: #444; /* 略深的灰色 */
+    /* color: #444; */
+    /* 略深的灰色 */
 }
 
 /* 按鈕樣式 */
 .emailButton {
-    background-color: #4a90e2; /* 主色系藍色 */
+    background-color: #4a90e2;
+    /* 主色系藍色 */
     color: white;
     padding: 8px 16px;
     font-size: 1rem;
-    border-radius: 8px; /* 圓角 */
-    text-decoration: none; /* 移除下劃線 */
+    border-radius: 8px;
+    /* 圓角 */
+    text-decoration: none;
+    /* 移除下劃線 */
     font-weight: 500;
     transition: background-color 0.3s ease;
 }
 
 .emailButton:hover {
-    background-color: #357ABD; /* 懸停更深色 */
-    text-decoration: underline; /* 懸停加下劃線 */
+    background-color: #357ABD;
+    /* 懸停更深色 */
+    text-decoration: underline;
+    /* 懸停加下劃線 */
 }
 
 /* 回覆時間樣式 */
 .responseTime {
     font-size: 0.95rem;
-    color: #888; /* 更淺的灰色 */
+    /* color: #888; */
+    /* 更淺的灰色 */
     margin-top: 20px;
 }

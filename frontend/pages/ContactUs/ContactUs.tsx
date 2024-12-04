@@ -56,25 +56,25 @@
 // }
 
 import React from 'react';
-import { Container, Title, Text, Group, Anchor } from '@mantine/core';
+import { Container, Title, Text, Group, Anchor, Center } from '@mantine/core';
 import styles from './ContactUs.module.css';
 import { Layout } from '@/components/Layout/Layout';
 
 export default function ContactUs() {
     return (
         <Layout>
-            <Container size="lg" py="md" className={styles.contactCard}>
+            <Container size="lg" py="md" className={styles.contactForm}>
                 {/* 頁面標題 */}
                 <Title
                     order={2}
                     className={styles.contactTitle} // 美化標題樣式
                 >
-                   
+
                 </Title>
 
                 {/* 說明文字 */}
-                <Text color="dimmed" mb="lg" className={styles.description}>
-                    如果您有任何問題或建議，歡迎聯絡我們。我們的電子郵件如下：
+                <Text mb="lg" className={styles.description}>
+                    如果您有任何問題或建議，歡迎聯絡我們。我們將在 1-2 個工作日內回覆您的訊息，感謝您的耐心。
                 </Text>
 
                 {/* 聯絡資訊 */}
@@ -90,10 +90,6 @@ export default function ContactUs() {
                     </Anchor>
                 </Group>
 
-                {/* 回覆時間說明 */}
-                <Text mt="lg" color="dimmed" className={styles.responseTime}>
-                    我們將在 1-2 個工作日內回覆您的訊息，感謝您的耐心。
-                </Text>
             </Container>
         </Layout>
     );
