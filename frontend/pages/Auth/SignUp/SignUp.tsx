@@ -16,7 +16,7 @@ interface SignUpProps {
 export function SignUp({ onToggle }: SignUpProps) {
     return (
         <Container size={420} my={40}>
-            <Title ta="center" style={{ color: 'white' }} className={classes.title}>
+            <Title ta="center" className={classes.title}>
                 建立帳號
             </Title>
             <Text c="dimmed" size="sm" ta="center" mt={5}>
