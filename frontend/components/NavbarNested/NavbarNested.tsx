@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button, Code, Group, ScrollArea, Modal } from '@mantine/core';
-import { LinksGroup } from '@/components/NavbarLinksGroup/NavbarLinksGroup';
+import { LinksGroup } from './LinksGroup';
 import { links } from '@/data/links';
 import { AuthenticationTitle } from '@/pages/Auth/SignIn/SignIn';
 import { SignUp } from '@/pages/Auth/SignUp/SignUp';
