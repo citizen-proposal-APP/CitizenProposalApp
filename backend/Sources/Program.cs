@@ -36,17 +36,12 @@ internal sealed class Program
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         builder.Services.AddAuthentication().AddScheme<SessionTokenAuthenticationHandlerOptions, SessionTokenAuthenticationHandler>("session", "Session token authentication handler", null);
         WebApplication app = builder.Build();
-        if (app.Environment.IsProduction())
-        {
-            app.UseHsts();
-        }
         if (app.Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage()
                 .AssertAutoMapperConfigurationIsValid();
         }
         app.UseStatusCodePages()
-            .UseHttpsRedirection()
             .UseSwagger()
             .UseSwaggerUI()
             .UseCookiePolicy(new()

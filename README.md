@@ -61,6 +61,11 @@ follow these steps:
 
 ### Without Visual Studio
 
+Note that the backend app no longer uses HTTPS if you use this method, because
+it's expected that there will be a reverse proxy in the production environment
+that will handle HTTPS and forward the request to the backend app using HTTP. If
+you still want to set up HTTPS using a development certificate, see step 5.
+
 Frontend developers might need to start the backend app and the DB without VS
 and debugging. In that case, follow these steps:
 
@@ -76,10 +81,19 @@ and debugging. In that case, follow these steps:
    the `Uid` and `Pwd`:
 
    ```plaintext
-   ASPNETCORE_Kestrel__Certificates__Default__Path=/app/DevelopmentCertificateDoNotUseForProduction.pfx
-   ASPNETCORE_Kestrel__Certificates__Default__Password=testpassword
    ConnectionStrings__CitizenProposalApp=Server=CitizenProposalAppDb;Database=CitizenProposalApp;Uid=<your username>;Pwd=<your password>
    ```
+
+   If you also want to set up HTTPS, and the following two more lines:
+
+   ```plaintext
+   ASPNETCORE_Kestrel__Certificates__Default__Path=/app/DevelopmentCertificateDoNotUseForProduction.pfx
+   ASPNETCORE_Kestrel__Certificates__Default__Password=testpassword
+   ```
+
+   And add `- ASPNETCORE_HTTPS_PORTS=8081` under `services.backend.environment`,
+   and `- 8081:8081` under `services.backend.ports` in `compose.yml`. You can
+   customize the port number to your liking.
 
 6. Run `docker compose --profile backend up -d` to start the backend app and the DB.
 7. After a few seconds, check the logs of the DB service with either `docker

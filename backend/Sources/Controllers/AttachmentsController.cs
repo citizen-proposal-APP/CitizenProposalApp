@@ -28,7 +28,7 @@ public class AttachmentsController(CitizenProposalAppDbContext context) : Contro
     [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
     [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
     [ProducesResponseType<ProblemDetails>(Status416RangeNotSatisfiable, Application.ProblemJson)]
-    public async Task<ActionResult<FileResult>> GetAttachmentById(int id)
+    public async Task<IActionResult> GetAttachmentById(int id)
     {
         Attachment? attachment = await context.Attachments.FindAsync(id);
         if (attachment is null)
