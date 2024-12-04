@@ -4,7 +4,7 @@ import { Proposal } from '@/types/Proposal';
 import { Tag, TagType } from '@/types/Tag';
 import React, { useState, useRef } from 'react';
 import { IconUpload, IconX } from '@tabler/icons-react';
-import { Badge, Button, Card, CheckIcon, Combobox, Container, FileInput, Flex, Grid, Group, Image, MantineProvider, Modal, Pill, PillsInput, rem, ScrollArea, SimpleGrid, Stack, Text, Textarea, Timeline, useCombobox } from '@mantine/core';
+import { Badge, Button, Card, CheckIcon, Combobox, Container, FileInput, Grid, Group, Image, MantineProvider, Modal, Pill, PillsInput, rem, ScrollArea, SimpleGrid, Stack, Text, Textarea, Timeline, useCombobox } from '@mantine/core';
 import { useDisclosure, useValidatedState, useViewportSize } from '@mantine/hooks';
 import { Dropzone } from '@mantine/dropzone';
 import '@mantine/dropzone/styles.css';
@@ -62,7 +62,7 @@ export default function EditPage() {
     tagList[7],
     tagList[8],
   ];
-  const testProposals: Proposal[] = [
+  const similarProposals: Proposal[] = [
     {
       id: 0,
       status: "",
@@ -83,7 +83,6 @@ export default function EditPage() {
       tags: [
         { id: 2, tagType: TagType.department, name: "文化部" },
         { id: 5, tagType: TagType.topic, name: "文化幣" },
-        { id: 11, tagType: TagType.topic, name: "🍌" },
         { id: 12, tagType: TagType.topic, name: "" },
       ],
     },
@@ -105,9 +104,7 @@ export default function EditPage() {
       postedTime: "",
       tags: [
         { id: 4, tagType: TagType.department, name: "想不到了" },
-        { id: 5, tagType: TagType.topic, name: "文化幣" },
         { id: 6, tagType: TagType.topic, name: "食品安全" },
-        { id: 7, tagType: TagType.topic, name: "asdfg" },
         { id: 8, tagType: TagType.topic, name: "還有啥來著" },
         { id: 9, tagType: TagType.topic, name: "1234567" },
         { id: 10, tagType: TagType.topic, name: "bbbb bbbbbb bbb" },
@@ -176,7 +173,6 @@ export default function EditPage() {
     setTagNameValue((current) =>
       current.includes(val) ? current.filter((v) => v != val) : [...current, val]
     );
-    //setTagNameValue(extractTagNames(tagValue))
   }
 
   const handleTagValueRemove = (val: string) =>  {
@@ -216,37 +212,37 @@ export default function EditPage() {
 	return (
     <Layout>
       <Notifications position="top-right" zIndex={1000}/>
-      <Modal opened={publishModalOpened} onClose={closePublishModal} title="送出確認" centered>
-        <Text size="sm">確認送出提案？</Text>
+      <Modal opened={publishModalOpened} onClose={closePublishModal} title="送出確認" centered size={"lg"}>
+        <Text size={"md"}>確認送出提案？</Text>
         <Group justify="flex-end" gap={"xl"}>
-          <Button variant="filled" size="sm">是</Button>
-          <Button variant="default" size="sm" onClick={closePublishModal}>否</Button>
+          <Button variant="filled" size={"md"}>是</Button>
+          <Button variant="default" size={"md"} onClick={closePublishModal}>否</Button>
         </Group>
       </Modal>
-      <Modal opened={saveModalOpened} onClose={closeSaveModal} title="保存成功" centered>
-        <Text size="sm">是否退出編輯？</Text>
+      <Modal opened={saveModalOpened} onClose={closeSaveModal} title="保存成功" centered size={"lg"}>
+        <Text size={"md"}>是否退出編輯？</Text>
         <Group justify="flex-end" gap={"xl"}>
-          <Button variant="filled" size="sm">是</Button>
-          <Button variant="default" size="sm" onClick={closeSaveModal}>否</Button>
+          <Button variant="filled" size={"md"}>是</Button>
+          <Button variant="default" size={"md"} onClick={closeSaveModal}>否</Button>
         </Group>
       </Modal>
     <MantineProvider>
         <Group justify="center" gap={"xl"} >              
           <Stack>
-            <Text fw={700} size="lg">輕鬆提案三步驟</Text>
+            <Text fw={"bold"} size={"xl"}>輕鬆提案三步驟</Text>
             <Timeline title="輕鬆提案三步驟" active={timelineProgress} bulletSize={24} lineWidth={4}>
               <Timeline.Item title="第一步：填寫資料">          
-                <Text c="dimmed" size="sm">
+                <Text c="dimmed" size={"lg"}>
                   輸入標題與內文，並上傳附件（非必要）
                 </Text>
               </Timeline.Item>
               <Timeline.Item title="第二步：選擇相關標籤">        
-                <Text c="dimmed" size="sm">
+                <Text c="dimmed" size={"lg"}>
                   依內容搜尋並選擇想加上的標籤
                 </Text>
               </Timeline.Item>
               <Timeline.Item title="第三步：公開此提議">   
-                <Text c="dimmed" size="sm">
+                <Text c="dimmed" size={"lg"}>
                   點擊「送出提案」即可將提議公開
                 </Text>
               </Timeline.Item>
@@ -258,9 +254,10 @@ export default function EditPage() {
               label="主題（必填）"
               placeholder="請輸入主題，30字以內，必填" 
               required
-              radius="lg"
+              radius={"lg"}
+              size={"lg"}
               autosize
-              minRows={4}
+              minRows={2}
               value={titleValue}
               onChange={(event) => setTitleValue(event.currentTarget.value)}
               error={!titleValid}
@@ -269,9 +266,10 @@ export default function EditPage() {
               label="提案內容或建議事項（必填）"
               placeholder="請輸入內容或建議事項，300字以內，必填" 
               required
-              radius="lg"
+              radius={"lg"}
+              size={"lg"}
               autosize
-              minRows={15}
+              minRows={10}
               value={contentValue}
               onChange={(event) => setContentValue(event.currentTarget.value)}
               error={!contentValid}
@@ -280,7 +278,8 @@ export default function EditPage() {
               label="上傳附件（支援圖片、影像格式）"
               placeholder="選擇檔案或將檔案拖至此處（支援圖片、影像格式）"
               accept="image/png, image/gif, image/jpeg, image/svg+xml, image/webp, image/avif, image/heic, image/heif, video/mp4"
-              radius="lg"
+              radius={"lg"}
+              size={"lg"}
               clearable
               multiple
               value={fileValue} 
@@ -314,20 +313,20 @@ export default function EditPage() {
                 </Dropzone.Idle>
 
                 <div>
-                  <Text size="xl" inline>
+                  <Text size={"xl"} inline>
                     將圖片/影像檔拖至此處或點擊以選取檔案
                   </Text>
-                  <Text size="sm" c="dimmed" inline mt={7}>
+                  <Text size={"sm"} c="dimmed" inline mt={7}>
                     檔案總數不限，每份檔案大小不應超過50mb
                   </Text>
-                  <Text size="sm" c="dimmed" inline mt={7}>
+                  <Text size={"sm"} c="dimmed" inline mt={7}>
                     可接受png/gif/jpeg/svg/xml/webp/avif/heic/heif/mp4等格式
                   </Text>
                 </div>
               </Group>
               }
               {(fileValue.length != 0) &&
-              <Grid gutter="md">
+              <Grid gutter={"md"}>
                 {fileValue.map((file, index) => (
                   <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
                     <Stack justify="center" align="center">
@@ -355,8 +354,8 @@ export default function EditPage() {
               }
             </Dropzone>
             <Group justify="space-between" gap={"xl"} grow>
-              <Button variant="filled" size="lg" onClick={openSaveModal}>保留草稿</Button>
-              <Button variant="filled" size="lg" onClick={inputValidation}>填寫完成</Button>
+              <Button variant="filled" size={"lg"} onClick={openSaveModal}>保留草稿</Button>
+              <Button variant="filled" size={"lg"} onClick={inputValidation}>填寫完成</Button>
             </Group>
           </Stack>
           }
@@ -364,7 +363,7 @@ export default function EditPage() {
           <Stack w={width < 990 + WIDTH_OFFSET ? (width - WIDTH_OFFSET) : 990} gap={"xl"}>
             <Combobox store={combobox} onOptionSubmit={handleTagValueSelect}>
               <Combobox.DropdownTarget>
-                <PillsInput onClick={() => combobox.openDropdown()} label="標籤選擇" radius={"lg"}>
+                <PillsInput onClick={() => combobox.openDropdown()} label="標籤選擇" radius={"lg"} size={"lg"}>
                   <Group>
                     {tagPills}
                     <Combobox.EventsTarget>
@@ -394,7 +393,7 @@ export default function EditPage() {
                 </Combobox.Options>
               </Combobox.Dropdown>
             </Combobox>
-            <Text fw={700} size="lg">
+            <Text size="lg">
               或許你想看看...？
             </Text>
             <ScrollArea
@@ -405,7 +404,7 @@ export default function EditPage() {
               onWheel={handleWheel}
             >
               <Group gap={"md"} style={{ display: "flex", flexWrap: "nowrap" }}>
-                {testProposals.map((card, index) => (
+                {similarProposals.map((proposal, index) => (
                   <Card
                     key={index}
                     withBorder 
@@ -417,13 +416,13 @@ export default function EditPage() {
                     style={{ width: `${CARD_WIDTH}px`, height: `${CARD_HEIGHT}px`,  flex: "0 0 auto" }}
                   >
                     <Card.Section>
-                      <Image src={card.thumbnail} alt={card.title} height={130} />
+                      <Image src={proposal.thumbnail} alt={proposal.title} height={130} />
                     </Card.Section>
-                    <Text size="lg" mt="md">
-                      {card.title}
+                    <Text size="lg" mt="md" fw={"bold"}>
+                      {proposal.title}
                     </Text>
                     <Group gap={"xs"} mt="xs">
-                      {card.tags.slice(0, MAX_TAGS).map((tag, tagIndex) => (
+                      {proposal.tags.slice(0, MAX_TAGS).map((tag, tagIndex) => (
                         <Badge
                           key={tagIndex}
                           variant={tag.tagType === TagType.department ? 'white' : 'light'}
@@ -441,9 +440,9 @@ export default function EditPage() {
                             : tag.name}
                         </Badge>
                       ))}
-                      {card.tags.length > MAX_TAGS && (
+                      {proposal.tags.length > MAX_TAGS && (
                         <Badge variant="outline" color="gray" radius="xl">
-                          +{card.tags.length - MAX_TAGS} more
+                          +{proposal.tags.length - MAX_TAGS} more
                         </Badge>
                       )}
                     </Group>
