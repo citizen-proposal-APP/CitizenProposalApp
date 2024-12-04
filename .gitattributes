@@ -1,0 +1,1 @@
+backend/docker-entrypoint-initdb.d/init.sh eol=lf

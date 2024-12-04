@@ -1,0 +1,52 @@
+services:
+  frontend:
+    container_name: CitizenProposalAppFrontend
+    build: frontend
+    networks:
+      - citizen-proposal-app
+    ports:
+      - 80:443
+
+  backend:
+    container_name: CitizenProposalApp
+    build: backend
+    networks:
+      - citizen-proposal-app
+    ports:
+      - 8080:8080
+      - 8081:8081
+  db:
+    container_name: CitizenProposalAppDb
+    image: mysql:8.0.36 # The current latest supported version by Pomelo.EntityFrameworkCore.MySql
+    networks:
+      - citizen-proposal-app
+    ports:
+      - 37591:3306
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./backend/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_USER_FILE=/run/secrets/db-user
+      - MYSQL_PASSWORD_FILE=/run/secrets/db-password
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+    env_file:
+      - env/mysql.env
+    secrets:
+      - db-user
+      - db-password
+
+networks:
+  citizen-proposal-app:
+    name: citizen-proposal-app # Prevents project prefix; otherwise it becomes <repo_directory_name>_citizen-proposal-app
+    attachable: true
+
+volumes:
+  mysql-data:
+    name: mysql-data # Prevents project prefix
+    # I wanted to specify the location of the volume using a bind mount, but that doesn't work on Windows: https://stackoverflow.com/a/50954066/11138778
+
+secrets:
+  db-password:
+    file: secrets/MYSQL_PASSWORD
+  db-user:
+    file: secrets/MYSQL_USER
