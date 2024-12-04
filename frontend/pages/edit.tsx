@@ -32,13 +32,16 @@ export default function EditPage() {
   const [tagNameValue, setTagNameValue] = useState<string[]>([]);
   const [publishModalOpened, { open: openPublishModal, close: closePublishModal }] = useDisclosure(false);
   
+  const MAX_FILE_SIZE = 50 * 1024 ** 2;
   const MAX_TAGS = 3;
   const MAX_PILL_LENGTH = 10;
   const CARD_HEIGHT = 250;
   const CARD_WIDTH = 250;
-  const timelineProgress = onFirstStep ? 0 : 1
   const WIDTH_OFFSET = 65;
+
+  const timelineProgress = onFirstStep ? 0 : 1
   const { height, width } = useViewportSize();
+  
   const tagList = [
     { id: 1, tagType: TagType.department, name: "交通部" },
     { id: 2, tagType: TagType.department, name: "文化部" },
@@ -146,8 +149,12 @@ export default function EditPage() {
     }
     else
     {
-      setFileValue(fileValue.concat(newFiles))
-      console.log('accepted files', newFiles)
+      newFiles.forEach(newFile => {
+        if (newFile.size <= MAX_FILE_SIZE && fileValue.includes(newFile) == false) {
+          setFileValue((current) => [...current, newFile])
+          console.log('accepted file', newFile)
+        }
+      });
     }
   }
   function extractTagNames(tags: Tag[]): string[] {
@@ -183,7 +190,7 @@ export default function EditPage() {
     </Pill>
   ));
 
-  const scrollAreaRef = useRef(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const handleWheel = (event: any) => {
     event.preventDefault();
     if (scrollAreaRef.current) {
@@ -282,7 +289,7 @@ export default function EditPage() {
             <Dropzone
               onDrop={(files) => uploadFile(files)}
               onReject={(files) => console.log('rejected files', files)}
-              maxSize={5 * 1024 ** 2}
+              maxSize={MAX_FILE_SIZE}
               accept={['image/png', 'image/gif', 'image/jpeg', 'image/svg+xml', 'image/webp', 'image/avif', 'image/heic', 'image/heif', 'video/mp4']}
             >
               {fileValue.length == 0 &&
@@ -311,7 +318,7 @@ export default function EditPage() {
                     將圖片/影像檔拖至此處或點擊以選取檔案
                   </Text>
                   <Text size="sm" c="dimmed" inline mt={7}>
-                    檔案總數不限，每份檔案大小不應超過5mb
+                    檔案總數不限，每份檔案大小不應超過50mb
                   </Text>
                   <Text size="sm" c="dimmed" inline mt={7}>
                     可接受png/gif/jpeg/svg/xml/webp/avif/heic/heif/mp4等格式
@@ -338,7 +345,7 @@ export default function EditPage() {
                         color="var(--mantine-color-blue-filled)"
                       />
                       }
-                      <Text align="center">
+                      <Text ta="center">
                         {file.name}
                       </Text>
                     </Stack>
