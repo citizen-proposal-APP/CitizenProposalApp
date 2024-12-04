@@ -24,14 +24,16 @@ export default function EditPage() {
     true
   );
   const [fileValue, setFileValue] = useState<File[]>([]);
+  const [replacingQueue, setReplacingQueue] = useState<File[]>([]);
+  const [currentReplacingFile, setCurrentReplacingFile] = useState<File | null>(null);
   const [onFirstStep, setOnFirstStep] = useState(true);
   const [onSecondStep, setOnSecondStep] = useState(false);
-  const [saveModalOpened, { open: openSaveModal, close: closeSaveModal }] = useDisclosure(false);
   const [tagSearch, setTagSearch] = useState('');
   const [tagValue, setTagValue] = useState<any[]>([]);
   const [tagNameValue, setTagNameValue] = useState<string[]>([]);
+  const [saveModalOpened, { open: openSaveModal, close: closeSaveModal }] = useDisclosure(false);
   const [publishModalOpened, { open: openPublishModal, close: closePublishModal }] = useDisclosure(false);
-  
+  const [replaceModalOpened, setReplaceModalOpened] = useState(false);  
   const MAX_FILE_SIZE = 50 * 1024 ** 2;
   const MAX_TAGS = 3;
   const MAX_PILL_LENGTH = 10;
@@ -138,22 +140,61 @@ export default function EditPage() {
       message: '請依照要求填寫必填欄位!'
     })
   }
-  function uploadFile(newFiles:File[]) {
-    if (newFiles.length == 0) 
-    {
-      setFileValue(newFiles)
-      console.log('cleared files')
-    }
-    else
-    {
-      newFiles.forEach(newFile => {
-        if (newFile.size <= MAX_FILE_SIZE && fileValue.includes(newFile) == false) {
-          setFileValue((current) => [...current, newFile])
-          console.log('accepted file', newFile)
+  function uploadFile(newFiles: File[]) {
+    if (newFiles.length === 0) {
+      setFileValue([]);
+      console.log("cleared files");
+    } 
+    else {
+      const duplicateFiles: File[] = [];
+      newFiles.forEach((newFile) => {
+        if (newFile.size <= MAX_FILE_SIZE) {
+          if (fileValue.some((file) => file.name === newFile.name)) {
+            duplicateFiles.push(newFile);
+            console.log("duplicate file", newFile);
+          } else {
+            setFileValue((current) => [...current, newFile]);
+            console.log("accepted file", newFile);
+          }
         }
       });
+      if (duplicateFiles.length > 0) {
+        console.log("handle duplicate files");
+        setReplacingQueue((queue) => [...queue, ...duplicateFiles]);
+        console.log("replacing files", replacingQueue);
+        processNextReplacement();
+      }
     }
   }
+  function processNextReplacement() {
+    setReplacingQueue((queue) => {
+      const [nextFile, ...remainingQueue] = queue;
+      setCurrentReplacingFile(nextFile || null);
+      console.log("current replacing file", nextFile);
+      setReplaceModalOpened(Boolean(nextFile));
+      return remainingQueue;
+    });
+  }
+  function replaceFile() {
+    if (currentReplacingFile) {
+      setFileValue((current) =>
+        current.filter((file) => file.name !== currentReplacingFile.name)
+      );
+      setFileValue((current) => [...current, currentReplacingFile]);
+      console.log("replaced file", currentReplacingFile);
+    }
+    setCurrentReplacingFile(null);
+    setReplaceModalOpened(false);
+    processNextReplacement()
+  }
+
+  function skipFile() {
+    console.log("skipped file", currentReplacingFile);
+    setCurrentReplacingFile(null);
+    setReplaceModalOpened(false);
+    processNextReplacement()
+  }
+
   function extractTagNames(tags: Tag[]): string[] {
     return tags.map((tag) => tag.name);
   }
@@ -224,6 +265,13 @@ export default function EditPage() {
         <Group justify="flex-end" gap={"xl"}>
           <Button variant="filled" size={"md"}>是</Button>
           <Button variant="default" size={"md"} onClick={closeSaveModal}>否</Button>
+        </Group>
+      </Modal>
+      <Modal opened={replaceModalOpened} onClose={skipFile} title="已存在同名檔案" centered size={"lg"}>
+        <Text size={"md"}>上傳區已存在名為「{currentReplacingFile?.name}」的檔案，是否取代檔案？</Text>
+        <Group justify="flex-end" gap={"xl"}>
+          <Button variant="filled" size={"md"} onClick={replaceFile}>是</Button>
+          <Button variant="default" size={"md"} onClick={skipFile}>否</Button>
         </Group>
       </Modal>
     <MantineProvider>
