@@ -4,6 +4,7 @@ using CitizenProposalApp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CitizenProposalApp.Migrations
 {
     [DbContext(typeof(CitizenProposalAppDbContext))]
-    partial class CitizenProposalAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241203135436_AddedAttachments")]
+    partial class AddedAttachments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

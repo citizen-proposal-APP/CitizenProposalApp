@@ -56,15 +56,15 @@ public class User
     /// <summary>
     /// The <see cref="Post"/>s posted by this user.
     /// </summary>
-    public required ICollection<Post> Posts { get; init; }
+    public required ICollection<Post> Posts { get; set; }
 
     /// <summary>
     /// The <see cref="Session"/>s that authenticate this user.
     /// </summary>
-    public required ICollection<Session> Sessions { get; init; }
+    public required ICollection<Session> Sessions { get; set; }
 
     /// <summary>
     /// The <see cref="Comment"/>s made by this user.
     /// </summary>
-    public required ICollection<Comment> Comments { get; init; }
+    public required ICollection<Comment> Comments { get; set; }
 }

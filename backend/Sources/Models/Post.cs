@@ -34,15 +34,20 @@ public class Post
     /// <summary>
     /// The <see cref="Tag"/>s on this post.
     /// </summary>
-    public required ICollection<Tag> Tags { get; init; }
+    public required ICollection<Tag> Tags { get; set; }
 
     /// <summary>
     /// The <see cref="Comment"/>s under this post.
     /// </summary>
-    public required ICollection<Comment> Comments { get; init; }
+    public required ICollection<Comment> Comments { get; set; }
 
     /// <summary>
     /// The <see cref="User"/> who made this post.
     /// </summary>
     public required User Author { get; set; }
+
+    /// <summary>
+    /// The <see cref="Attachment"/>s on this post.
+    /// </summary>
+    public required ICollection<Attachment> Attachments { get; set; }
 }

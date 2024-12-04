@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using static Microsoft.AspNetCore.Http.StatusCodes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CitizenProposalApp;
 
@@ -34,8 +35,8 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
     /// <response code="409">The specified username already exists.</response>
     [HttpPost("register")]
     [ProducesResponseType(Status201Created)]
-    [ProducesResponseType(Status400BadRequest)]
-    [ProducesResponseType(Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status409Conflict, Application.ProblemJson)]
     public async Task<IActionResult> RegisterUser([FromForm] RegisterRequestDto registerRequest)
     {
         if (await context.Users.AnyAsync(user => user.Username == registerRequest.Username))
@@ -58,8 +59,8 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
     /// <response code="401">The username or password is incorrect.</response>
     [HttpPost("login")]
     [ProducesResponseType(Status204NoContent)]
-    [ProducesResponseType(Status400BadRequest)]
-    [ProducesResponseType(Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType(typeof(void), Status401Unauthorized)]
     public async Task<IActionResult> Login([FromForm] LoginRequestDto loginRequest)
     {
         User? user = await context.Users.FirstOrDefaultAsync(user => user.Username == loginRequest.Username);
@@ -158,9 +159,13 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
     /// </summary>
     /// <param name="id">The ID of the user to query.</param>
     /// <returns>A <see cref="UserQueryResponseDto"/> containing info about the user.</returns>
+    /// <response code="200">An user with the specified ID.</response>
+    /// <response code="400">The provided ID is not a valid integer.</response>
+    /// <response code="404">No user with the specified ID exists.</response>
     [HttpGet("{id}")]
     [ProducesResponseType(Status200OK)]
-    [ProducesResponseType(Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
     public async Task<ActionResult<UserQueryResponseDto>> GetUserById(int id)
     {
         User? user = await context.Users.FirstOrDefaultAsync(user => user.Id == id);

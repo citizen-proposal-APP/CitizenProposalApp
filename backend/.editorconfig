@@ -218,6 +218,9 @@ dotnet_diagnostic.CA1724.severity = silent
 # CA1515: Consider making public types internal
 dotnet_diagnostic.CA1515.severity = silent
 
+# CA2227: Collection properties should be read only
+dotnet_diagnostic.CA2227.severity = silent
+
 [*.{cs,vb}]
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 tab_width = 4

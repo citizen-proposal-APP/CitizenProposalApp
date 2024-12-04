@@ -24,7 +24,7 @@ public class Tag
     /// <summary>
     /// The <see cref="Post"/>s that uses this tag.
     /// </summary>
-    public required ICollection<Post> Posts { get; init; }
+    public required ICollection<Post> Posts { get; set; }
 
     /// <summary>
     /// The type of this tag.

@@ -42,6 +42,11 @@ public class CitizenProposalAppDbContext(IConfiguration config) : DbContext
     public required DbSet<TagType> TagTypes { get; set; }
 
     /// <summary>
+    /// Represents a table that stores all attachments on all posts.
+    /// </summary>
+    public required DbSet<Attachment> Attachments { get; set; }
+
+    /// <summary>
     /// Used to configure EF Core to use MySQL with a connection string.
     /// </summary>
     /// <param name="optionsBuilder">The <see cref="DbContextOptionsBuilder"/> to configure.</param>

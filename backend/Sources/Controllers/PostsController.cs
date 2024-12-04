@@ -12,6 +12,9 @@ using static CitizenProposalApp.PostSortKey;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Globalization;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CitizenProposalApp;
 
@@ -34,14 +37,15 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     /// <response code="404">No post with the specified ID exists.</response>
     [HttpGet("{id}")]
     [ProducesResponseType(Status200OK)]
-    [ProducesResponseType(Status400BadRequest)]
-    [ProducesResponseType(Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
     public async Task<ActionResult<PostQueryResponsePostDto>> GetPostById(int id)
     {
         Post? post = await context.Posts
             .Include(post => post.Tags)
                 .ThenInclude(tag => tag.TagType)
             .Include(post => post.Author)
+            .Include(post => post.Attachments)
             .FirstOrDefaultAsync(post => post.Id == id);
         if (post is null)
         {
@@ -59,7 +63,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     /// <response code="400">The query parameters are malformed.</response>
     [HttpGet]
     [ProducesResponseType(Status200OK)]
-    [ProducesResponseType(Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
     public async Task<ActionResult<PostQueryResponseDto>> GetPostsByParameters([FromQuery] PostQueryRequestDto parameters)
     {
         if (!Enum.IsDefined(parameters.SortDirection) || !Enum.IsDefined(parameters.SortBy))
@@ -92,18 +96,21 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     /// <param name="post">The post to submit.</param>
     /// <returns>Nothing if successful.</returns>
     /// <response code="201">The new post has been successfully created.</response>
-    /// <response code="400">The request body is malformed or lacks required fields.</response>
+    /// <response code="400">The request body is malformed, lacks required fields, has form fields larger than 50 MiB, or the total size of the request body is over 100 MiB.</response>
     /// <response code="401">The user has not logged in, the logged-in user's account has been deleted, or the session has expired.</response>
     /// <response code="500">Something went wrong with the authentication process.</response>
     [HttpPost]
     [ProducesResponseType(Status201Created)]
-    [ProducesResponseType(Status400BadRequest)]
-    [ProducesResponseType(Status401Unauthorized)]
-    [ProducesResponseType(Status500InternalServerError)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType(typeof(void), Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(Status500InternalServerError, Application.ProblemJson)]
+    [RequestFormLimits(MultipartBodyLengthLimit = postSubmissionMultipartLimit)]
+    [RequestSizeLimit(postSubmissionTotalLimit)]
     [Authorize]
     public async Task<IActionResult> AddPost([FromForm] PostSubmissionDto post)
     {
         Claim? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        // This should be impossible unless the authentication handler has a bug.
         if (userIdClaim is null)
         {
             return Problem("Something went wrong with the authentication process.", statusCode: Status500InternalServerError);
@@ -114,12 +121,22 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         {
             return Problem("The account of the currently logged in user has been deleted.", statusCode: Status401Unauthorized);
         }
-        // This is a compatibility fix for a bug in Swagger UI where if you use OpenAPI 3, arrays sent as form fields are sent as comma-separated lists instead of one element per field.
-        // https://github.com/swagger-api/swagger-ui/issues/10221
-        IEnumerable<string> tagsString = post.Tags.SelectMany(tag => tag.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
-        await AddMissingTagsToDb(tagsString);
-        // Since AddMissingTagsToDb never adds duplicate tags to the DB, this part will also not have duplicate tags.
-        ICollection<Tag> tags = await context.Tags.Where(tag => tagsString.Contains(tag.Name)).ToListAsync();
+        IEnumerable<string> tagsString;
+        ICollection<Tag> tags;
+        if (post.Tags is null or { Count: 0 })
+        {
+            tagsString = [];
+            tags = [];
+        }
+        else
+        {
+            // This is a compatibility fix for a bug in NSwag where if you use OpenAPI 3, arrays sent as form fields are sent as comma-separated lists instead of one element per field in the Swagger UI.
+            // https://github.com/swagger-api/swagger-ui/issues/10221
+            tagsString = post.Tags.SelectMany(tag => tag.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+            await AddMissingTagsToDb(tagsString);
+            // Since AddMissingTagsToDb never adds duplicate tags to the DB, this part will also not have duplicate tags.
+            tags = await context.Tags.Where(tag => tagsString.Contains(tag.Name)).ToListAsync();
+        }
         Post newPost = new()
         {
             Author = author,
@@ -127,8 +144,13 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
             Content = post.Content,
             PostedTime = timeProvider.GetUtcNow(),
             Tags = tags,
-            Title = post.Title
+            Title = post.Title,
+            Attachments = []
         };
+        if (post.Attachments is not null and not { Count: 0 })
+        {
+            newPost.Attachments = await ProcessAttachments(post.Attachments, newPost);
+        }
         context.Posts.Add(newPost);
         await context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetPostById), new { id = newPost.Id }, null);
@@ -145,4 +167,32 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         await context.Tags.AddRangeAsync(newTags);
         await context.SaveChangesAsync();
     }
+
+    private static async Task<ICollection<Attachment>> ProcessAttachments(IFormFileCollection attachments, Post parentPost)
+    {
+        Attachment[] result = await Task.WhenAll(
+            attachments.Select(
+                async attachment =>
+                {
+                    using MemoryStream memoryStream = new((int)attachment.Length);
+                    await attachment.CopyToAsync(memoryStream);
+                    string filename = new(Path.GetRandomFileName() + Path.GetExtension(attachment.FileName));
+                    if (filename.Length > 256)
+                    {
+                        filename = filename[^256..];
+                    }
+                    return new Attachment
+                    {
+                        Content = memoryStream.ToArray(),
+                        Filename = filename,
+                        ParentPost = parentPost
+                    };
+                }
+            )
+        );
+        return result;
+    }
+
+    private const long postSubmissionMultipartLimit = 50 * 1024 * 1024;
+    private const long postSubmissionTotalLimit = 100 * 1024 * 1024;
 }

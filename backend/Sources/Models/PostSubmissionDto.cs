@@ -28,7 +28,7 @@ public record PostSubmissionDto
     /// The names of the tags to use.
     /// </summary>
     [ElementMaxLength(32)]
-    public required ICollection<string> Tags { get; init; }
+    public ICollection<string>? Tags { get; init; }
 
     /// <summary>
     /// The files to add as attachments.

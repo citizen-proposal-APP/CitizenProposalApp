@@ -29,4 +29,9 @@ public record PostQueryResponsePostDto
     /// The user who made this post.
     /// </summary>
     public required UserQueryResponseDto Author { get; init; }
+
+    /// <summary>
+    /// The IDs of the attachments on this post. To get the attachments themselves, query them at <code>/api/Attachments/{id}</code>.
+    /// </summary>
+    public required IList<int> AttachmentIds { get; init; }
 }
