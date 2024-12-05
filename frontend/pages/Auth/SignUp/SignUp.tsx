@@ -27,11 +27,11 @@ export function SignUp({ onToggle }: SignUpProps) {
             </Text>
 
             <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-                <TextInput label="Name" placeholder="Your name" required />
-                <TextInput label="Email" placeholder="your@gmail.com" required mt="md" />
-                <PasswordInput label="Password" placeholder="Your password" required mt="md" />
-                <PasswordInput label="Confirm Password" placeholder="Confirm your password" required mt="md" />
-                
+                {/* <TextInput label="Name" placeholder="Your name" required /> */}
+                <TextInput label="使用者名稱" placeholder="任何您想要的使用者名稱" required mt="md" />
+                <PasswordInput label="密碼" placeholder="任何您想要的密碼（至少一個字）" required mt="md" />
+                <PasswordInput label="確認密碼" placeholder="再輸入一次您設定的密碼" required mt="md" />
+
                 <Button fullWidth mt="xl">
                     建立帳號
                 </Button>
