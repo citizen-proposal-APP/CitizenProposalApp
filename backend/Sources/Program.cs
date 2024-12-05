@@ -36,6 +36,8 @@ internal sealed class Program
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         builder.Services.AddAuthentication().AddScheme<SessionTokenAuthenticationHandlerOptions, SessionTokenAuthenticationHandler>("session", "Session token authentication handler", null);
         WebApplication app = builder.Build();
+        // UseExceptionHandler is registered before UseDeveloperExceptionPage, so this is only used if the environment is Production to give a ProblemDetails response. At Production, UseDeveloperExceptionPage is used instead to return JSON or HTML.
+        app.UseExceptionHandler();
         if (app.Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage()

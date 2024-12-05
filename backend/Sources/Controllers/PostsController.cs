@@ -10,8 +10,6 @@ using static Microsoft.AspNetCore.Http.StatusCodes;
 using static CitizenProposalApp.SortDirection;
 using static CitizenProposalApp.PostSortKey;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
-using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using static System.Net.Mime.MediaTypeNames;
@@ -97,25 +95,28 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     /// <returns>Nothing if successful.</returns>
     /// <response code="201">The new post has been successfully created.</response>
     /// <response code="400">The request body is malformed, lacks required fields, has form fields larger than 50 MiB, or the total size of the request body is over 100 MiB.</response>
-    /// <response code="401">The user has not logged in, the logged-in user's account has been deleted, or the session has expired.</response>
+    /// <response code="401">The user has not logged in, the logged-in user's account has been deleted, or the session has expired. Only includes a body if the user's account has been deleted before a post can be added.</response>
     /// <response code="500">Something went wrong with the authentication process.</response>
     [HttpPost]
     [ProducesResponseType(Status201Created)]
     [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
-    [ProducesResponseType(typeof(void), Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(Status401Unauthorized, Application.ProblemJson)]
     [ProducesResponseType<ProblemDetails>(Status500InternalServerError, Application.ProblemJson)]
     [RequestFormLimits(MultipartBodyLengthLimit = postSubmissionMultipartLimit)]
     [RequestSizeLimit(postSubmissionTotalLimit)]
     [Authorize]
     public async Task<IActionResult> AddPost([FromForm] PostSubmissionDto post)
     {
-        Claim? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        User? author;
+        try
+        {
+            author = await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User);
+        }
         // This should be impossible unless the authentication handler has a bug.
-        if (userIdClaim is null)
+        catch (InvalidOperationException)
         {
             return Problem("Something went wrong with the authentication process.", statusCode: Status500InternalServerError);
         }
-        User? author = await context.Users.FindAsync(int.Parse(userIdClaim.Value, CultureInfo.InvariantCulture));
         // Handles the possible race condition where the account has been deleted after the authentication and before this line.
         if (author is null)
         {

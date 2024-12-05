@@ -1,5 +1,6 @@
 using AutoMapper;
 using Konscious.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -103,6 +104,28 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
         return NoContent();
     }
 
+    /// <summary>
+    /// Gets the info of a user using its ID.
+    /// </summary>
+    /// <param name="id">The ID of the user to query.</param>
+    /// <returns>A <see cref="UserQueryResponseDto"/> containing info about the user.</returns>
+    /// <response code="200">An user with the specified ID.</response>
+    /// <response code="400">The provided ID is not a valid integer.</response>
+    /// <response code="404">No user with the specified ID exists.</response>
+    [HttpGet("{id}")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
+    public async Task<ActionResult<UserQueryResponseDto>> GetUserById(int id)
+    {
+        User? user = await context.Users.FirstOrDefaultAsync(user => user.Id == id);
+        if (user is null)
+        {
+            return Problem($"No user with ID \"{id}\" exists.", statusCode: Status404NotFound);
+        }
+        return mapper.Map<User, UserQueryResponseDto>(user);
+    }
+
     private static async Task<byte[]> HashPassword(string password, byte[] salt, int memorySize, int iterations, int degreeOfParallelism)
     {
         using Argon2id argon2Id = new(Encoding.UTF8.GetBytes(password))
@@ -113,6 +136,36 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
             DegreeOfParallelism = degreeOfParallelism
         };
         return await argon2Id.GetBytesAsync(64);
+    }
+
+    /// <summary>
+    /// Gets the info of the currently logged in user.
+    /// </summary>
+    /// <returns>A <see cref="UserQueryResponseDto"/> containing info about the user.</returns>
+    /// <response code="200">The currently logged in user.</response>
+    /// <response code="401">The user has not logged in. Only includes a body if the user's account has been deleted before a response can be sent.</response>
+    /// <response code="500">Something went wrong with the authentication process.</response>
+    [HttpGet("current")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType<ProblemDetails>(Status401Unauthorized, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status500InternalServerError, Application.ProblemJson)]
+    [Authorize]
+    public async Task<ActionResult<UserQueryResponseDto>> GetCurrentUser()
+    {
+        User? user;
+        try
+        {
+            user = await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User);
+        }
+        catch (InvalidOperationException)
+        {
+            return Problem("Something went wrong with the authentication process.", statusCode: Status500InternalServerError);
+        }
+        if (user is null)
+        {
+            return Problem("The account of the currently logged in user has been deleted.", statusCode: Status401Unauthorized);
+        }
+        return mapper.Map<User, UserQueryResponseDto>(user);
     }
 
     private async Task<User> AddUser(RegisterRequestDto registerRequest, RandomNumberGenerator rng)
@@ -152,27 +205,5 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
         };
         context.Sessions.Add(newSession);
         await context.SaveChangesAsync();
-    }
-
-    /// <summary>
-    /// Gets the info of a user using its ID.
-    /// </summary>
-    /// <param name="id">The ID of the user to query.</param>
-    /// <returns>A <see cref="UserQueryResponseDto"/> containing info about the user.</returns>
-    /// <response code="200">An user with the specified ID.</response>
-    /// <response code="400">The provided ID is not a valid integer.</response>
-    /// <response code="404">No user with the specified ID exists.</response>
-    [HttpGet("{id}")]
-    [ProducesResponseType(Status200OK)]
-    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
-    [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
-    public async Task<ActionResult<UserQueryResponseDto>> GetUserById(int id)
-    {
-        User? user = await context.Users.FirstOrDefaultAsync(user => user.Id == id);
-        if (user is null)
-        {
-            return Problem($"No user with ID \"{id}\" exists.", statusCode: Status404NotFound);
-        }
-        return mapper.Map<User, UserQueryResponseDto>(user);
     }
 }
