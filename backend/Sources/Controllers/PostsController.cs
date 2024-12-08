@@ -1,7 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +8,7 @@ using System.Threading.Tasks;
 using static Microsoft.AspNetCore.Http.StatusCodes;
 using static CitizenProposalApp.SortDirection;
 using static CitizenProposalApp.PostSortKey;
+using static System.StringComparison;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.IO;
@@ -53,7 +53,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     }
 
     /// <summary>
-    /// Queries posts by various query parameters.
+    /// Queries posts by various query parameters. If multiple criteria are given, this searches for posts that satisfy all of them.
     /// </summary>
     /// <param name="parameters">Contains the conditions about which posts to query.</param>
     /// <returns>The posts that meet the conditions speficied by <paramref name="parameters"/>.</returns>
@@ -68,10 +68,26 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         {
             return Problem("\"SortDirection\" or \"SortBy\" contain invalid values.", statusCode: Status400BadRequest);
         }
-        IIncludableQueryable<Post, User> unsortedPosts = context.Posts
+        IQueryable<Post> unsortedPosts = context.Posts
             .Include(post => post.Tags)
                 .ThenInclude(tag => tag.TagType)
             .Include(post => post.Author);
+        if (parameters.Author is not null)
+        {
+            unsortedPosts = unsortedPosts.Where(post => post.Author.Username.Contains(parameters.Author, InvariantCultureIgnoreCase));
+        }
+        if (parameters.Tag is not null)
+        {
+            unsortedPosts = unsortedPosts.Where(post => post.Tags.Any(tag => tag.Name.Contains(parameters.Tag, InvariantCultureIgnoreCase)));
+        }
+        if (parameters.Title is not null)
+        {
+            unsortedPosts = unsortedPosts.Where(post => post.Title.Contains(parameters.Title, InvariantCultureIgnoreCase));
+        }
+        if (parameters.Content is not null)
+        {
+            unsortedPosts = unsortedPosts.Where(post => post.Content.Contains(parameters.Content, InvariantCultureIgnoreCase));
+        }
         IOrderedQueryable<Post> sortedPosts = (parameters.SortDirection, parameters.SortBy) switch
         {
             (Ascending, ById) => unsortedPosts.OrderBy(post => post.Id),
@@ -82,8 +98,8 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         };
         PostQueryResponseDto result = new()
         {
-            Count = await context.Posts.CountAsync(),
-            Posts = mapper.Map<IEnumerable<Post>, IEnumerable<PostQueryResponsePostDto>>(await sortedPosts.Skip(parameters.Start).Take(parameters.Range).ToListAsync())
+            Count = await sortedPosts.CountAsync(),
+            Posts = mapper.Map<IEnumerable<Post>, IEnumerable<PostQueryResponsePostDto>>(sortedPosts.Skip(parameters.Start).Take(parameters.Range))
         };
         return Ok(result);
     }

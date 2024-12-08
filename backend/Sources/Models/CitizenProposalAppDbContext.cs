@@ -56,7 +56,8 @@ public class CitizenProposalAppDbContext(IConfiguration config) : DbContext
         {
             return;
         }
-        optionsBuilder.UseMySql(config.GetConnectionString("CitizenProposalApp"), new MySqlServerVersion(new Version(8, 0, 36)));
+        optionsBuilder.UseMySql(config.GetConnectionString("CitizenProposalApp"), new MySqlServerVersion(new Version(8, 0, 36)),
+            options => options.EnableStringComparisonTranslations());
     }
 
     /// <summary>

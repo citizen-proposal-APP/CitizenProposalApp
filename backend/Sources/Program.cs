@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Globalization;
 
 namespace CitizenProposalApp;
 
@@ -15,6 +16,8 @@ internal sealed class Program
 {
     private static void Main(string[] args)
     {
+        CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+        CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
         builder.Services
             .AddHsts(options =>
