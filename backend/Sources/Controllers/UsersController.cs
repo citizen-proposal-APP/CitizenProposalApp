@@ -32,7 +32,7 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
     /// <param name="registerRequest">Contains the username and password to use.</param>
     /// <returns>Nothing if successful.</returns>
     /// <response code="201">The new user has been created successfully.</response>
-    /// <response code="400">The request body is malformed or lacks required fields.</response>
+    /// <response code="400">The request body is malformed, lacks required fields, or has a username longer than 32 characters.</response>
     /// <response code="409">The specified username already exists.</response>
     [HttpPost("register")]
     [ProducesResponseType(Status201Created)]
@@ -56,7 +56,7 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
     /// <param name="loginRequest">Contains the username and password to log in with.</param>
     /// <returns>Nothing if successful.</returns>
     /// <response code="204">Successfully logged in.</response>
-    /// <response code="400">The request body is malformed or lacks required fields.</response>
+    /// <response code="400">The request body is malformed, lacks required fields, or has a username longer than 32 characters.</response>
     /// <response code="401">The username or password is incorrect.</response>
     [HttpPost("login")]
     [ProducesResponseType(Status204NoContent)]
@@ -143,28 +143,14 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
     /// </summary>
     /// <returns>A <see cref="UserQueryResponseDto"/> containing info about the user.</returns>
     /// <response code="200">The currently logged in user.</response>
-    /// <response code="401">The user has not logged in. Only includes a body if the user's account has been deleted before a response can be sent.</response>
-    /// <response code="500">Something went wrong with the authentication process.</response>
+    /// <response code="401">The user has not logged in or the session has expired.</response>
     [HttpGet("current")]
     [ProducesResponseType(Status200OK)]
-    [ProducesResponseType<ProblemDetails>(Status401Unauthorized, Application.ProblemJson)]
-    [ProducesResponseType<ProblemDetails>(Status500InternalServerError, Application.ProblemJson)]
+    [ProducesResponseType(typeof(void), Status401Unauthorized, Application.ProblemJson)]
     [Authorize]
     public async Task<ActionResult<UserQueryResponseDto>> GetCurrentUser()
     {
-        User? user;
-        try
-        {
-            user = await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User);
-        }
-        catch (InvalidOperationException)
-        {
-            return Problem("Something went wrong with the authentication process.", statusCode: Status500InternalServerError);
-        }
-        if (user is null)
-        {
-            return Problem("The account of the currently logged in user has been deleted.", statusCode: Status401Unauthorized);
-        }
+        User user = (await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User))!;
         return mapper.Map<User, UserQueryResponseDto>(user);
     }
 

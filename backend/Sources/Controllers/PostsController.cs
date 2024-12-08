@@ -29,7 +29,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     /// Quries a post by its ID.
     /// </summary>
     /// <param name="id">The ID of the post to query.</param>
-    /// <returns>A <see cref="PostQueryResponsePostDto"/> instance that contains the content, tags, and author of the queried post.</returns>
+    /// <returns>A <see cref="PostQueryResponseDto"/> instance that contains the content, tags, and author of the queried post.</returns>
     /// <response code="200">A post with the specified ID.</response>
     /// <response code="400">The provided ID is not a valid integer.</response>
     /// <response code="404">No post with the specified ID exists.</response>
@@ -37,7 +37,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
     [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
-    public async Task<ActionResult<PostQueryResponsePostDto>> GetPostById(int id)
+    public async Task<ActionResult<PostQueryResponseDto>> GetPostById(int id)
     {
         Post? post = await context.Posts
             .Include(post => post.Tags)
@@ -49,7 +49,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         {
             return Problem($"No post with the ID {id} exists.", statusCode: Status404NotFound);
         }
-        return mapper.Map<Post, PostQueryResponsePostDto>(post);
+        return mapper.Map<Post, PostQueryResponseDto>(post);
     }
 
     /// <summary>
@@ -57,12 +57,12 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     /// </summary>
     /// <param name="parameters">Contains the conditions about which posts to query.</param>
     /// <returns>The posts that meet the conditions speficied by <paramref name="parameters"/>.</returns>
-    /// <response code="200">An object that contains the total number of posts in the database and an array of posts that satisify the given parameters. The array can be empty if no post satisfy the given parameters.</response>
+    /// <response code="200">An object that contains the total number of posts in the database that satisfy the given parameters and an array of those posts. The array can be empty if no post satisfy the given parameters.</response>
     /// <response code="400">The query parameters are malformed.</response>
     [HttpGet]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
-    public async Task<ActionResult<PostQueryResponseDto>> GetPostsByParameters([FromQuery] PostQueryRequestDto parameters)
+    public async Task<ActionResult<PostsQueryResponseDto>> GetPostsByParameters([FromQuery] PostsQueryRequestDto parameters)
     {
         if (!Enum.IsDefined(parameters.SortDirection) || !Enum.IsDefined(parameters.SortBy))
         {
@@ -96,10 +96,10 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
             (Descending, ByDate) => unsortedPosts.OrderByDescending(post => post.PostedTime).ThenByDescending(post => post.Id),
             _ => throw new NotImplementedException("Impossible situation")
         };
-        PostQueryResponseDto result = new()
+        PostsQueryResponseDto result = new()
         {
             Count = await sortedPosts.CountAsync(),
-            Posts = mapper.Map<IEnumerable<Post>, IEnumerable<PostQueryResponsePostDto>>(sortedPosts.Skip(parameters.Start).Take(parameters.Range))
+            Posts = mapper.Map<IEnumerable<Post>, IEnumerable<PostQueryResponseDto>>(sortedPosts.Skip(parameters.Start).Take(parameters.Range))
         };
         return Ok(result);
     }
@@ -110,34 +110,18 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     /// <param name="post">The post to submit.</param>
     /// <returns>Nothing if successful.</returns>
     /// <response code="201">The new post has been successfully created.</response>
-    /// <response code="400">The request body is malformed, lacks required fields, has form fields larger than 50 MiB, or the total size of the request body is over 100 MiB.</response>
-    /// <response code="401">The user has not logged in, the logged-in user's account has been deleted, or the session has expired. Only includes a body if the user's account has been deleted before a post can be added.</response>
-    /// <response code="500">Something went wrong with the authentication process.</response>
+    /// <response code="400">The request body is malformed, lacks required fields, has form fields larger than 50 MiB, has a title longer than 100 characters, has a content longer than 2000 characters, has tag names longer than 32 characters, or the total size of the request body is over 100 MiB.</response>
+    /// <response code="401">The user has not logged in or the session has expired.</response>
     [HttpPost]
     [ProducesResponseType(Status201Created)]
     [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
-    [ProducesResponseType<ProblemDetails>(Status401Unauthorized, Application.ProblemJson)]
-    [ProducesResponseType<ProblemDetails>(Status500InternalServerError, Application.ProblemJson)]
+    [ProducesResponseType(typeof(void), Status401Unauthorized, Application.ProblemJson)]
     [RequestFormLimits(MultipartBodyLengthLimit = postSubmissionMultipartLimit)]
     [RequestSizeLimit(postSubmissionTotalLimit)]
     [Authorize]
     public async Task<IActionResult> AddPost([FromForm] PostSubmissionDto post)
     {
-        User? author;
-        try
-        {
-            author = await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User);
-        }
-        // This should be impossible unless the authentication handler has a bug.
-        catch (InvalidOperationException)
-        {
-            return Problem("Something went wrong with the authentication process.", statusCode: Status500InternalServerError);
-        }
-        // Handles the possible race condition where the account has been deleted after the authentication and before this line.
-        if (author is null)
-        {
-            return Problem("The account of the currently logged in user has been deleted.", statusCode: Status401Unauthorized);
-        }
+        User author = (await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User))!;
         IEnumerable<string> tagsString;
         ICollection<Tag> tags;
         if (post.Tags is null or { Count: 0 })
@@ -171,6 +155,81 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         context.Posts.Add(newPost);
         await context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetPostById), new { id = newPost.Id }, null);
+    }
+
+    /// <summary>
+    /// Adds a comment to a post.
+    /// </summary>
+    /// <param name="comment">The comment to add.</param>
+    /// <param name="postId">The ID of the post under which to post this comment.</param>
+    /// <returns>Nothing if successful.</returns>
+    /// <response code="201">The new comment has been successfully created.</response>
+    /// <response code="400">The request is malformed or the comment is longer than 200 characters.</response>
+    /// <response code="401">The user has not logged in or the session has expired.</response>
+    /// <response code="404">No post with the specified ID exists.</response>
+    [HttpPost("{postId}/Comments")]
+    [ProducesResponseType(Status201Created)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType(typeof(void), Status401Unauthorized, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
+    [Authorize]
+    public async Task<IActionResult> AddComment([FromForm] CommentSubmissionDto comment, int postId)
+    {
+        Post? parentPost = await context.Posts.FindAsync(postId);
+        if (parentPost is null)
+        {
+            return Problem($"No post with the ID {postId} exists.", statusCode: Status404NotFound);
+        }
+        User user = (await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User))!;
+        Comment newComment = new()
+        {
+            Author = user,
+            Content = comment.Content,
+            ParentPost = parentPost,
+            PostedTime = timeProvider.GetUtcNow()
+        };
+        context.Comments.Add(newComment);
+        await context.SaveChangesAsync();
+        return CreatedAtAction(nameof(GetPostById), new { id = postId }, null);
+    }
+
+    /// <summary>
+    /// Queries comments under a post by various query parameters.
+    /// </summary>
+    /// <param name="parameters">Contains the conditions about which comments to query.</param>
+    /// <param name="postId">The ID of the post under which to query comments.</param>
+    /// <returns>The comments that meet the conditions speficied by <paramref name="parameters"/>.</returns>
+    /// <response code="200">An object that contains the total number of comments in the database that satisfy the given parameters and an array of those comments. The array can be empty if no comment satisfy the given parameters.</response>
+    /// <response code="400">The query parameters are malformed.</response>
+    /// <response code="404">No post with the specified ID exists.</response>
+    [HttpGet("{postId}/Comments")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
+    public async Task<ActionResult<CommentsQueryResponseDto>> GetCommentsByParameters([FromQuery] CommentsQueryRequestDto parameters, int postId)
+    {
+        Post? parentPost = await context.Posts.FindAsync(postId);
+        if (parentPost is null)
+        {
+            return Problem($"No post with the ID {postId} exists.", statusCode: Status404NotFound);
+        }
+        if (!Enum.IsDefined(parameters.SortDirection))
+        {
+            return Problem("\"SortDirection\" contain invalid values.", statusCode: Status400BadRequest);
+        }
+        IQueryable<Comment> comments = context.Comments.Include(comment => comment.Author).Where(comment => comment.ParentPost.Id == postId);
+        comments = parameters.SortDirection switch
+        {
+            Ascending => comments.OrderBy(comment => comment.PostedTime),
+            Descending => comments.OrderByDescending(comment => comment.PostedTime),
+            _ => throw new NotImplementedException("Impossible situation")
+        };
+        CommentsQueryResponseDto result = new()
+        {
+            Count = await comments.CountAsync(),
+            Comments = mapper.Map<IEnumerable<Comment>, IEnumerable<CommentQueryResponseDto>>(comments.Skip(parameters.Start).Take(parameters.Range))
+        };
+        return Ok(result);
     }
 
     private async Task AddMissingTagsToDb(IEnumerable<string> tagsToAddToNewPost)
