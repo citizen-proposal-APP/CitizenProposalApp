@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100pt" height="106.52pt" version="1.1" viewBox="0 0 100 106.52" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <filter id="filter-remove-color" x="0" y="0" width="1" height="1">
+   <feColorMatrix color-interpolation-filters="sRGB" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/>
+  </filter>
+  <clipPath id="clip-2">
+   <path d="m0.50391 125h517.5v4.9688h-517.5z"/>
+  </clipPath>
+  <mask>
+   <g filter="url(#filter-remove-color)">
+    <rect x="-132.49" y="-684.14" width="775.56" height="1061.3" fill-opacity=".85001"/>
+   </g>
+  </mask>
+  <clipPath>
+   <path d="m0.50391 0.22266h5.4961v4.7461h-5.4961z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m27 0.22266h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m54 0.22266h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m81 0.22266h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m108 0.22266h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m135 0.22266h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m162 0.22266h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m189 0.22266h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m216 0.22266h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m243 0.22266h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m270 0.22266h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m297 0.22266h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m324 0.22266h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m351 0.22266h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m378 0.22266h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m405 0.22266h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m432 0.22266h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m459 0.22266h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m485 0.22266h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m512 0.22266h5.7148v4.7461h-5.7148z"/>
+  </clipPath>
+  <clipPath id="clip-23">
+   <rect width="518" height="5"/>
+  </clipPath>
+  <g clip-path="url(#clip-23)"></g>
+  <clipPath id="clip-24">
+   <path d="m0.50391 100h517.5v6h-517.5z"/>
+  </clipPath>
+  <mask>
+   <g filter="url(#filter-remove-color)">
+    <rect x="-132.49" y="-684.14" width="775.56" height="1061.3" fill-opacity=".7"/>
+   </g>
+  </mask>
+  <clipPath>
+   <path d="m0.50391 0.375h5.4961v4.7461h-5.4961z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m27 0.375h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m54 0.375h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m81 0.375h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m108 0.375h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m135 0.375h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m162 0.375h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m189 0.375h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m216 0.375h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m243 0.375h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m270 0.375h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m297 0.375h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m324 0.375h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m351 0.375h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m378 0.375h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m405 0.375h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m432 0.375h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m459 0.375h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m485 0.375h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m512 0.375h5.7148v4.7461h-5.7148z"/>
+  </clipPath>
+  <clipPath id="clip-45">
+   <rect width="518" height="6"/>
+  </clipPath>
+  <g clip-path="url(#clip-45)"></g>
+  <clipPath id="clip-46">
+   <path d="m0.50391 75h517.5v6h-517.5z"/>
+  </clipPath>
+  <mask>
+   <g filter="url(#filter-remove-color)">
+    <rect x="-132.49" y="-684.14" width="775.56" height="1061.3" fill-opacity=".55"/>
+   </g>
+  </mask>
+  <clipPath>
+   <path d="m0.50391 0.52734h5.4961v4.7461h-5.4961z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m27 0.52734h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m54 0.52734h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m81 0.52734h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m108 0.52734h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m135 0.52734h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m162 0.52734h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m189 0.52734h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m216 0.52734h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m243 0.52734h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m270 0.52734h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m297 0.52734h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m324 0.52734h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m351 0.52734h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m378 0.52734h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m405 0.52734h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m432 0.52734h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m459 0.52734h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m485 0.52734h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m512 0.52734h5.7148v4.7461h-5.7148z"/>
+  </clipPath>
+  <clipPath id="clip-67">
+   <rect width="518" height="6"/>
+  </clipPath>
+  <g clip-path="url(#clip-67)"></g>
+  <clipPath id="clip-68">
+   <path d="m0.50391 50h517.5v6h-517.5z"/>
+  </clipPath>
+  <mask>
+   <g filter="url(#filter-remove-color)">
+    <rect x="-132.49" y="-684.14" width="775.56" height="1061.3" fill-opacity=".39999"/>
+   </g>
+  </mask>
+  <clipPath>
+   <path d="m0.50391 0.67969h5.4961v4.7461h-5.4961z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m27 0.67969h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m54 0.67969h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m81 0.67969h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m108 0.67969h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m135 0.67969h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m162 0.67969h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m189 0.67969h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m216 0.67969h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m243 0.67969h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m270 0.67969h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m297 0.67969h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m324 0.67969h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m351 0.67969h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m378 0.67969h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m405 0.67969h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m432 0.67969h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m459 0.67969h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m485 0.67969h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m512 0.67969h5.7148v4.7461h-5.7148z"/>
+  </clipPath>
+  <clipPath id="clip-89">
+   <rect width="518" height="6"/>
+  </clipPath>
+  <g clip-path="url(#clip-89)"></g>
+  <clipPath id="clip-90">
+   <path d="m0.50391 25h517.5v6h-517.5z"/>
+  </clipPath>
+  <mask>
+   <g filter="url(#filter-remove-color)">
+    <rect x="-132.49" y="-684.14" width="775.56" height="1061.3" fill-opacity=".25"/>
+   </g>
+  </mask>
+  <clipPath>
+   <path d="m0.50391 0.82812h5.4961v4.7461h-5.4961z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m27 0.82812h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m54 0.82812h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m81 0.82812h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m108 0.82812h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m135 0.82812h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m162 0.82812h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m189 0.82812h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m216 0.82812h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m243 0.82812h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m270 0.82812h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m297 0.82812h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m324 0.82812h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m351 0.82812h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m378 0.82812h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m405 0.82812h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m432 0.82812h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m459 0.82812h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m485 0.82812h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m512 0.82812h5.7148v4.7461h-5.7148z"/>
+  </clipPath>
+  <clipPath id="clip-111">
+   <rect width="518" height="6"/>
+  </clipPath>
+  <g clip-path="url(#clip-111)"></g>
+  <clipPath id="clip-112">
+   <path d="m0.50391 0.98047h517.5v5.0195h-517.5z"/>
+  </clipPath>
+  <mask>
+   <g filter="url(#filter-remove-color)">
+    <rect x="-132.49" y="-684.14" width="775.56" height="1061.3" fill-opacity=".10001"/>
+   </g>
+  </mask>
+  <clipPath>
+   <path d="m0.50391 0.98047h5.4961v4.7461h-5.4961z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m27 0.98047h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m54 0.98047h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m81 0.98047h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m108 0.98047h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m135 0.98047h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m162 0.98047h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m189 0.98047h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m216 0.98047h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m243 0.98047h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m270 0.98047h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m297 0.98047h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m324 0.98047h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m351 0.98047h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m378 0.98047h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m405 0.98047h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m432 0.98047h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m459 0.98047h5v4.7461h-5z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m485 0.98047h6v4.7461h-6z"/>
+  </clipPath>
+  <clipPath>
+   <path d="m512 0.98047h5.7148v4.7461h-5.7148z"/>
+  </clipPath>
+  <clipPath id="clip-133">
+   <rect width="518" height="6"/>
+  </clipPath>
+  <g clip-path="url(#clip-133)"></g>
+  <clipPath id="clip-134">
+   <rect width="525" height="130"/>
+  </clipPath>
+  <g clip-path="url(#clip-134)">
+   <g clip-path="url(#clip-2)"></g>
+   <g clip-path="url(#clip-24)"></g>
+   <g clip-path="url(#clip-46)"></g>
+   <g clip-path="url(#clip-68)"></g>
+   <g clip-path="url(#clip-90)"></g>
+   <g clip-path="url(#clip-112)"></g>
+  </g>
+ </defs>
+ <path d="m59.981 9.908c-4.7873-1.2268-8.6011-5.0274-10.041-9.908-1.4669 5.0674-5.5207 8.9612-10.561 10.041v0.0137c-22.51 4.814-39.379 24.657-39.379 48.393 0 23.23 16.149 42.712 37.925 48.073-14.802-5.0407-25.443-19.043-25.443-35.538 0-8.5345 2.8537-16.402 7.6544-22.71-1.1868 3.3338-1.8269 6.9209-1.8269 10.641 0 15.562 11.202 28.497 25.963 31.191-8.2144-2.467-14.215-10.095-14.215-19.123 0-11.015 8.9212-19.949 19.936-19.949 11.015 0 19.949 8.9345 19.949 19.949 0 9.0279-6.0008 16.656-14.229 19.123 14.775-2.6937 25.977-15.629 25.977-31.191 0-3.7205-0.65344-7.3077-1.8402-10.641 4.8006 6.3075 7.6543 14.175 7.6543 22.71 0 16.496-10.641 30.497-25.43 35.538 21.776-5.3607 37.925-24.843 37.925-48.073 0-23.963-17.189-43.953-40.019-48.54" fill="#0c3b8a" stroke-width="3.4138"/>
+</svg>
