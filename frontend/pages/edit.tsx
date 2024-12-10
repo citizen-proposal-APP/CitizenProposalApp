@@ -4,7 +4,7 @@ import { Proposal } from '@/types/Proposal';
 import { Tag, TagType } from '@/types/Tag';
 import React, { useState, useRef } from 'react';
 import { IconUpload, IconX } from '@tabler/icons-react';
-import { Badge, Button, Card, CheckIcon, Combobox, Container, FileInput, Grid, Group, Image, MantineProvider, Modal, Pill, PillsInput, rem, ScrollArea, SimpleGrid, Stack, Text, Textarea, Timeline, useCombobox } from '@mantine/core';
+import { Badge, Button, Card, CheckIcon, Combobox, Container, Grid, Group, Image, MantineProvider, Modal, Pill, PillsInput, rem, ScrollArea, SimpleGrid, Stack, TagsInput, Text, Textarea, Timeline, useCombobox } from '@mantine/core';
 import { useDisclosure, useValidatedState, useViewportSize } from '@mantine/hooks';
 import { Dropzone } from '@mantine/dropzone';
 import '@mantine/dropzone/styles.css';
@@ -15,12 +15,12 @@ import { IconPhoto, IconVideo } from '@tabler/icons-react';
 export default function EditPage() {
 	const [{ value: titleValue, valid: titleValid }, setTitleValue] = useValidatedState(
     '',
-    (val) => val.length > 0 && val.length <= 30,
+    (val) => val.length > 0 && val.length <= 100,
     true
   );
 	const [{ value: contentValue, valid: contentValid }, setContentValue] = useValidatedState(
     '',
-    (val) => val.length > 0 && val.length <= 300,
+    (val) => val.length > 0 && val.length <= 2000,
     true
   );
   const [fileValue, setFileValue] = useState<File[]>([]);
@@ -28,18 +28,20 @@ export default function EditPage() {
   const [currentReplacingFile, setCurrentReplacingFile] = useState<File | null>(null);
   const [onFirstStep, setOnFirstStep] = useState(true);
   const [onSecondStep, setOnSecondStep] = useState(false);
-  const [tagSearch, setTagSearch] = useState('');
-  const [tagValue, setTagValue] = useState<any[]>([]);
-  const [tagNameValue, setTagNameValue] = useState<string[]>([]);
   const [saveModalOpened, { open: openSaveModal, close: closeSaveModal }] = useDisclosure(false);
   const [publishModalOpened, { open: openPublishModal, close: closePublishModal }] = useDisclosure(false);
   const [replaceModalOpened, setReplaceModalOpened] = useState(false);  
+  /*
+  const [tagSearch, setTagSearch] = useState('');
+  const [tagValue, setTagValue] = useState<any[]>([]);
+  const [tagNameValue, setTagNameValue] = useState<string[]>([]);
+  */
   const MAX_FILE_SIZE = 50 * 1024 ** 2;
+  const WIDTH_OFFSET = 65;
   const MAX_TAGS = 3;
   const MAX_PILL_LENGTH = 10;
   const CARD_HEIGHT = 250;
   const CARD_WIDTH = 250;
-  const WIDTH_OFFSET = 65;
 
   const timelineProgress = onFirstStep ? 0 : 1
   const { height, width } = useViewportSize();
@@ -123,12 +125,14 @@ export default function EditPage() {
   function nextStep() {
     setOnFirstStep(false)
     setOnSecondStep(true)
+    /*
     tagValue.forEach(element => {
       handleTagValueRemove(element.name)
     });
     autoTags.forEach(element => {
       handleTagValueSelect(element.name)
     });
+    */
   }
   function prevStep() {
     setOnFirstStep(true)
@@ -166,6 +170,9 @@ export default function EditPage() {
       }
     }
   }
+  function clearFile() {
+    uploadFile([])
+  }
   function processNextReplacement() {
     setReplacingQueue((queue) => {
       const [nextFile, ...remainingQueue] = queue;
@@ -187,21 +194,22 @@ export default function EditPage() {
     setReplaceModalOpened(false);
     processNextReplacement()
   }
-
   function skipFile() {
     console.log("skipped file", currentReplacingFile);
     setCurrentReplacingFile(null);
     setReplaceModalOpened(false);
     processNextReplacement()
   }
-
   function extractTagNames(tags: Tag[]): string[] {
     return tags.map((tag) => tag.name);
   }
+  /*
   function findTag(input:string): Tag | undefined {
     return tagList.find((tag) => tag.name == input)
   }
+  */
 
+  /*
 	const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
     onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
@@ -226,6 +234,7 @@ export default function EditPage() {
       {item}
     </Pill>
   ));
+  */
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const handleWheel = (event: any) => {
@@ -238,6 +247,7 @@ export default function EditPage() {
     }
   };
 
+  /*
   const options = extractTagNames(tagList)
     .filter((item) => item.toLowerCase().includes(tagSearch.trim().toLowerCase()))
     .map((item) => (
@@ -248,7 +258,7 @@ export default function EditPage() {
         </Group>
       </Combobox.Option>
     ));
-	
+	*/
 
 	return (
     <Layout>
@@ -300,7 +310,7 @@ export default function EditPage() {
           <Stack w={width < 990 + WIDTH_OFFSET ? (width - WIDTH_OFFSET) : 990} gap={"xl"}>
             <Textarea 
               label="主題（必填）"
-              placeholder="請輸入主題，30字以內，必填" 
+              placeholder="請輸入主題，100字以內，必填" 
               required
               radius={"lg"}
               size={"lg"}
@@ -312,7 +322,7 @@ export default function EditPage() {
             />
             <Textarea 
               label="提案內容或建議事項（必填）"
-              placeholder="請輸入內容或建議事項，300字以內，必填" 
+              placeholder="請輸入內容或建議事項，2000字以內，必填" 
               required
               radius={"lg"}
               size={"lg"}
@@ -322,17 +332,9 @@ export default function EditPage() {
               onChange={(event) => setContentValue(event.currentTarget.value)}
               error={!contentValid}
             />
-            <FileInput
-              label="上傳附件（支援圖片、影像格式）"
-              placeholder="選擇檔案或將檔案拖至此處（支援圖片、影像格式）"
-              accept="image/png, image/gif, image/jpeg, image/svg+xml, image/webp, image/avif, image/heic, image/heif, video/mp4"
-              radius={"lg"}
-              size={"lg"}
-              clearable
-              multiple
-              value={fileValue} 
-              onChange={uploadFile}
-            />
+            <Text size="lg">
+              上傳附件（支援圖片、影像格式）
+            </Text>
             <Dropzone
               onDrop={(files) => uploadFile(files)}
               onReject={(files) => console.log('rejected files', files)}
@@ -401,14 +403,18 @@ export default function EditPage() {
               </Grid>
               }
             </Dropzone>
+            {fileValue.length > 0 &&
+            <Button variant="filled" size="lg" onClick={clearFile}>清除已上傳的檔案</Button>
+            }
             <Group justify="space-between" gap={"xl"} grow>
-              <Button variant="filled" size={"lg"} onClick={openSaveModal}>保留草稿</Button>
+              {/*<Button variant="filled" size={"lg"} onClick={openSaveModal}>保留草稿</Button>*/}
               <Button variant="filled" size={"lg"} onClick={inputValidation}>填寫完成</Button>
             </Group>
           </Stack>
           }
           {onSecondStep &&
           <Stack w={width < 990 + WIDTH_OFFSET ? (width - WIDTH_OFFSET) : 990} gap={"xl"}>
+            {/*
             <Combobox store={combobox} onOptionSubmit={handleTagValueSelect}>
               <Combobox.DropdownTarget>
                 <PillsInput onClick={() => combobox.openDropdown()} label="標籤選擇" radius={"lg"} size={"lg"}>
@@ -441,6 +447,16 @@ export default function EditPage() {
                 </Combobox.Options>
               </Combobox.Dropdown>
             </Combobox>
+            */}
+            <TagsInput
+              label="標籤選擇" 
+              radius={"lg"} 
+              size={"lg"}
+              placeholder="請輸入關鍵字，並選取推薦標籤"
+              data={extractTagNames(tagList)}
+              defaultValue={extractTagNames(autoTags)}
+              clearable
+            />
             <Text size="lg">
               或許你想看看...？
             </Text>
@@ -460,14 +476,14 @@ export default function EditPage() {
             {/*
             <Container>
               <SimpleGrid cols={3} spacing="lg">
-                {testProposals.map((proposal) => (
+                {similarProposals.map((proposal) => (
                   <ProposalCard key={proposal.id} data={proposal} />
                 ))}
               </SimpleGrid>
             </Container>
             */}
             <Group justify="space-between" gap={"xl"} grow>
-              <Button variant="filled" size="lg" onClick={openSaveModal}>保留草稿</Button>
+              {/*<Button variant="filled" size="lg" onClick={openSaveModal}>保留草稿</Button>*/}
               <Button variant="filled" size="lg" onClick={prevStep}>回上一步</Button>
             </Group>
             <Group justify="space-between" gap={"xl"} grow>
