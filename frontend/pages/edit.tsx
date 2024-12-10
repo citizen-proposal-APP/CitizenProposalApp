@@ -403,51 +403,10 @@ export default function EditPage() {
               viewportRef={scrollAreaRef}
               onWheel={handleWheel}
             >
-              <Group gap={"md"} style={{ display: "flex", flexWrap: "nowrap" }}>
-                {similarProposals.map((proposal, index) => (
-                  <Card
-                    key={index}
-                    withBorder 
-                    radius="md" 
-                    component="a" 
-                    href="#"
-                    shadow="sm"
-                    padding="lg"
-                    style={{ width: `${CARD_WIDTH}px`, height: `${CARD_HEIGHT}px`,  flex: "0 0 auto" }}
-                  >
-                    <Card.Section>
-                      <Image src={proposal.thumbnail} alt={proposal.title} height={130} />
-                    </Card.Section>
-                    <Text size="lg" mt="md" fw={"bold"}>
-                      {proposal.title}
-                    </Text>
-                    <Group gap={"xs"} mt="xs">
-                      {proposal.tags.slice(0, MAX_TAGS).map((tag, tagIndex) => (
-                        <Badge
-                          key={tagIndex}
-                          variant={tag.tagType === TagType.department ? 'white' : 'light'}
-                          color="blue"
-                          radius="xl"
-                          style={{
-                            maxWidth: "80px",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {tag.name.length > MAX_PILL_LENGTH
-                            ? `${tag.name.slice(0, MAX_PILL_LENGTH)}...`
-                            : tag.name}
-                        </Badge>
-                      ))}
-                      {proposal.tags.length > MAX_TAGS && (
-                        <Badge variant="outline" color="gray" radius="xl">
-                          +{proposal.tags.length - MAX_TAGS} more
-                        </Badge>
-                      )}
-                    </Group>
-                  </Card>
-                ))}
+              <Group gap={"md"} style={{ display: "flex", flexWrap: "nowrap" }} h={300}>
+                {similarProposals.map((proposal) =>
+                  <ProposalCard key={proposal.id} data={proposal} width={300} height="100%"/>
+                )}
               </Group>
             </ScrollArea>
             {/*
