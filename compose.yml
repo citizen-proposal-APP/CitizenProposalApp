@@ -26,6 +26,15 @@ services:
     secrets:
       - db-user
       - db-password
+  ai:
+    container_name: CitizenProposalAppAi
+    build: ai
+    networks:
+      - citizen-proposal-app
+    ports:
+      - 5001:5001
+    volumes:
+      - vector-db:/app/db
 
 networks:
   citizen-proposal-app:
@@ -36,6 +45,8 @@ volumes:
   mysql-data:
     name: mysql-data # Prevents project prefix
     # I wanted to specify the location of the volume using a bind mount, but that doesn't work on Windows: https://stackoverflow.com/a/50954066/11138778
+  vector-db:
+    name: vector-db
 
 secrets:
   db-password:
