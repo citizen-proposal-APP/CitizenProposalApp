@@ -1,5 +1,10 @@
 # Citizen Proposal App
 
+- [Backend Development](#backend-development)
+- [Frontend Development](#frontend-development)
+  - [Docker](#docker)
+  - [Components](#components)
+
 ## Backend Development
 
 To start development on the backend ASP.NET Core app with a local test DB,
@@ -35,6 +40,34 @@ follow these steps:
    of using `docker compose` is because VS uses special optimizations with
    Docker containers. This is called "fast mode". It also makes debugging
    easier.
+
+## Frontend Development
+
+No additional installations are required to make the frontend work. `yarn` is already included with the project.
+
+1. Clone the repository.
+2. Run `yarn install` in `frontend/` to install all dependencies.
+3. Run `yarn dev` in `frontend/` to start the development server.
+
+### Docker
+
+To start only the frontend container, run:
+
+```sh
+docker compose up -d frontend
+```
+
+You should now be able to access the frontend at `localhost:80`.
+
+### Components
+
+| Component    | Description              | Note                                                              |
+|--------------|--------------------------|-------------------------------------------------------------------|
+| ActionToggle | Color scheme toggle      |                                                                   |
+| HeaderMenu   | Desktop navigation       | This component should not be used directly. Use `Layout` instead. |
+| Layout       | Default layout structure |                                                                   |
+| Logo         | Logo of the application  |                                                                   |
+| NavbarNested | Mobile navigation        | This component should not be used directly. Use `Layout` instead. |
 
 ## AI Development
 
