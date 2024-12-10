@@ -10,7 +10,7 @@ const PostSection = ({ title, proposals }: { title: string; proposals: Proposal[
         {title}
       </Text>
 
-      {/* 使用 ScrollArea 取代 Carousel */}
+      {/* ScrollArea */}
       <ScrollArea
         style={{ maxWidth: '100%', overflow: 'hidden' }}
         scrollbarSize={8} // 捲軸大小
@@ -27,7 +27,6 @@ const PostSection = ({ title, proposals }: { title: string; proposals: Proposal[
             <ProposalCard
               key={proposal.id}
               data={proposal}
-              style={{ flex: '0 0 250px' }} // 設定卡片寬度
             />
           ))}
         </Box>

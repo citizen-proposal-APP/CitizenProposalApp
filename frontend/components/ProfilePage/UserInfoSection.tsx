@@ -1,12 +1,9 @@
-import { Avatar, Button, Card, Grid, Text } from '@mantine/core';
+import { Button, Card, Grid, Text } from '@mantine/core';
 
 // 定義使用者資料的型別
 interface User {
-  avatar: string;
-  name: string;
-  email: string;
-  nickname: string;
-  points: number;
+  id: number;
+  username: string;
 }
 
 interface UserInfoSectionProps {
@@ -26,19 +23,6 @@ const UserInfoSection = ({ user, onEdit }: UserInfoSectionProps) => (
         textAlign: 'left',
       }}
     >
-      {/* 頭像區域 */}
-      <Grid.Col
-        span={6}
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          textAlign: 'center',
-        }}
-      >
-        <Avatar src={user.avatar} alt={`${user.name} 的頭像`} radius="xl" size={120} />
-      </Grid.Col>
-
       {/* 使用者資訊區域 */}
       <Grid.Col
         span={6}
@@ -49,11 +33,8 @@ const UserInfoSection = ({ user, onEdit }: UserInfoSectionProps) => (
         }}
       >
         <Text size="xl" fw={700}>
-          {user.name}，你好
+          {user.username}，你好
         </Text>
-        <Text size="sm">電子信箱：{user.email}</Text>
-        <Text size="sm">暱稱：{user.nickname}</Text>
-        <Text size="sm">國民之聲 Point：{user.points}</Text>
       </Grid.Col>
 
       {/* 編輯按鈕區域 */}
