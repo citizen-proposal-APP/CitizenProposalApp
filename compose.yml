@@ -28,7 +28,7 @@ services:
       - db-password
   ai:
     container_name: CitizenProposalAppAi
-    build: ai
+    build: AI
     networks:
       - citizen-proposal-app
     ports:
