@@ -5,8 +5,8 @@ import { ActionToggle } from '@/components/ActionToggle/ActionToggle';
 import { Logo } from '@/components/Logo/Logo';
 import { links } from '@/data/links';
 import classes from './HeaderMenu.module.css';
-import { AuthenticationTitle } from '@/pages/Auth/SignIn/SignIn';
-import { SignUp } from '@/pages/Auth/SignUp/SignUp';
+import { AuthenticationTitle } from '@/components/Auth/SignIn/SignIn';
+import { SignUp } from '@/components/Auth/SignUp/SignUp';
 
 interface HeaderMenuProps {
   opened: boolean;

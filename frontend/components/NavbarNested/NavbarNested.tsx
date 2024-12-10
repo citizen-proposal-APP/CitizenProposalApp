@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Button, Code, Group, ScrollArea, Modal } from '@mantine/core';
 import { LinksGroup } from './LinksGroup';
 import { links } from '@/data/links';
-import { AuthenticationTitle } from '@/pages/Auth/SignIn/SignIn';
-import { SignUp } from '@/pages/Auth/SignUp/SignUp';
+import { AuthenticationTitle } from '@/components/Auth/SignIn/SignIn';
+import { SignUp } from '@/components/Auth/SignUp/SignUp';
 import classes from './NavbarNested.module.css';
 import Link from 'next/link';
 
