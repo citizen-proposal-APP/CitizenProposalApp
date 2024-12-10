@@ -43,6 +43,7 @@ topic_label_index.load("model/topic_label/proposal.index")
 
 index = Index(ndim=1792)
 if not os.path.exists("db/main.index"):
+    os.makedirs("db")
     index.save("db/main.index")
 index.load("db/main.index")
 
