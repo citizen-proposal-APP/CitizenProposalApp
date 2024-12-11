@@ -3,8 +3,8 @@ import { Accordion, Anchor, Container, Title, Text, Modal, Grid } from '@mantine
 import { Image } from '@mantine/core';
 import styles from './Manual.module.css';
 import { Layout } from '@/components/Layout/Layout';
-import { AuthenticationTitle } from '@/pages/Auth/SignIn/SignIn';
-import { SignUp } from '@/pages/Auth/SignUp/SignUp';
+import { AuthenticationTitle } from '@/components/Auth/SignIn/SignIn';
+import { SignUp } from '@/components/Auth/SignUp/SignUp';
 import { LinkCard } from '@/components/LinkCard/LinkCard';
 
 
