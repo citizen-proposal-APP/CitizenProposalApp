@@ -1,9 +1,9 @@
 # Citizen Proposal App
 
-- [Backend Development](#backend-development)
-- [Frontend Development](#frontend-development)
-  - [Docker](#docker)
-  - [Components](#components)
+-   [Backend Development](#backend-development)
+-   [Frontend Development](#frontend-development)
+    -   [Docker](#docker)
+    -   [Components](#components)
 
 ## Backend Development
 
@@ -18,9 +18,9 @@ follow these steps:
    use into `env/mysql.env`. For its syntax, check the
    [docs](https://docs.docker.com/reference/compose-file/services/#env_file-format).
 5. `cd` into the project root and start **only** the DB service with `docker
-   compose up -d db`.
+compose up -d db`.
 6. After a few seconds, check the logs of the DB service with either `docker
-   compose logs` or with the Docker Desktop GUI. You should see the line
+compose logs` or with the Docker Desktop GUI. You should see the line
    `GENERATED ROOT PASSWORD: ...`. This will be the root password of the DB.
    Note that if a `datadir` already exists, the root password will not be
    regenerated. [This also applies to `MYSQL_USER` and
@@ -31,9 +31,9 @@ follow these steps:
    CitizenProposalApp project in the Solution Explorer and click on Manage User
    Secrets. Add the following line to the JSON file that shows up:
 
-   ```json
-   "ConnectionStrings:CitizenProposalApp": "server=CitizenProposalAppDb;database=CitizenProposalApp;uid=<your username>;pwd=<your password>"
-   ```
+    ```json
+    "ConnectionStrings:CitizenProposalApp": "server=CitizenProposalAppDb;database=CitizenProposalApp;uid=<your username>;pwd=<your password>"
+    ```
 
 8. Click on the green play button. The backend app should now be able to
    communicate with the DB. The reason why we have to use VS separately instead
@@ -61,12 +61,14 @@ You should now be able to access the frontend at `localhost:80`.
 
 ### Components
 
-| Component    | Description                      | Note                                                              |
-|--------------|----------------------------------|-------------------------------------------------------------------|
-| ActionToggle | Color scheme toggle              |                                                                   |
-| HeaderMenu   | Desktop navigation               | This component should not be used directly. Use `Layout` instead. |
-| Layout       | Default layout structure         |                                                                   |
-| LinkCard     | External link                    | Use with `SimpleGrid` or `Container` is recommended.              |
-| Logo         | Logo of the application          |                                                                   |
-| NavbarNested | Mobile navigation                | This component should not be used directly. Use `Layout` instead. |
-| ProposalCard | Unified way to display proposals | Use with `SimpleGrid` or `Container` is recommended.              |
+| Component    | Description                       | Note                                                              |
+| ------------ | --------------------------------- | ----------------------------------------------------------------- |
+| ActionToggle | Color scheme toggle               |                                                                   |
+| HeaderMenu   | Desktop navigation                | This component should not be used directly. Use `Layout` instead. |
+| Layout       | Default layout structure          |                                                                   |
+| LinkCard     | External link                     | Use with `SimpleGrid` or `Container` is recommended.              |
+| Logo         | Logo of the application           |                                                                   |
+| NavbarNested | Mobile navigation                 | This component should not be used directly. Use `Layout` instead. |
+| ProposalCard | Unified way to display proposals  | Use with `SimpleGrid` or `Container` is recommended.              |
+| SignIn       | Allows users to sign in           | Includes username and password validation.                        |
+| SignUp       | Allows users to create an account | Includes username, password, and confirm password validation.     |
