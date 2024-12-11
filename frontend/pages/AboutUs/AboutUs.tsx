@@ -15,7 +15,7 @@ export default function AboutUs() {
         <Space h="xl" />
 
         {/* 系統簡介 */}
-        <Text size="lg" weight={500} align="center">
+        <Text size="lg" fw={500} ta="center">
           國民參與國家規劃 APP 致力於打造一個簡單、透明且高效的平台，
           讓國民能夠輕鬆參與國家政策的討論與規劃。
           我們的願景是透過技術創新，提升公共政策的參與度，讓每個人的聲音都能被聽見。
