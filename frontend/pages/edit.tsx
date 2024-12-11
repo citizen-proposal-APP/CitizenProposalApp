@@ -108,10 +108,10 @@ export default function EditPage() {
       postedTime: "",
       tags: [
         { id: 4, tagType: TagType.department, name: "想不到了" },
-        { id: 6, tagType: TagType.topic, name: "食品安全" },
-        { id: 8, tagType: TagType.topic, name: "還有啥來著" },
-        { id: 9, tagType: TagType.topic, name: "1234567" },
         { id: 10, tagType: TagType.topic, name: "bbbb bbbbbb bbb" },
+        { id: 6, tagType: TagType.topic, name: "食品安全" },
+        { id: 9, tagType: TagType.topic, name: "1234567" },
+        { id: 8, tagType: TagType.topic, name: "還有啥來著" },
         { id: 11, tagType: TagType.topic, name: "🍌" },
         { id: 12, tagType: TagType.topic, name: "" },
       ],
@@ -460,6 +460,7 @@ export default function EditPage() {
             <Text size="lg">
               或許你想看看...？
             </Text>
+            {/*
             <ScrollArea
               style={{ width: "100%", overflowX: "auto" }}
               scrollbarSize={8}
@@ -471,13 +472,73 @@ export default function EditPage() {
                 {similarProposals.map((proposal) =>
                   <ProposalCard key={proposal.id} data={proposal} width={300} height="100%"/>
                 )}
+              <Group gap={"md"} style={{ height: "260px", display: "flex", flexWrap: "nowrap" }}>
+                {similarProposals.map((proposal, index) => (
+                  <Card
+                    key={index}
+                    withBorder 
+                    radius="md" 
+                    component="a" 
+                    href="#"
+                    shadow="sm"
+                    padding="lg"
+                    style={{ width: `${CARD_WIDTH}px`, height: `${CARD_HEIGHT}px`,  flex: "0 0 auto" }}
+                  >
+                    <Card.Section>
+                      <Image src={proposal.thumbnail} alt={proposal.title} height={130} />
+                    </Card.Section>
+                    <Text size="lg" mt="md" fw={"bold"}>
+                      {proposal.title}
+                    </Text>
+                    <Group gap={"xs"} mt="xs">
+                      {proposal.tags.slice(0, MAX_TAGS).map((tag, tagIndex) => (
+                        <Badge
+                          key={tagIndex}
+                          variant={tag.tagType === TagType.department ? 'white' : 'light'}
+                          color="blue"
+                          radius="xl"
+                          style={{
+                            maxWidth: "80px",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {tag.name.length > MAX_PILL_LENGTH
+                            ? `${tag.name.slice(0, MAX_PILL_LENGTH)}...`
+                            : tag.name}
+                        </Badge>
+                      ))}
+                      {proposal.tags.length > MAX_TAGS && (
+                        <Badge variant="outline" color="gray" radius="xl">
+                          +{proposal.tags.length - MAX_TAGS} more
+                        </Badge>
+                      )}
+                    </Group>
+                  </Card>
+                ))}
+              </Group>
+            </ScrollArea>
+            */}
+            <ScrollArea
+              style={{ width: "100%", overflowX: "auto" }}
+              scrollbarSize={8}
+              viewportRef={scrollAreaRef}
+              onWheel={handleWheel}
+            >
+              <Group gap={"xs"} style={{ display: "flex", flexWrap: "nowrap" }}>
+                {similarProposals.map((proposal) => (
+                  <Container style={{ width: "260px", height: "100%" }}>
+                    <ProposalCard key={proposal.id} data={proposal}/>
+                  </Container>
+                ))}
               </Group>
             </ScrollArea>
             {/*
             <Container>
               <SimpleGrid cols={3} spacing="lg">
                 {similarProposals.map((proposal) => (
-                  <ProposalCard key={proposal.id} data={proposal} />
+                  <ProposalCard key={proposal.id} data={proposal}/>
                 ))}
               </SimpleGrid>
             </Container>
