@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Response, Form
 from pydantic import BaseModel, Field
 from typing import List, Optional, Annotated
+import logging
 from contextlib import asynccontextmanager
 from classifier import index_rank, get_tags, embed, save_db
 
@@ -23,6 +24,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+logger = logging.getLogger('uvicorn.error')
+
 # Request and Response Models
 class ClassifyRequest(BaseModel):
     text: str = Field(
@@ -32,9 +35,7 @@ class ClassifyRequest(BaseModel):
     )
 
 class ClassifyResponse(BaseModel):
-    department_label_id: int = Field(None, description="Numeric identifier for the department label.")
     department_label: str = Field(..., description="The predicted department label name.")
-    topic_label_id: int = Field(None, description="Numeric identifier for the topic label.")
     topic_label: Optional[str] = Field(None, description="The predicted topic label name.")
 
 class RankRequest(BaseModel):
@@ -70,8 +71,8 @@ async def classify(request: Annotated[ClassifyRequest, Form()]):
     
     - **text**: Input text to classify.
     - The endpoint returns:
-      - The predicted department label and its ID (if available).
-      - The predicted topic label and its ID (if available).
+      - The predicted department label.
+      - The predicted topic label.
     """
     text = request.text
 
@@ -85,9 +86,7 @@ async def classify(request: Annotated[ClassifyRequest, Form()]):
 
     return ClassifyResponse(
         department_label=department_label,
-        department_label_id=department_label_id,
         topic_label=topic_label,
-        topic_label_id=topic_label_id
     )
 
 @app.post("/add", summary="Vector Database", tags=["Vector DB"])
