@@ -1,7 +1,14 @@
 from fastapi import FastAPI, HTTPException, Response, Form
 from pydantic import BaseModel, Field
 from typing import List, Optional, Annotated
-from classifier import index_rank, get_tags, embed
+from contextlib import asynccontextmanager
+from classifier import index_rank, get_tags, embed, save_db
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    print("Shutdown event triggered, saving database...")
+    await save_db()
 
 app = FastAPI(
     title="Text Vector API",
@@ -13,6 +20,7 @@ app = FastAPI(
     2. **Ranking**: Retrieve the top-k relevant items based on a query string or vector embedding.
     3. **Vector Database**: Add Post to vector database.
     """,
+    lifespan=lifespan,
 )
 
 # Request and Response Models

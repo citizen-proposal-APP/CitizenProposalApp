@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
+VOLUME ["/app/db"]
+
 COPY requirements.txt /app/
 
 RUN pip install torch~=2.5.0 --index-url https://download.pytorch.org/whl/cpu

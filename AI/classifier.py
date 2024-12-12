@@ -42,8 +42,8 @@ topic_label_index = Index(ndim=1792)
 topic_label_index.load("model/topic_label/proposal.index")
 
 index = Index(ndim=1792)
+os.makedirs("db", exist_ok=True)
 if not os.path.exists("db/main.index"):
-    os.makedirs("db")
     index.save("db/main.index")
 index.load("db/main.index")
 
@@ -53,6 +53,9 @@ with open("model/topic_label/proposal_cluster_labels.pkl", "rb") as f:
 def embed(id: int, x: str):
     vector = model.encode(x)
     index.add(id, vector)
+
+async def save_db():
+    index.save("db/main.index")
 
 def index_rank(query: str, topk: int):
     query_embedding = model.encode(query)

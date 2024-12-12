@@ -1,0 +1,5 @@
+data/
+svm_training.py
+train_data_generation.py
+model/department_label
+model/onnx
