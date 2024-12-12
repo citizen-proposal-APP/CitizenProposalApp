@@ -1,15 +1,21 @@
 from fastapi import FastAPI, HTTPException, Response, Form
 from pydantic import BaseModel, Field
-from typing import List, Optional, Annotated
+from typing import List, Optional, Annotated, Dict
 import logging
 from contextlib import asynccontextmanager
-from classifier import index_rank, get_tags, embed, save_db
+# from classifier import index_rank, get_tags, embed, save_db
+from classifier import Ranker
+
+ranker = {}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    ranker[0] = Ranker("model", "db")
+    print("Server init successfully.")
     yield
     print("Shutdown event triggered, saving database...")
-    await save_db()
+    await ranker[0].save_db()
+    print("exit gracefully...")
 
 app = FastAPI(
     title="Text Vector API",
@@ -35,8 +41,8 @@ class ClassifyRequest(BaseModel):
     )
 
 class ClassifyResponse(BaseModel):
-    department_label: str = Field(..., description="The predicted department label name.")
-    topic_label: Optional[str] = Field(None, description="The predicted topic label name.")
+    department_label: List[str] = Field(..., description="The predicted department label name.")
+    topic_label: Optional[List[str]] = Field(None, description="The predicted topic label name.")
 
 class RankRequest(BaseModel):
     query: str = Field(
@@ -51,7 +57,7 @@ class RankRequest(BaseModel):
 
 class RankedResult(BaseModel):
     index: int = Field(..., description="Index of the retrieved posts.")
-    # content: str = Field(..., description="Content of the ranked item.")
+    distance: float = Field(..., description="Distance to the query. range in [0, 1]")
 
 class RankResponse(BaseModel):
     ranked_results: List[RankedResult] = Field(
@@ -80,7 +86,10 @@ async def classify(request: Annotated[ClassifyRequest, Form()]):
         raise HTTPException(status_code=400, detail="Text cannot be empty or whitespace only.")
 
     try:
-        department_label, department_label_id, topic_label, topic_label_id = get_tags(text)
+        department_label, topic_label = ranker[0].get_tags(text)
+        topic_label = [topic_label] if topic_label != None else None
+        department_label = [department_label]
+        # department_label, department_label_id, topic_label, topic_label_id = get_tags(text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred during classification: {e}")
 
@@ -104,7 +113,8 @@ async def add(request: Annotated[EmbeddingRequest, Form()]):
     text = request.text
     
     try:
-        embed(id, text)
+        ranker[0].embed(id, text)
+        # embed(id, text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
     
@@ -128,10 +138,11 @@ async def rank(request: Annotated[RankRequest, Form()]):
         raise HTTPException(status_code=400, detail="Query string cannot be empty or whitespace only.")
 
     try:
-        results = list(index_rank(query, topk))
-        ranked_results = [RankedResult(index=int(idx)) for idx in results]
+        results, distances = ranker[0].index_rank(query, topk)
+        distances[distances < 0] = 0
+        ranked_results = [RankedResult(index=int(idx), distance=float(dis)) for idx, dis in zip(results, distances)]
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred during ranking: {e}")
+        raise HTTPException(status_code=500, detail=f"{e}")
 
     return RankResponse(ranked_results=ranked_results)
 
