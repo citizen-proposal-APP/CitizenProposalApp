@@ -71,7 +71,8 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         IQueryable<Post> unsortedPosts = context.Posts
             .Include(post => post.Tags)
                 .ThenInclude(tag => tag.TagType)
-            .Include(post => post.Author);
+            .Include(post => post.Author)
+            .Include(post => post.Attachments);
         if (parameters.Author is not null)
         {
             unsortedPosts = unsortedPosts.Where(post => post.Author.Username.Contains(parameters.Author, InvariantCultureIgnoreCase));
