@@ -35,10 +35,27 @@ internal sealed class Program
                 options.SupportNonNullableReferenceTypes();
             })
             .AddSingleton(TimeProvider.System)
+            .AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.SetIsOriginAllowed(origin =>
+                    {
+                        Uri originUri = new(origin);
+                        return originUri.IsLoopback ||
+                            originUri.Host is "nation-voice.works" ||
+                            originUri.Host.EndsWith(".nation-voice.works", StringComparison.InvariantCulture);
+                    })
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithExposedHeaders("*")
+                    .AllowCredentials();
+                });
+            })
             .AddControllers(options => options.Filters.Add(new ProducesAttribute(Application.Json)))
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         builder.Services.AddAuthentication().AddScheme<SessionTokenAuthenticationHandlerOptions, SessionTokenAuthenticationHandler>("session", "Session token authentication handler", null);
-        WebApplication app = builder.Build();
+        WebApplication app = builder.Build(); // It seems like AddAuthorization is automagically called here. Can't find any documentation.
         // UseExceptionHandler is registered before UseDeveloperExceptionPage, so this is only used if the environment is Production to give a ProblemDetails response. At Production, UseDeveloperExceptionPage is used instead to return JSON or HTML.
         app.UseExceptionHandler();
         if (app.Environment.IsDevelopment())
@@ -54,7 +71,10 @@ internal sealed class Program
                 HttpOnly = HttpOnlyPolicy.Always,
                 Secure = CookieSecurePolicy.Always,
                 MinimumSameSitePolicy = SameSiteMode.Strict
-            });
+            })
+            .UseCors()
+            .UseAuthentication()
+            .UseAuthorization();
         app.MapControllers();
         app.MapGet("/api", () => "Welcome to the Citizen Proposal App API!");
         app.Run();
