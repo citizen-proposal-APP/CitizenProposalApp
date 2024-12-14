@@ -201,7 +201,7 @@ export default function ProposalSubpage({ proposalData }) {
           <Flex align="center" mt={50} gap={8}>
             {/* 留言區圖標 */}
             <Image
-              src={liked ? '../image/iine-blue.png' : '../image/iine.png'}
+              src={liked ? '../mockdata/image/iine-blue.png' : '../mockdata/image/iine.png'}
               alt="good"
               onClick={handleLikeClick}
               width={40} // 寬度
