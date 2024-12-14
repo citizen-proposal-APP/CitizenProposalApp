@@ -1,18 +1,6 @@
-/* SignUp.module.css */
-
 .title {
-    font-family: Greycliff CF, var(--mantine-font-family);
-    font-weight: 900;
-    color: var(--mantine-color-dark-9);
-}
-
-.container {
-    margin-top: 40px;
-    margin-bottom: 40px;
-}
-
-.paper {
-    padding: 30px;
-    border-radius: var(--mantine-radius-md);
-    box-shadow: var(--mantine-shadow-md);
+  font-family:
+    Greycliff CF,
+    var(--mantine-font-family);
+  font-weight: 900;
 }

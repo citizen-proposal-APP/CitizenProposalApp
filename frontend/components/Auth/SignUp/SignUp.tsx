@@ -9,7 +9,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import classes from './signup.module.css';
+import classes from './SignUp.module.css';
 
 interface SignUpProps {
   onToggle: () => void; // switch between login and sign up
