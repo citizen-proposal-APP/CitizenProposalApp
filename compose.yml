@@ -14,7 +14,12 @@ services:
       - citizen-proposal-app
     ports:
       - 8080:8080
-      - 8081:8081
+    environment:
+      - ASPNETCORE_HTTP_PORTS=8080
+    env_file:
+      - path: env/backend.env
+        required: false
+    profiles: [backend]
   db:
     container_name: CitizenProposalAppDb
     image: mysql:8.0.36 # The current latest supported version by Pomelo.EntityFrameworkCore.MySql
@@ -30,10 +35,12 @@ services:
       - MYSQL_PASSWORD_FILE=/run/secrets/db-password
       - MYSQL_RANDOM_ROOT_PASSWORD=true
     env_file:
-      - env/mysql.env
+      - path: env/mysql.env
+        required: false
     secrets:
       - db-user
       - db-password
+    profiles: [backend]
 
 networks:
   citizen-proposal-app:
