@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { AppShell } from '@mantine/core';
 import { HeaderMenu } from '@/components/HeaderMenu/HeaderMenu';
