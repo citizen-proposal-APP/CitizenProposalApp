@@ -6,6 +6,7 @@ import React, { useState, useRef } from 'react';
 import { IconUpload, IconX } from '@tabler/icons-react';
 import { Badge, Button, Card, CheckIcon, Combobox, Container, Grid, Group, Image, MantineProvider, Modal, Pill, PillsInput, rem, ScrollArea, SimpleGrid, Stack, TagsInput, Text, Textarea, Timeline, useCombobox } from '@mantine/core';
 import { useDisclosure, useValidatedState, useViewportSize } from '@mantine/hooks';
+import { useForm } from '@mantine/form';
 import { Dropzone } from '@mantine/dropzone';
 import '@mantine/dropzone/styles.css';
 import { Notifications, notifications } from '@mantine/notifications';
@@ -13,6 +14,7 @@ import '@mantine/notifications/styles.css';
 import { IconPhoto, IconVideo } from '@tabler/icons-react';
 
 export default function EditPage() {
+  /*
 	const [{ value: titleValue, valid: titleValid }, setTitleValue] = useValidatedState(
     '',
     (val) => val.length > 0 && val.length <= 100,
@@ -23,6 +25,7 @@ export default function EditPage() {
     (val) => val.length > 0 && val.length <= 2000,
     true
   );
+  */
   const [fileValue, setFileValue] = useState<File[]>([]);
   const [replacingQueue, setReplacingQueue] = useState<File[]>([]);
   const [currentReplacingFile, setCurrentReplacingFile] = useState<File | null>(null);
@@ -38,13 +41,34 @@ export default function EditPage() {
   */
   const MAX_FILE_SIZE = 50 * 1024 ** 2;
   const WIDTH_OFFSET = 65;
+  /*
   const MAX_TAGS = 3;
   const MAX_PILL_LENGTH = 10;
   const CARD_HEIGHT = 250;
   const CARD_WIDTH = 250;
-
+  */
   const timelineProgress = onFirstStep ? 0 : 1
   const { height, width } = useViewportSize();
+
+  const form = useForm<{ title: string; content: string }>({
+    mode: 'uncontrolled',
+    validateInputOnChange: true,
+    validateInputOnBlur: true,
+    initialValues: { title: '', content: '' },
+    validate: (values) => ({
+      title: values.title.length == 0 
+        ? '此欄位為必填' 
+        : values.title.length > 100
+          ? '此欄位字數不得超過100字'
+          : null,
+      content: values.content.length == 0 
+        ? '此欄位為必填' 
+        : values.content.length > 2000
+          ? '此欄位字數不得超過2000字'
+          : null,
+    }),
+  });
+
   
   const tagList = [
     { id: 1, tagType: TagType.department, name: "交通部" },
@@ -118,9 +142,8 @@ export default function EditPage() {
     },
   ];
   
-
   function inputValidation() {
-		(titleValue.length > 0 && contentValue.length > 0 && titleValid && contentValid) ? nextStep() : invalidNotification()
+		form.isValid() ? nextStep() : invalidNotification()
   }
   function nextStep() {
     setOnFirstStep(false)
@@ -308,108 +331,108 @@ export default function EditPage() {
           </Stack>
           {onFirstStep &&
           <Stack w={width < 990 + WIDTH_OFFSET ? (width - WIDTH_OFFSET) : 990} gap={"xl"}>
-            <Textarea 
-              label="主題（必填）"
-              placeholder="請輸入主題，100字以內，必填" 
-              required
-              radius={"lg"}
-              size={"lg"}
-              autosize
-              minRows={2}
-              value={titleValue}
-              onChange={(event) => setTitleValue(event.currentTarget.value)}
-              error={!titleValid}
-            />
-            <Textarea 
-              label="提案內容或建議事項（必填）"
-              placeholder="請輸入內容或建議事項，2000字以內，必填" 
-              required
-              radius={"lg"}
-              size={"lg"}
-              autosize
-              minRows={10}
-              value={contentValue}
-              onChange={(event) => setContentValue(event.currentTarget.value)}
-              error={!contentValid}
-            />
-            <Text size="lg">
-              上傳附件（支援圖片、影像格式）
-            </Text>
-            <Dropzone
-              onDrop={(files) => uploadFile(files)}
-              onReject={(files) => console.log('rejected files', files)}
-              maxSize={MAX_FILE_SIZE}
-              accept={['image/png', 'image/gif', 'image/jpeg', 'image/svg+xml', 'image/webp', 'image/avif', 'image/heic', 'image/heif', 'video/mp4']}
-            >
-              {fileValue.length == 0 &&
-              <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: 'none' }}>
-                <Dropzone.Accept>
-                  <IconUpload
-                    style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-blue-6)' }}
-                    stroke={1.5}
-                  />
-                </Dropzone.Accept>
-                <Dropzone.Reject>
-                  <IconX
-                    style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-red-6)' }}
-                    stroke={1.5}
-                  />
-                </Dropzone.Reject>
-                <Dropzone.Idle>
-                  <IconUpload
-                    style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-dimmed)' }}
-                    stroke={1.5}
-                  />
-                </Dropzone.Idle>
+            <form onSubmit={form.onSubmit((values) => console.log(values))}>
+              <Textarea 
+                label="主題（必填）"
+                placeholder="請輸入主題，100字以內，必填" 
+                required
+                radius={"lg"}
+                size={"lg"}
+                autosize
+                minRows={2}
+                key={form.key('title')}
+                {...form.getInputProps('title')}
+              />
+              <Textarea 
+                label="提案內容或建議事項（必填）"
+                placeholder="請輸入內容或建議事項，2000字以內，必填" 
+                required
+                radius={"lg"}
+                size={"lg"}
+                autosize
+                minRows={10}
+                key={form.key('content')}
+                {...form.getInputProps('content')}
+              />
+              <Text size="lg">
+                上傳附件（支援圖片、影像格式）
+              </Text>
+              <Dropzone
+                onDrop={(files) => uploadFile(files)}
+                onReject={(files) => console.log('rejected files', files)}
+                maxSize={MAX_FILE_SIZE}
+                accept={['image/png', 'image/gif', 'image/jpeg', 'image/svg+xml', 'image/webp', 'image/avif', 'image/heic', 'image/heif', 'video/mp4']}
+              >
+                {fileValue.length == 0 &&
+                <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: 'none' }}>
+                  <Dropzone.Accept>
+                    <IconUpload
+                      style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-blue-6)' }}
+                      stroke={1.5}
+                    />
+                  </Dropzone.Accept>
+                  <Dropzone.Reject>
+                    <IconX
+                      style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-red-6)' }}
+                      stroke={1.5}
+                    />
+                  </Dropzone.Reject>
+                  <Dropzone.Idle>
+                    <IconUpload
+                      style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-dimmed)' }}
+                      stroke={1.5}
+                    />
+                  </Dropzone.Idle>
 
-                <div>
-                  <Text size={"xl"} inline>
-                    將圖片/影像檔拖至此處或點擊以選取檔案
-                  </Text>
-                  <Text size={"sm"} c="dimmed" inline mt={7}>
-                    檔案總數不限，每份檔案大小不應超過50mb
-                  </Text>
-                  <Text size={"sm"} c="dimmed" inline mt={7}>
-                    可接受png/gif/jpeg/svg/xml/webp/avif/heic/heif/mp4等格式
-                  </Text>
-                </div>
+                  <div>
+                    <Text size={"xl"} inline>
+                      將圖片/影像檔拖至此處或點擊以選取檔案
+                    </Text>
+                    <Text size={"sm"} c="dimmed" inline mt={7}>
+                      檔案總數不限，每份檔案大小不應超過50mb
+                    </Text>
+                    <Text size={"sm"} c="dimmed" inline mt={7}>
+                      可接受png/gif/jpeg/svg/xml/webp/avif/heic/heif/mp4等格式
+                    </Text>
+                  </div>
+                </Group>
+                }
+                {(fileValue.length != 0) &&
+                <Grid gutter={"md"}>
+                  {fileValue.map((file, index) => (
+                    <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
+                      <Stack justify="center" align="center">
+                        {file.type != "video/mp4" &&
+                        <IconPhoto
+                          style={{ width: rem(80), height: rem(80) }}
+                          stroke={1.5}
+                          color="var(--mantine-color-blue-filled)"
+                        />
+                        }
+                        {file.type == "video/mp4" &&
+                        <IconVideo
+                          style={{ width: rem(80), height: rem(80) }}
+                          stroke={1.5}
+                          color="var(--mantine-color-blue-filled)"
+                        />
+                        }
+                        <Text ta="center">
+                          {file.name}
+                        </Text>
+                      </Stack>
+                    </Grid.Col>
+                  ))}
+                </Grid>
+                }
+              </Dropzone>
+              {fileValue.length > 0 &&
+              <Button variant="filled" size="lg" onClick={clearFile}>清除已上傳的檔案</Button>
+              }
+              <Group justify="space-between" gap={"xl"} grow>
+                {/*<Button variant="filled" size={"lg"} onClick={openSaveModal}>保留草稿</Button>*/}
+                <Button variant="filled" size={"lg"} type="submit" onClick={inputValidation}>填寫完成</Button>
               </Group>
-              }
-              {(fileValue.length != 0) &&
-              <Grid gutter={"md"}>
-                {fileValue.map((file, index) => (
-                  <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
-                    <Stack justify="center" align="center">
-                      {file.type != "video/mp4" &&
-                      <IconPhoto
-                        style={{ width: rem(80), height: rem(80) }}
-                        stroke={1.5}
-                        color="var(--mantine-color-blue-filled)"
-                      />
-                      }
-                      {file.type == "video/mp4" &&
-                      <IconVideo
-                        style={{ width: rem(80), height: rem(80) }}
-                        stroke={1.5}
-                        color="var(--mantine-color-blue-filled)"
-                      />
-                      }
-                      <Text ta="center">
-                        {file.name}
-                      </Text>
-                    </Stack>
-                  </Grid.Col>
-                ))}
-              </Grid>
-              }
-            </Dropzone>
-            {fileValue.length > 0 &&
-            <Button variant="filled" size="lg" onClick={clearFile}>清除已上傳的檔案</Button>
-            }
-            <Group justify="space-between" gap={"xl"} grow>
-              {/*<Button variant="filled" size={"lg"} onClick={openSaveModal}>保留草稿</Button>*/}
-              <Button variant="filled" size={"lg"} onClick={inputValidation}>填寫完成</Button>
-            </Group>
+            </form>
           </Stack>
           }
           {onSecondStep &&
