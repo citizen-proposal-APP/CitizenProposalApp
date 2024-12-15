@@ -1,43 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, TextInput, Button, Group } from '@mantine/core';
+import { Alert, Modal, TextInput, Button, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
 const EditProfileModal = ({ userId }: { userId: string }) => {
   const [opened, setOpened] = useState(false);
-  
-  // 使用 Mantine 的 useForm 來處理表單
+  const [loading, setLoading] = useState(false); // 加入 loading 狀態
+  const [error, setError] = useState<string | null>(null); // 錯誤訊息
   const form = useForm({
     initialValues: {
       username: '', // 預設值為空
     },
   });
 
-  // 獲取當前使用者的 username
   useEffect(() => {
-    // 確保只有第一次獲取資料時才設置表單初始值
     const fetchData = async () => {
-      const res = await fetch(`/api/user${userId}`);
-      const data = await res.json();
-      form.setFieldValue('username', data.username); // 設定表單的初始值
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/Users/${userId}`);
+        if (!res.ok) {
+          throw new Error('無法獲取使用者資料');
+        }
+        const data = await res.json();
+        form.setFieldValue('username', data.username); // 設定表單的初始值
+      } catch (error) {
+        setError('無法加載使用者資料');
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchData();
-  }, [userId, form]); // 確保 form 只會在首次加載時設置初始值
+  }, [userId, form]);
 
-  const handleSubmit = () => {
-    // 提交更新資料
-    fetch(`/api/user${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: form.values.username, // 直接使用表單的值
-      }),
-    }).then(() => {
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/Users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: form.values.username, // 直接使用表單的值
+        }),
+      });
+      if (!res.ok) {
+        throw new Error('更新失敗');
+      }
       console.log('Updated Data:', { username: form.values.username });
       setOpened(false); // 關閉彈窗
-    });
+    } catch (error) {
+      setError('更新失敗');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,6 +63,8 @@ const EditProfileModal = ({ userId }: { userId: string }) => {
       <Button onClick={() => setOpened(true)}>編輯個人資料</Button>
 
       <Modal opened={opened} onClose={() => setOpened(false)} title="編輯個人資料" centered>
+        {loading && <div>Loading...</div>} {/* 顯示載入中的提示 */}
+        {error && <Alert color="red">{error}</Alert>} {/* 顯示錯誤訊息 */}
         <TextInput
           label="使用者名稱"
           placeholder="請輸入使用者名稱"
@@ -56,11 +76,14 @@ const EditProfileModal = ({ userId }: { userId: string }) => {
           <Button variant="outline" onClick={() => setOpened(false)}>
             取消
           </Button>
-          <Button onClick={handleSubmit}>保存變更</Button>
+          <Button onClick={handleSubmit} disabled={loading}>
+            保存變更
+          </Button>
         </Group>
       </Modal>
     </>
   );
 };
+
 
 export default EditProfileModal;
