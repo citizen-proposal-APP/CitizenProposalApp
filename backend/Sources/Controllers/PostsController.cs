@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Http;
 using static Microsoft.AspNetCore.Http.StatusCodes;
 using static CitizenProposalApp.SortDirection;
 using static CitizenProposalApp.PostSortKey;
@@ -13,6 +14,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using static System.Net.Mime.MediaTypeNames;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CitizenProposalApp;
 
@@ -22,8 +25,9 @@ namespace CitizenProposalApp;
 /// <param name="context">The injected <see cref="CitizenProposalAppDbContext"/>.</param>
 /// <param name="mapper">The AutoMapper mapper.</param>
 /// <param name="timeProvider">A <see cref="TimeProvider"/> that will be used to provide the current UTC time.</param>
+/// <param name="logger">The injected <see cref="ILogger"/>.</param>
 [Route("api/[controller]")]
-public class PostsController(CitizenProposalAppDbContext context, IMapper mapper, TimeProvider timeProvider) : ControllerBase
+public class PostsController(CitizenProposalAppDbContext context, IMapper mapper, TimeProvider timeProvider, ILogger<PostsController> logger) : ControllerBase
 {
     /// <summary>
     /// Quries a post by its ID.
@@ -109,6 +113,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     /// Submits a new post. Tags that were not known by the DB are automatically added to it as "topic" tags.
     /// </summary>
     /// <param name="post">The post to submit.</param>
+    /// <param name="aiService">Injected <see cref="IAiService"/> from <see cref="HttpClientFactoryServiceCollectionExtensions.AddHttpClient{TClient, TImplementation}(IServiceCollection, Action{HttpClient})"/>.</param>
     /// <returns>Nothing if successful.</returns>
     /// <response code="201">The new post has been successfully created.</response>
     /// <response code="400">The request body is malformed, lacks required fields, has form fields larger than 50 MiB, has a title longer than 100 characters, has a content longer than 2000 characters, has tag names longer than 32 characters, or the total size of the request body is over 100 MiB.</response>
@@ -120,7 +125,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     [RequestFormLimits(MultipartBodyLengthLimit = postSubmissionMultipartLimit)]
     [RequestSizeLimit(postSubmissionTotalLimit)]
     [Authorize]
-    public async Task<IActionResult> AddPost([FromForm] PostSubmissionDto post)
+    public async Task<IActionResult> AddPost([FromForm] PostSubmissionDto post, [FromServices] IAiService aiService)
     {
         User author = (await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User))!;
         IEnumerable<string> tagsString;
@@ -155,6 +160,10 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         }
         context.Posts.Add(newPost);
         await context.SaveChangesAsync();
+        if (!await aiService.AddPostToAiDb(newPost.Id, newPost.Title))
+        {
+            logger.LogFailureToAddPostToAiDb(newPost.Id, newPost.Title);
+        }
         return CreatedAtAction(nameof(GetPostById), new { id = newPost.Id }, null);
     }
 

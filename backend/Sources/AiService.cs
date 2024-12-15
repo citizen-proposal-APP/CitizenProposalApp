@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
+using System.Globalization;
 
 namespace CitizenProposalApp;
 
@@ -31,5 +32,16 @@ internal sealed class AiService(HttpClient httpClient) : IAiService
             return null;
         }
         return responseObject.DepartmentTags.Concat(responseObject.TopicTags ?? []);
+    }
+
+    public async Task<bool> AddPostToAiDb(int id, string title)
+    {
+        using FormUrlEncodedContent formContent = new(new Dictionary<string, string>
+        {
+            { "id", id.ToString(CultureInfo.InvariantCulture) },
+            { "text", title }
+        });
+        HttpResponseMessage response = await httpClient.PostAsync(new Uri("add", UriKind.Relative), formContent);
+        return response.IsSuccessStatusCode;
     }
 }
