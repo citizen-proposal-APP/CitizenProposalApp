@@ -4,7 +4,7 @@ import { Proposal } from '@/types/Proposal';
 import { Tag, TagType } from '@/types/Tag';
 import React, { useState, useRef } from 'react';
 import { IconUpload, IconX } from '@tabler/icons-react';
-import { Badge, Button, Card, CheckIcon, Combobox, Container, Grid, Group, Image, MantineProvider, Modal, Pill, PillsInput, rem, ScrollArea, SimpleGrid, Stack, TagsInput, Text, Textarea, Timeline, useCombobox } from '@mantine/core';
+import { Badge, Button, Card, CheckIcon, Combobox, Container, Grid, Group, Image, MantineProvider, Modal, Pill, PillsInput, rem, ScrollArea, SimpleGrid, Stack, TagsInput, Text, Textarea, Timeline, Title, useCombobox } from '@mantine/core';
 import { useDisclosure, useValidatedState, useViewportSize } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { Dropzone } from '@mantine/dropzone';
@@ -344,10 +344,12 @@ export default function EditPage() {
             </Timeline>
           </Stack>
           {onFirstStep &&
-          <Stack w={width < 990 + WIDTH_OFFSET ? (width - WIDTH_OFFSET) : 990} gap={"xl"}>
-            <form onSubmit={form.onSubmit((values) => console.log(values))}>
+          <form onSubmit={form.onSubmit((values) => console.log(values))}>
+            <Stack w={width < 990 + WIDTH_OFFSET ? (width - WIDTH_OFFSET) : 990} gap={"xl"}>
+              <Title size="lg">
+                主題（必填）
+              </Title>
               <Textarea 
-                label="主題（必填）"
                 placeholder="請輸入主題，100字以內，必填" 
                 required
                 radius={"lg"}
@@ -357,8 +359,10 @@ export default function EditPage() {
                 key={form.key('title')}
                 {...form.getInputProps('title')}
               />
+              <Title size="lg">
+                提案內容或建議事項（必填）
+              </Title>
               <Textarea 
-                label="提案內容或建議事項（必填）"
                 placeholder="請輸入內容或建議事項，2000字以內，必填" 
                 required
                 radius={"lg"}
@@ -368,9 +372,9 @@ export default function EditPage() {
                 key={form.key('content')}
                 {...form.getInputProps('content')}
               />
-              <Text size="lg">
+              <Title size="lg">
                 上傳附件（支援圖片、影像格式）
-              </Text>
+              </Title>
               <Dropzone
                 onDrop={(files) => uploadFile(files)}
                 onReject={(files) => handleNotification("file")}
@@ -446,8 +450,8 @@ export default function EditPage() {
                 {/*<Button variant="filled" size={"lg"} onClick={openSaveModal}>保留草稿</Button>*/}
                 <Button variant="filled" size={"lg"} type="submit" onClick={inputValidation}>填寫完成</Button>
               </Group>
-            </form>
-          </Stack>
+            </Stack>
+          </form>
           }
           {onSecondStep &&
           <Stack w={width < 990 + WIDTH_OFFSET ? (width - WIDTH_OFFSET) : 990} gap={"xl"}>
@@ -485,8 +489,10 @@ export default function EditPage() {
               </Combobox.Dropdown>
             </Combobox>
             */}
+            <Title size="lg">
+              標籤選擇
+            </Title>
             <TagsInput
-              label="標籤選擇" 
               radius={"lg"} 
               size={"lg"}
               placeholder="請輸入關鍵字，並選取推薦標籤"
@@ -494,9 +500,9 @@ export default function EditPage() {
               defaultValue={extractTagNames(autoTags)}
               clearable
             />
-            <Text size="lg">
+            <Title size="lg">
               或許你想看看...？
-            </Text>
+            </Title>
             {/*
             <ScrollArea
               style={{ width: "100%", overflowX: "auto" }}
