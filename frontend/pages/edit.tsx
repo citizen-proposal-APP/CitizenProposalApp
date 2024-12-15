@@ -143,7 +143,7 @@ export default function EditPage() {
   ];
   
   function inputValidation() {
-		form.isValid() ? nextStep() : invalidNotification()
+		form.isValid() ? nextStep() : handleNotification("text")
   }
   function nextStep() {
     setOnFirstStep(false)
@@ -161,11 +161,25 @@ export default function EditPage() {
     setOnFirstStep(true)
     setOnSecondStep(false)
   }
-  function invalidNotification() {
-    notifications.show({
-      title: '無法送出',
-      message: '請依照要求填寫必填欄位!'
-    })
+  function handleNotification(sig: string) {
+    switch (sig) {
+      case "text":
+        notifications.show({
+          title: '無法送出',
+          message: '請依照要求填寫必填欄位！'
+        })
+        break;
+      case "file":
+        notifications.show({
+          title: '檔案無法上傳',
+          message: '請確認欲上傳檔案之大小和格式！'
+        })
+        break
+    
+      default:
+        break;
+    }
+    
   }
   function uploadFile(newFiles: File[]) {
     if (newFiles.length === 0) {
@@ -359,7 +373,7 @@ export default function EditPage() {
               </Text>
               <Dropzone
                 onDrop={(files) => uploadFile(files)}
-                onReject={(files) => console.log('rejected files', files)}
+                onReject={(files) => handleNotification("file")}
                 maxSize={MAX_FILE_SIZE}
                 accept={['image/png', 'image/gif', 'image/jpeg', 'image/svg+xml', 'image/webp', 'image/avif', 'image/heic', 'image/heif', 'video/mp4']}
               >
