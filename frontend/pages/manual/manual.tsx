@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Accordion, Anchor, Container, Title, Text, Modal, Grid } from '@mantine/core';
 import { Image } from '@mantine/core';
-import styles from './Manual.module.css';
+import styles from './manual.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { AuthenticationTitle } from '@/components/Auth/SignIn/SignIn';
 import { SignUp } from '@/components/Auth/SignUp/SignUp';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Accordion, Container, Title, Text } from '@mantine/core';
-import styles from './FAQ.module.css';
+import styles from './faq.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { LinkCard } from '@/components/LinkCard/LinkCard';
 

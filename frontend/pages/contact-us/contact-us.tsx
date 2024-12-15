@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Container, Title, Text, Group, Anchor, Center } from '@mantine/core';
-import styles from './ContactUs.module.css';
+import styles from './contact-us.module.css';
 import { Layout } from '@/components/Layout/Layout';
 
 export default function ContactUs() {
