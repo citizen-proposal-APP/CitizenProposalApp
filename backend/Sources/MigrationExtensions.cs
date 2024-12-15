@@ -7,15 +7,15 @@ namespace CitizenProposalApp;
 internal static class MigrationExtentions
 {
     /// <summary>
-    /// Migrates <typeparamref name="Context"/> on app startup.
+    /// Migrates <typeparamref name="TContext"/> on app startup.
     /// </summary>
-    /// <typeparam name="Context">The <see cref="DbContext"/> to migrate.</typeparam>
+    /// <typeparam name="TContext">The <see cref="DbContext"/> to migrate.</typeparam>
     /// <param name="app">The <see cref="IApplicationBuilder"/> returned from <see cref="WebApplicationBuilder.Build"/>.</param>
     /// <returns><paramref name="app"/></returns>
-    public static IApplicationBuilder EnsureMigration<Context>(this IApplicationBuilder app) where Context : DbContext
+    public static IApplicationBuilder EnsureMigration<TContext>(this IApplicationBuilder app) where TContext : DbContext
     {
         using IServiceScope scope = app.ApplicationServices.CreateScope();
-        scope.ServiceProvider.GetRequiredService<Context>().Database.Migrate();
+        scope.ServiceProvider.GetRequiredService<TContext>().Database.Migrate();
         return app;
     }
 }

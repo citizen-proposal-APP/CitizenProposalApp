@@ -3633,19 +3633,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mantine/carousel@npm:^7.14.1":
-  version: 7.14.1
-  resolution: "@mantine/carousel@npm:7.14.1"
-  peerDependencies:
-    "@mantine/core": 7.14.1
-    "@mantine/hooks": 7.14.1
-    embla-carousel-react: ">=7.0.0"
-    react: ^18.x || ^19.x
-    react-dom: ^18.x || ^19.x
-  checksum: 10c0/f25c49055a4081ff26a578a91c0168ae8c632d0efa32bce80fc8e036b3461effccf952f71bec410971638665541bd5e37f4e7d220f198021f9f42868f305d32d
-  languageName: node
-  linkType: hard
-
 "@mantine/core@npm:7.13.4":
   version: 7.13.4
   resolution: "@mantine/core@npm:7.13.4"
@@ -3664,29 +3651,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mantine/dropzone@npm:^7.14.2":
-  version: 7.14.2
-  resolution: "@mantine/dropzone@npm:7.14.2"
-  dependencies:
-    react-dropzone-esm: "npm:15.2.0"
-  peerDependencies:
-    "@mantine/core": 7.14.2
-    "@mantine/hooks": 7.14.2
-    react: ^18.x || ^19.x
-    react-dom: ^18.x || ^19.x
-  checksum: 10c0/7863c81668d42701d0a90746e03fcad5b5037f27c55dde7bc6fd64b664ce96bb39c1534353c3c81cd60b6f8e16260f28ce2d4a4b85f7b2923633ac2fa2a079a8
-  languageName: node
-  linkType: hard
-
-"@mantine/form@npm:^7.15.1":
-  version: 7.15.1
-  resolution: "@mantine/form@npm:7.15.1"
+"@mantine/form@npm:^7.14.3":
+  version: 7.14.3
+  resolution: "@mantine/form@npm:7.14.3"
   dependencies:
     fast-deep-equal: "npm:^3.1.3"
     klona: "npm:^2.0.6"
   peerDependencies:
     react: ^18.x || ^19.x
-  checksum: 10c0/b8221e5d05ef1203426a126cbbf0ba75b3bc8a1300d357333e8a3c65dbc4dd81bda7c1b6305f1a6adb1b68411633181cca462c99be3635ad42e09d812d2b74aa
+  checksum: 10c0/473e29d79508a874647cfbbcc5f16bab3f7d57fdf36edfb7481cb3f32c20b13a3f5851a8a475a876587f62daba2b2db21b63259a8d732b2f57d26da2b61cca7d
   languageName: node
   linkType: hard
 
@@ -8496,34 +8469,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"embla-carousel-react@npm:^8.4.0":
-  version: 8.4.0
-  resolution: "embla-carousel-react@npm:8.4.0"
-  dependencies:
-    embla-carousel: "npm:8.4.0"
-    embla-carousel-reactive-utils: "npm:8.4.0"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.1 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
-  checksum: 10c0/62326f3a3e1487ca136d1493cc8cea518d92e6bd474566d2416f5678c07903a0c6cdbe3c7806411a3211028edafdd4e08348f1cc9bcf9ddb2a20f4f85702c856
-  languageName: node
-  linkType: hard
-
-"embla-carousel-reactive-utils@npm:8.4.0":
-  version: 8.4.0
-  resolution: "embla-carousel-reactive-utils@npm:8.4.0"
-  peerDependencies:
-    embla-carousel: 8.4.0
-  checksum: 10c0/8925da88b853d26ae34464329b87e98c6f540efdca50865bc515570ae30fb1732a0bbdd6185efa51d6712f9c0129281978e230c416392e32b6edfa96fca3a858
-  languageName: node
-  linkType: hard
-
-"embla-carousel@npm:8.4.0":
-  version: 8.4.0
-  resolution: "embla-carousel@npm:8.4.0"
-  checksum: 10c0/4973294f253b7b9f4ba155099efd4436bbeffbfd1ae8a6f56c50985db406b4613c9d561d6bb40af8df6e970de4759d7d7f4105a7b5bcdf51bdea7510b8af3e43
-  languageName: node
-  linkType: hard
-
 "emittery@npm:^0.13.1":
   version: 0.13.1
   resolution: "emittery@npm:0.13.1"
@@ -12401,10 +12346,8 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.24.7"
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.3.1"
-    "@mantine/carousel": "npm:^7.14.1"
     "@mantine/core": "npm:7.13.4"
-    "@mantine/dropzone": "npm:^7.14.2"
-    "@mantine/form": "npm:^7.15.1"
+    "@mantine/form": "npm:^7.14.3"
     "@mantine/hooks": "npm:7.13.4"
     "@next/bundle-analyzer": "npm:^14.2.4"
     "@next/eslint-plugin-next": "npm:^14.2.4"
@@ -12421,7 +12364,6 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^7.13.1"
     "@typescript-eslint/parser": "npm:^7.13.1"
     babel-loader: "npm:^9.1.3"
-    embla-carousel-react: "npm:^8.4.0"
     eslint: "npm:^8.57.0"
     eslint-config-airbnb: "npm:19.0.4"
     eslint-config-airbnb-typescript: "npm:^18.0.0"
@@ -12439,9 +12381,8 @@ __metadata:
     postcss-preset-mantine: "npm:1.17.0"
     postcss-simple-vars: "npm:^7.0.1"
     prettier: "npm:^3.3.2"
-    react: "npm:18.2.0"
-    react-dom: "npm:18.2.0"
-    react-easy-crop: "npm:^5.1.0"
+    react: "npm:18.3.1"
+    react-dom: "npm:18.3.1"
     storybook: "npm:^8.1.10"
     storybook-dark-mode: "npm:^4.0.2"
     stylelint: "npm:^16.6.1"
@@ -13070,13 +13011,6 @@ __metadata:
   version: 3.0.0
   resolution: "normalize-path@npm:3.0.0"
   checksum: 10c0/e008c8142bcc335b5e38cf0d63cfd39d6cf2d97480af9abdbe9a439221fd4d749763bab492a8ee708ce7a194bb00c9da6d0a115018672310850489137b3da046
-  languageName: node
-  linkType: hard
-
-"normalize-wheel@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "normalize-wheel@npm:1.0.1"
-  checksum: 10c0/5daf4c97e39f36658a5263a6499bbc148676ae2bd85f12c8d03c46ffe7bc3c68d44564c00413d88d0457ac0d94450559bb1c24c2ce7ae0c107031f82d093ac06
   languageName: node
   linkType: hard
 
@@ -14262,39 +14196,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:18.2.0":
-  version: 18.2.0
-  resolution: "react-dom@npm:18.2.0"
+"react-dom@npm:18.3.1":
+  version: 18.3.1
+  resolution: "react-dom@npm:18.3.1"
   dependencies:
     loose-envify: "npm:^1.1.0"
-    scheduler: "npm:^0.23.0"
+    scheduler: "npm:^0.23.2"
   peerDependencies:
-    react: ^18.2.0
-  checksum: 10c0/66dfc5f93e13d0674e78ef41f92ed21dfb80f9c4ac4ac25a4b51046d41d4d2186abc915b897f69d3d0ebbffe6184e7c5876f2af26bfa956f179225d921be713a
-  languageName: node
-  linkType: hard
-
-"react-dropzone-esm@npm:15.2.0":
-  version: 15.2.0
-  resolution: "react-dropzone-esm@npm:15.2.0"
-  dependencies:
-    prop-types: "npm:^15.8.1"
-  peerDependencies:
-    react: ">= 16.8 || 18.0.0"
-  checksum: 10c0/a82dce547746f29214fa396e4060930250dd1b5f15c81e761035a05a09a1354493a90f79c1125c6341aee4b6226444bc7c7d29fc54ad266c149dfff170ef47a9
-  languageName: node
-  linkType: hard
-
-"react-easy-crop@npm:^5.1.0":
-  version: 5.1.0
-  resolution: "react-easy-crop@npm:5.1.0"
-  dependencies:
-    normalize-wheel: "npm:^1.0.1"
-    tslib: "npm:^2.0.1"
-  peerDependencies:
-    react: ">=16.4.0"
-    react-dom: ">=16.4.0"
-  checksum: 10c0/8ce16548cef4062f5b2953c139759f61fd1cf0bbcd546881b3457f0bfd8d96a2de96446eec078671e7e9199bf9e1192738b90b5a15943f3402dd65f21e4a905f
+    react: ^18.3.1
+  checksum: 10c0/a752496c1941f958f2e8ac56239172296fcddce1365ce45222d04a1947e0cc5547df3e8447f855a81d6d39f008d7c32eab43db3712077f09e3f67c4874973e85
   languageName: node
   linkType: hard
 
@@ -14443,12 +14353,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:18.2.0":
-  version: 18.2.0
-  resolution: "react@npm:18.2.0"
+"react@npm:18.3.1":
+  version: 18.3.1
+  resolution: "react@npm:18.3.1"
   dependencies:
     loose-envify: "npm:^1.1.0"
-  checksum: 10c0/b562d9b569b0cb315e44b48099f7712283d93df36b19a39a67c254c6686479d3980b7f013dc931f4a5a3ae7645eae6386b4aa5eea933baa54ecd0f9acb0902b8
+  checksum: 10c0/283e8c5efcf37802c9d1ce767f302dd569dd97a70d9bb8c7be79a789b9902451e0d16334b05d73299b20f048cbc3c7d288bbbde10b701fa194e2089c237dbea3
   languageName: node
   linkType: hard
 
@@ -14948,7 +14858,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"scheduler@npm:^0.23.0":
+"scheduler@npm:^0.23.2":
   version: 0.23.2
   resolution: "scheduler@npm:0.23.2"
   dependencies:
