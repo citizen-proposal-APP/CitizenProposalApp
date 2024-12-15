@@ -221,6 +221,9 @@ dotnet_diagnostic.CA1515.severity = silent
 # CA2227: Collection properties should be read only
 dotnet_diagnostic.CA2227.severity = silent
 
+# CA1812: Avoid uninstantiated internal classes
+dotnet_diagnostic.CA1812.severity = silent
+
 [*.{cs,vb}]
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 tab_width = 4
