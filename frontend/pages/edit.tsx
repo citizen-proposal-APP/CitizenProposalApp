@@ -523,15 +523,14 @@ export default function EditPage() {
             <ScrollArea
               style={{ width: "100%", overflowX: "auto" }}
               scrollbarSize={8}
+              type="hover"
               viewportRef={scrollAreaRef}
               onWheel={handleWheel}
             >
-              <Group gap={"xs"} style={{ display: "flex", flexWrap: "nowrap" }}>
-                {similarProposals.map((proposal) => (
-                  <Container style={{ width: "260px", height: "100%" }}>
-                    <ProposalCard key={proposal.id} data={proposal}/>
-                  </Container>
-                ))}
+              <Group gap={"md"} style={{ display: "flex", flexWrap: "nowrap" }} h={300}>
+                {similarProposals.map((proposal) =>
+                  <ProposalCard key={proposal.id} data={proposal} width={300} height="100%"/>
+                )}
               </Group>
             </ScrollArea>
             {/*
