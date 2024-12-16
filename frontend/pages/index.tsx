@@ -1,4 +1,5 @@
 import { Container, SimpleGrid, Stack, Title } from '@mantine/core';
+import { KeywordSearch } from '@/components/KeywordSearch/KeywordSearch';
 import { Layout } from '@/components/Layout/Layout';
 import { ProposalCard } from '@/components/ProposalCard/ProposalCard';
 import data from '@/public/mockdata/proposals.json';
@@ -26,6 +27,7 @@ export default function HomePage() {
         <Title order={2} mt="md" mb="md">
           熱門議題
         </Title>
+        <KeywordSearch />
         <SimpleGrid cols={{ base: 1, sm: 3 }}>
           {Array.from({ length: 3 }).map((_, index) => (
             <Stack key={index}>
