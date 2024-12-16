@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { IconChevronDown } from '@tabler/icons-react';
 import { Burger, Button, Center, Container, Group, Menu, Modal } from '@mantine/core';
 import { ActionToggle } from '@/components/ActionToggle/ActionToggle';
@@ -6,7 +6,13 @@ import { AuthenticationTitle } from '@/components/Auth/SignIn/SignIn';
 import { SignUp } from '@/components/Auth/SignUp/SignUp';
 import { Logo } from '@/components/Logo/Logo';
 import { links } from '@/data/links';
+import { Configuration, UsersApi } from '@/openapi';
 import classes from './HeaderMenu.module.css';
+
+const configuration = new Configuration({
+  basePath: 'http://localhost:8080',
+});
+const usersApi = new UsersApi(configuration);
 
 interface HeaderMenuProps {
   opened: boolean;
@@ -27,6 +33,17 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
   // 切換登入或註冊
   const toggleAuthPage = () => {
     setIsSignUp((prev) => !prev);
+  };
+
+  // 登出
+  const handleLogout = async () => {
+    try {
+      await usersApi.apiUsersLogoutDelete();
+      setUsername(null); // 清除登入狀態
+      console.log('使用者已成功登出');
+    } catch (error) {
+      console.error('登出失敗:', error);
+    }
   };
 
   const items = links.map((link) => {
@@ -73,12 +90,18 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
         </Group>
         <Group visibleFrom="sm">
           {username ? (
-            <Button
-              variant="subtle"
-              onClick={() => console.log('跳轉到個人頁面')} // 這裡加上個人頁面邏輯
-            >
-              {username}，您好
-            </Button>
+            <>
+              {/* <username> 按鈕 */}
+              <Button
+                variant="subtle"
+                onClick={() => console.log('跳轉到個人頁面')} // 這裡加上個人頁面邏輯
+              >
+                {username}，您好
+              </Button>
+              <Button variant="default" onClick={handleLogout}>
+                登出
+              </Button>
+            </>
           ) : (
             <>
               <Button variant="default" onClick={() => openAuthModal(false)}>
