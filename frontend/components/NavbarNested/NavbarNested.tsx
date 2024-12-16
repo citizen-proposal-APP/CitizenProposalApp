@@ -4,8 +4,14 @@ import { Button, Code, Group, Modal, ScrollArea } from '@mantine/core';
 import { AuthenticationTitle } from '@/components/Auth/SignIn/SignIn';
 import { SignUp } from '@/components/Auth/SignUp/SignUp';
 import { links } from '@/data/links';
+import { Configuration, UsersApi } from '@/openapi';
 import { LinksGroup } from './LinksGroup';
 import classes from './NavbarNested.module.css';
+
+const configuration = new Configuration({
+  basePath: 'http://localhost:8080',
+});
+const usersApi = new UsersApi(configuration);
 
 export function NavbarNested() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -24,11 +30,28 @@ export function NavbarNested() {
     setIsSignUp((prev) => !prev);
   };
 
+  // 登出
+  const handleLogout = async () => {
+    try {
+      await usersApi.apiUsersLogoutDelete(); // 調用登出 API
+      setUsername(null); // 清除登入狀態
+      console.log('成功登出');
+    } catch (error) {
+      console.error('登出失敗', error);
+    }
+  };
+
   return (
     <>
       <div className={classes.header}>
         <Group justify="space-between">
-          您尚未登入 您好！伊隆馬。
+          {username ? (
+            <Button variant="subtle" onClick={() => console.log('跳轉到個人頁面')}>
+              {username}，您好
+            </Button>
+          ) : (
+            '您尚未登入 您好！伊隆馬。'
+          )}
           <Code fw={700}>v3.1.2</Code>
         </Group>
       </div>
@@ -38,10 +61,18 @@ export function NavbarNested() {
       </ScrollArea>
 
       <div className={classes.footer}>
-        <Button variant="default" onClick={() => openAuthModal(false)}>
-          Log in
-        </Button>
-        <Button onClick={() => openAuthModal(true)}>Sign up</Button>
+        {username ? (
+          <Button variant="default" onClick={handleLogout}>
+            登出
+          </Button>
+        ) : (
+          <>
+            <Button variant="default" onClick={() => openAuthModal(false)}>
+              Log in
+            </Button>
+            <Button onClick={() => openAuthModal(true)}>Sign up</Button>
+          </>
+        )}
       </div>
 
       <Link href="/SiteMap/SiteMap" passHref>
