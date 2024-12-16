@@ -11,7 +11,7 @@ ranker = {}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     ranker[0] = Ranker("model", "db")
-    print("Server init successfully.")
+    print("Server launch successfully.")
     yield
     print("Shutdown event triggered, saving database...")
     await ranker[0].save_db()
@@ -68,6 +68,13 @@ class RankResponse(BaseModel):
 class EmbeddingRequest(BaseModel):
     id: int = Field(..., gt=0, description="Id of the Post. Must not be empty.")
     text: str = Field(..., description="Post title to embed. Nust not be empty.")
+
+class ModerationRequest(BaseModel):
+    text: str = Field(..., description="Any text")
+
+class ModerationReponse(BaseModel):
+    flag: bool = Field(..., description="if input content is unsafe, flag will be True, otherwise False")
+
 
 # API Endpoints
 @app.post("/classify", response_model=ClassifyResponse, summary="Classify a Text", tags=["Classification"])
@@ -145,6 +152,22 @@ async def rank(request: Annotated[RankRequest, Form()]):
         raise HTTPException(status_code=500, detail=f"{e}")
 
     return RankResponse(ranked_results=ranked_results)
+
+@app.post("/moderation", response_model=ModerationReponse, summary="Fake endpoint", tags=["Moderation"])
+async def moderation(request: Annotated[ModerationRequest, Form()]):
+    text = request.text
+    
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Query string cannot be empty or whitespace only.")
+    
+    try:
+        pass
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"{e}")
+    
+    return ModerationReponse(flag=True)
+
+
 
 # python3 -m uvicorn main:app --port 5002
 # sudo docker buildx build -t machine-learning .
