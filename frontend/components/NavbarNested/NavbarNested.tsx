@@ -10,6 +10,7 @@ import classes from './NavbarNested.module.css';
 export function NavbarNested() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false); // 狀態用於切換登入或註冊頁面
+  const [username, setUsername] = useState<string | null>(null); // 管理登入狀態和使用者名稱
 
   const items = links.map((item) => <LinksGroup {...item} key={item.label} />);
 
@@ -60,11 +61,13 @@ export function NavbarNested() {
           <SignUp
             onToggle={toggleAuthPage} // 切換到登入
             onClose={() => setAuthModalOpen(false)} // 關閉 Modal
+            onLoginSuccess={(user) => setUsername(user)} // 註冊成功後回傳使用者名稱
           />
         ) : (
           <AuthenticationTitle
             onToggle={toggleAuthPage} // 切換到註冊
             onClose={() => setAuthModalOpen(false)} // 關閉 Modal
+            onLoginSuccess={(user) => setUsername(user)} // 登入成功後回傳使用者名稱
           />
         )}{' '}
       </Modal>

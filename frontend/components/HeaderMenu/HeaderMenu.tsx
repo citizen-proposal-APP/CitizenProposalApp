@@ -16,6 +16,7 @@ interface HeaderMenuProps {
 export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
   const [authModalOpen, setAuthModalOpen] = useState(false); // 控制 Modal 的開關
   const [isSignUp, setIsSignUp] = useState(false); // 控制是登入還是註冊
+  const [username, setUsername] = useState<string | null>(null); // 管理登入狀態和使用者名稱
 
   // 打開 Modal
   const openAuthModal = (signUp = false) => {
@@ -71,11 +72,21 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
           {items}
         </Group>
         <Group visibleFrom="sm">
-          {/* 按下按鈕打開對應 Modal */}
-          <Button variant="default" onClick={() => openAuthModal(false)}>
-            Log in
-          </Button>
-          <Button onClick={() => openAuthModal(true)}>Sign up</Button>
+          {username ? (
+            <Button
+              variant="subtle"
+              onClick={() => console.log('跳轉到個人頁面')} // 這裡加上個人頁面邏輯
+            >
+              {username}，您好
+            </Button>
+          ) : (
+            <>
+              <Button variant="default" onClick={() => openAuthModal(false)}>
+                Log in
+              </Button>
+              <Button onClick={() => openAuthModal(true)}>Sign up</Button>
+            </>
+          )}
         </Group>
         <ActionToggle />
       </div>
@@ -89,11 +100,13 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
           <SignUp
             onToggle={toggleAuthPage} // 切換到登入
             onClose={() => setAuthModalOpen(false)} // 關閉 Modal
+            onLoginSuccess={(user) => setUsername(user)} // 設定使用者名稱
           />
         ) : (
           <AuthenticationTitle
             onToggle={toggleAuthPage} // 切換到註冊
             onClose={() => setAuthModalOpen(false)} // 關閉 Modal
+            onLoginSuccess={(user) => setUsername(user)} // 設定使用者名稱
           />
         )}
       </Modal>

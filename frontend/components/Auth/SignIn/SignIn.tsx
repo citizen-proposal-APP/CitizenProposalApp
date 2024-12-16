@@ -16,9 +16,10 @@ import classes from './SignIn.module.css';
 interface AuthenticationTitleProps {
   onToggle: () => void;
   onClose: () => void;
+  onLoginSuccess: (username: string) => void;
 }
 
-export function AuthenticationTitle({ onToggle, onClose }: AuthenticationTitleProps) {
+export function AuthenticationTitle({ onToggle, onClose, onLoginSuccess }: AuthenticationTitleProps) {
   const configuration = new Configuration({
     basePath: 'http://localhost:8080',
   });
@@ -56,6 +57,7 @@ export function AuthenticationTitle({ onToggle, onClose }: AuthenticationTitlePr
                 password: values.password,
               });
               console.log('登入成功:', values.username);
+              onLoginSuccess(values.username);
               onClose(); // 登入成功後關閉 Modal
             } catch (error) {
               console.error('登入失敗', error);

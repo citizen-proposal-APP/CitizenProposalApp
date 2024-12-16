@@ -16,9 +16,10 @@ import classes from './SignUp.module.css';
 interface SignUpProps {
   onToggle: () => void; // switch between login and sign up
   onClose: () => void; // 關閉 Modal
+  onLoginSuccess: (username: string) => void; // return username after login
 }
 
-export function SignUp({ onToggle, onClose }: SignUpProps) {
+export function SignUp({ onToggle, onClose, onLoginSuccess }: SignUpProps) {
   const configuration = new Configuration({
     basePath: 'http://localhost:8080',
   });
@@ -58,6 +59,7 @@ export function SignUp({ onToggle, onClose }: SignUpProps) {
                 password: values.password,
               });
               console.log('註冊成功:', values.username);
+              onLoginSuccess(values.username); // 註冊成功後返回使用者名稱
               onClose(); // 註冊成功後關閉 Modal
             } catch (error) {
               console.error('註冊失敗', error);
