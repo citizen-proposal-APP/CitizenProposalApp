@@ -2,6 +2,19 @@ import { Container, SimpleGrid, Stack, Title } from '@mantine/core';
 import { Layout } from '@/components/Layout/Layout';
 import { ProposalCard } from '@/components/ProposalCard/ProposalCard';
 import data from '@/public/mockdata/proposals.json';
+import { ImageCarousel } from '../components/ImageCarousel/ImageCarousel';
+
+const images = [
+  '/mockdata/homepage_images/6hJVKZ6.jpg',
+  '/mockdata/homepage_images/FT7SQUvaIAAWKdh.jpg',
+  '/mockdata/homepage_images/1024px-Archlinux__.jpg',
+  '/mockdata/homepage_images/IMG_8410.jpg',
+  '/mockdata/homepage_images/IMG_8505.jpg',
+  '/mockdata/homepage_images/tumblr_or4jabpmXV1rcvimbo1_540.webp',
+  '/mockdata/homepage_images/tumblr_osceeuuOP51tiivhqo1_540.webp',
+  '/mockdata/homepage_images/IMG_8872.jpg',
+  '/mockdata/homepage_images/jKae0YF.jpeg',
+];
 
 export default function HomePage() {
   const items = data.map((item) => <ProposalCard data={item} key={item.id} />);
@@ -9,7 +22,8 @@ export default function HomePage() {
   return (
     <Layout>
       <Container size="xl">
-        <Title order={2} mt="xl" mb="md">
+        <ImageCarousel images={images} />
+        <Title order={2} mt="md" mb="md">
           熱門議題
         </Title>
         <SimpleGrid cols={{ base: 1, sm: 3 }}>
