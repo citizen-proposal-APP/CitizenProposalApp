@@ -19,7 +19,7 @@ export function ImageCarousel({ images }: { images: string[] }) {
 
   return (
     <Carousel
-      slideSize="60%"
+      slideSize={{ base: '100%', sm: '60%' }}
       slideGap="md"
       loop
       withIndicators
