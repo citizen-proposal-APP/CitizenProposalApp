@@ -1,0 +1,48 @@
+/* 外框卡片樣式 */
+.aboutCard {
+    background-color: #f9f9f9; /* 淡灰背景 */
+    padding: 40px;
+    border-radius: 12px; /* 圓角 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 陰影效果 */
+    text-align: center; /* 內容居中 */
+}
+
+/* 標題樣式 */
+.aboutTitle {
+    font-size: 2rem; /* 標題字體大小 */
+    font-weight: bold;
+    color: #333; /* 深灰色字體 */
+    margin-bottom: 20px;
+}
+
+/* 小節標題樣式 */
+.sectionTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #4a90e2; /* 主色系藍色 */
+    margin-top: 40px;
+    margin-bottom: 10px;
+}
+
+/* 描述文字樣式 */
+.description {
+    font-size: 1.1rem;
+    color: #666; /* 中灰色字體 */
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+/* 圖片樣式 */
+.teamImage {
+    border-radius: 8px; /* 圓角 */
+    max-width: 100%; /* 適應容器寬度 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 陰影效果 */
+}
+
+/* 普通段落文字 */
+.textBlock {
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-top: 10px;
+    text-align: justify; /* 兩端對齊 */
+}
