@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { IconChevronDown } from '@tabler/icons-react';
 import { Burger, Button, Center, Container, Group, Menu, Modal } from '@mantine/core';
 import { ActionToggle } from '@/components/ActionToggle/ActionToggle';
+import { AuthenticationTitle } from '@/components/Auth/SignIn/SignIn';
+import { SignUp } from '@/components/Auth/SignUp/SignUp';
 import { Logo } from '@/components/Logo/Logo';
 import { links } from '@/data/links';
 import classes from './HeaderMenu.module.css';
-import { AuthenticationTitle } from '@/components/Auth/SignIn/SignIn';
-import { SignUp } from '@/components/Auth/SignUp/SignUp';
 
 interface HeaderMenuProps {
   opened: boolean;
@@ -72,7 +72,9 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
         </Group>
         <Group visibleFrom="sm">
           {/* 按下按鈕打開對應 Modal */}
-          <Button variant="default" onClick={() => openAuthModal(false)}>Log in</Button>
+          <Button variant="default" onClick={() => openAuthModal(false)}>
+            Log in
+          </Button>
           <Button onClick={() => openAuthModal(true)}>Sign up</Button>
         </Group>
         <ActionToggle />
@@ -81,14 +83,18 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
       {/* Modal 彈出視窗 */}
       <Modal
         opened={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-        // title={isSignUp ? 'Sign Up' : 'Log In'}
-        title={null}
+        onClose={() => setAuthModalOpen(false)} // 傳遞關閉 Modal 的邏輯
       >
         {isSignUp ? (
-          <SignUp onToggle={toggleAuthPage} />
+          <SignUp
+            onToggle={toggleAuthPage} // 切換到登入
+            onClose={() => setAuthModalOpen(false)} // 關閉 Modal
+          />
         ) : (
-          <AuthenticationTitle onToggle={toggleAuthPage} />
+          <AuthenticationTitle
+            onToggle={toggleAuthPage} // 切換到註冊
+            onClose={() => setAuthModalOpen(false)} // 關閉 Modal
+          />
         )}
       </Modal>
     </Container>

@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Button, Code, Group, ScrollArea, Modal } from '@mantine/core';
-import { LinksGroup } from './LinksGroup';
-import { links } from '@/data/links';
+import Link from 'next/link';
+import { Button, Code, Group, Modal, ScrollArea } from '@mantine/core';
 import { AuthenticationTitle } from '@/components/Auth/SignIn/SignIn';
 import { SignUp } from '@/components/Auth/SignUp/SignUp';
+import { links } from '@/data/links';
+import { LinksGroup } from './LinksGroup';
 import classes from './NavbarNested.module.css';
-import Link from 'next/link';
 
 export function NavbarNested() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -37,7 +37,9 @@ export function NavbarNested() {
       </ScrollArea>
 
       <div className={classes.footer}>
-        <Button variant="default" onClick={() => openAuthModal(false)}>Log in</Button>
+        <Button variant="default" onClick={() => openAuthModal(false)}>
+          Log in
+        </Button>
         <Button onClick={() => openAuthModal(true)}>Sign up</Button>
       </div>
 
@@ -52,9 +54,19 @@ export function NavbarNested() {
         opened={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
 
-      // title={isSignUp ? "Sign Up" : "Authentication"}
+        // title={isSignUp ? "Sign Up" : "Authentication"}
       >
-        {isSignUp ? <SignUp onToggle={toggleAuthPage} /> : <AuthenticationTitle onToggle={toggleAuthPage} />} {/* 根據 isSignUp 顯示不同內容 */}
+        {isSignUp ? (
+          <SignUp
+            onToggle={toggleAuthPage} // 切換到登入
+            onClose={() => setAuthModalOpen(false)} // 關閉 Modal
+          />
+        ) : (
+          <AuthenticationTitle
+            onToggle={toggleAuthPage} // 切換到註冊
+            onClose={() => setAuthModalOpen(false)} // 關閉 Modal
+          />
+        )}{' '}
       </Modal>
     </>
   );

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Anchor,
   Button,
@@ -9,13 +10,22 @@ import {
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { Configuration, UsersApi } from '@/openapi';
 import classes from './SignUp.module.css';
 
 interface SignUpProps {
   onToggle: () => void; // switch between login and sign up
+  onClose: () => void; // 關閉 Modal
 }
 
-export function SignUp({ onToggle }: SignUpProps) {
+export function SignUp({ onToggle, onClose }: SignUpProps) {
+  const configuration = new Configuration({
+    basePath: 'http://localhost:8080',
+  });
+  const api = new UsersApi(configuration);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const form = useForm({
     mode: 'uncontrolled',
     validate: {
@@ -39,7 +49,23 @@ export function SignUp({ onToggle }: SignUpProps) {
       </Text>
 
       <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-        <form onSubmit={form.onSubmit(console.log)}>
+        <form
+          onSubmit={form.onSubmit(async (values) => {
+            setIsSubmitting(true);
+            try {
+              await api.apiUsersRegisterPost({
+                username: values.username,
+                password: values.password,
+              });
+              console.log('註冊成功:', values.username);
+              onClose(); // 註冊成功後關閉 Modal
+            } catch (error) {
+              console.error('註冊失敗', error);
+            } finally {
+              setIsSubmitting(false);
+            }
+          })}
+        >
           <TextInput
             label="使用者名稱"
             placeholder="任何您想要的使用者名稱"
@@ -64,8 +90,8 @@ export function SignUp({ onToggle }: SignUpProps) {
             key={form.key('confirmPassword')}
             {...form.getInputProps('confirmPassword')}
           />
-          <Button fullWidth mt="xl" type="submit">
-            建立帳號
+          <Button fullWidth mt="xl" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? '處理中...' : '建立帳號'}
           </Button>
         </form>
       </Paper>
