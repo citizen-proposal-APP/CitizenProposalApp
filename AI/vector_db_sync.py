@@ -1,7 +1,6 @@
 import mysql.connector
 import requests
 
-# 資料庫連線設定
 config = {
     'user': 'admin',
     'password': 'admin',

@@ -11,7 +11,7 @@ ranker = {}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     ranker[0] = Ranker("model", "db")
-    print("Server launch successfully.")
+    print("Server launched successfully.")
     yield
     print("Shutdown event triggered, saving database...")
     await ranker[0].save_db()
@@ -171,4 +171,4 @@ async def moderation(request: Annotated[ModerationRequest, Form()]):
 
 # python3 -m uvicorn main:app --port 5002
 # sudo docker buildx build -t machine-learning .
-# sudo docker run -it -p 5001:5001 --rm machine-learning
+# docker run -it -p 5001:5001 -v vector-db:/app/db -d machine-learning
