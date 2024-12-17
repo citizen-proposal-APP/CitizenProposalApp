@@ -16,12 +16,13 @@ import classes from './SignUp.module.css';
 interface SignUpProps {
   onToggle: () => void; // switch between login and sign up
   onClose: () => void; // 關閉 Modal
-  onLoginSuccess: (username: string) => void; // return username after login
+  onLoginSuccess: (data: { id: number; username: string }) => void;
 }
 
 export function SignUp({ onToggle, onClose, onLoginSuccess }: SignUpProps) {
   const configuration = new Configuration({
     basePath: 'http://localhost:8080',
+    credentials: 'include',
   });
   const api = new UsersApi(configuration);
 
@@ -59,8 +60,18 @@ export function SignUp({ onToggle, onClose, onLoginSuccess }: SignUpProps) {
                 password: values.password,
               });
               console.log('註冊成功:', values.username);
-              onLoginSuccess(values.username); // 註冊成功後返回使用者名稱
-              onClose(); // 註冊成功後關閉 Modal
+
+              // 登入成功後，調用 apiUsersCurrentGet() 獲取用戶資訊
+              const userData = await api.apiUsersCurrentGet();
+              
+              if (userData?.id && userData?.username) {
+                // 確保 userData 正確
+                console.log('用戶資訊:', userData);
+                onLoginSuccess({ id: userData.id, username: userData.username }); // 傳遞完整的用戶資訊
+                onClose(); // 關閉 Modal
+              } else {
+                console.error('無法獲取用戶資訊');
+              }
             } catch (error) {
               console.error('註冊失敗', error);
             } finally {

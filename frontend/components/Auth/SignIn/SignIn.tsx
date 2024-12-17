@@ -16,12 +16,13 @@ import classes from './SignIn.module.css';
 interface AuthenticationTitleProps {
   onToggle: () => void;
   onClose: () => void;
-  onLoginSuccess: (username: string) => void;
+  onLoginSuccess: (data: { id: number; username: string }) => void;
 }
 
 export function AuthenticationTitle({ onToggle, onClose, onLoginSuccess }: AuthenticationTitleProps) {
   const configuration = new Configuration({
     basePath: 'http://localhost:8080',
+    credentials: 'include',
   });
   const api = new UsersApi(configuration);
 
@@ -57,8 +58,18 @@ export function AuthenticationTitle({ onToggle, onClose, onLoginSuccess }: Authe
                 password: values.password,
               });
               console.log('登入成功:', values.username);
-              onLoginSuccess(values.username);
-              onClose(); // 登入成功後關閉 Modal
+              console.log('註冊成功:', values.username);
+              // 登入成功後，調用 apiUsersCurrentGet() 獲取用戶資訊
+              const userData = await api.apiUsersCurrentGet();
+
+              if (userData?.id && userData?.username) {
+                console.log('用戶資訊:', userData);
+                onLoginSuccess({ id: userData.id, username: userData.username });
+                onClose();
+              } else {
+                console.error('無法獲取用戶資訊');
+              }
+            
             } catch (error) {
               console.error('登入失敗', error);
             } finally {
@@ -82,7 +93,7 @@ export function AuthenticationTitle({ onToggle, onClose, onLoginSuccess }: Authe
             {...form.getInputProps('password')}
           />
           <Button fullWidth mt="xl" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? '處理中...' : '建立帳號'}
+            {isSubmitting ? '處理中...' : '登入'}
           </Button>
         </form>
       </Paper>

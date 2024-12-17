@@ -22,7 +22,7 @@ interface HeaderMenuProps {
 export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
   const [authModalOpen, setAuthModalOpen] = useState(false); // 控制 Modal 的開關
   const [isSignUp, setIsSignUp] = useState(false); // 控制是登入還是註冊
-  const [username, setUsername] = useState<string | null>(null); // 管理登入狀態和使用者名稱
+  const [user, setUser] = useState<{ id: number; username: string } | null>(null); // 管理登入狀態
 
   // 打開 Modal
   const openAuthModal = (signUp = false) => {
@@ -35,11 +35,17 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
     setIsSignUp((prev) => !prev);
   };
 
+  // 登入成功
+  const handleLoginSuccess = (data: { id: number; username: string }) => {
+    setUser(data); // 設定登入狀態
+    console.log('登入成功:', data);
+  };
+
   // 登出
   const handleLogout = async () => {
     try {
       await usersApi.apiUsersLogoutDelete();
-      setUsername(null); // 清除登入狀態
+      setUser(null); // 清除登入狀態
       console.log('使用者已成功登出');
     } catch (error) {
       console.error('登出失敗:', error);
@@ -89,14 +95,14 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
           {items}
         </Group>
         <Group visibleFrom="sm">
-          {username ? (
+          {user ? (
             <>
               {/* <username> 按鈕 */}
               <Button
                 variant="subtle"
                 onClick={() => console.log('跳轉到個人頁面')} // 這裡加上個人頁面邏輯
               >
-                {username}，您好
+                {user.username}，您好
               </Button>
               <Button variant="default" onClick={handleLogout}>
                 登出
@@ -123,13 +129,13 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
           <SignUp
             onToggle={toggleAuthPage} // 切換到登入
             onClose={() => setAuthModalOpen(false)} // 關閉 Modal
-            onLoginSuccess={(user) => setUsername(user)} // 設定使用者名稱
+            onLoginSuccess={handleLoginSuccess}// 設定使用者名稱
           />
         ) : (
           <AuthenticationTitle
             onToggle={toggleAuthPage} // 切換到註冊
             onClose={() => setAuthModalOpen(false)} // 關閉 Modal
-            onLoginSuccess={(user) => setUsername(user)} // 設定使用者名稱
+            onLoginSuccess={handleLoginSuccess}
           />
         )}
       </Modal>

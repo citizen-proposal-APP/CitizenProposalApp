@@ -16,8 +16,8 @@ const usersApi = new UsersApi(configuration);
 export function NavbarNested() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false); // 狀態用於切換登入或註冊頁面
-  const [username, setUsername] = useState<string | null>(null); // 管理登入狀態和使用者名稱
-
+  const [user, setUser] = useState<{ id: number; username: string } | null>(null); // 管理登入狀態
+  
   const items = links.map((item) => <LinksGroup {...item} key={item.label} />);
 
   // 打開登入或註冊 Modal，並設定模式
@@ -30,14 +30,19 @@ export function NavbarNested() {
     setIsSignUp((prev) => !prev);
   };
 
+  const handleLoginSuccess = (data: { id: number; username: string }) => {
+    setUser(data); // 設定登入狀態
+    console.log('登入成功:', data);
+  };
+
   // 登出
   const handleLogout = async () => {
     try {
-      await usersApi.apiUsersLogoutDelete(); // 調用登出 API
-      setUsername(null); // 清除登入狀態
-      console.log('成功登出');
+      await usersApi.apiUsersLogoutDelete();
+      setUser(null); // 清除登入狀態
+      console.log('使用者已成功登出');
     } catch (error) {
-      console.error('登出失敗', error);
+      console.error('登出失敗:', error);
     }
   };
 
@@ -45,9 +50,9 @@ export function NavbarNested() {
     <>
       <div className={classes.header}>
         <Group justify="space-between">
-          {username ? (
+          {user ? (
             <Button variant="subtle" onClick={() => console.log('跳轉到個人頁面')}>
-              {username}，您好
+              {user.username}，您好
             </Button>
           ) : (
             '您尚未登入 您好！伊隆馬。'
@@ -61,7 +66,7 @@ export function NavbarNested() {
       </ScrollArea>
 
       <div className={classes.footer}>
-        {username ? (
+        {user ? (
           <Button variant="default" onClick={handleLogout}>
             登出
           </Button>
@@ -92,13 +97,13 @@ export function NavbarNested() {
           <SignUp
             onToggle={toggleAuthPage} // 切換到登入
             onClose={() => setAuthModalOpen(false)} // 關閉 Modal
-            onLoginSuccess={(user) => setUsername(user)} // 註冊成功後回傳使用者名稱
+            onLoginSuccess={handleLoginSuccess}
           />
         ) : (
           <AuthenticationTitle
             onToggle={toggleAuthPage} // 切換到註冊
             onClose={() => setAuthModalOpen(false)} // 關閉 Modal
-            onLoginSuccess={(user) => setUsername(user)} // 登入成功後回傳使用者名稱
+            onLoginSuccess={handleLoginSuccess}
           />
         )}{' '}
       </Modal>
