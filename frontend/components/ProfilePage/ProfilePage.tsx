@@ -4,8 +4,8 @@ import { useForm } from '@mantine/form'; // 引入 Mantine 的 useForm
 import UserInfoSection from './UserInfoSection';
 import PostSection from './PostSection';
 import { Proposal } from '@/types/Proposal'; // 引入 Proposal 類型
-import { Configuration, UsersApi, PostsApi } from '@/openapi';
-
+import { Configuration, UsersApi, PostsApi, PostsQueryResponseDto, PostQueryResponseDto } from '@/openapi';
+import { Tag, TagType } from '@/types/Tag';
 interface User {
   id: number;
   username: string;
@@ -15,13 +15,32 @@ interface ProfilePageProps {
   userId: string; // 接收 userId 作為屬性
 }
 
+const convertPostToProposal = (post: PostQueryResponseDto): Proposal => {
+  const tags: Tag[] = post.tags.map((tag) => ({
+    id: tag.id,
+    tagType: tag.tagType || TagType.topic,
+    name: tag.name,
+  }));
+
+  return {
+    id: post.id,
+    status: 'published',
+    title: post.title,
+    thumbnail: '', // 預設空字串
+    postedTime: post.postedTime instanceof Date 
+      ? post.postedTime.toISOString() // 轉換 Date -> ISO string
+      : post.postedTime, // 若已是 string 則直接返回
+    tags: tags,
+  };
+};
+
 const configuration = new Configuration({
     basePath: 'http://localhost:8080',
     credentials: 'include',
   });
 
-  const usersApi = new UsersApi(configuration);
-  const postsApi = new PostsApi(configuration);
+const usersApi = new UsersApi(configuration);
+const postsApi = new PostsApi(configuration);
 
 const ProfilePage = ({ userId }: ProfilePageProps) => {
   const [user, setUser] = useState<User | null>(null);
@@ -49,13 +68,20 @@ const ProfilePage = ({ userId }: ProfilePageProps) => {
         setUser({ id: userResponse.id, username: userResponse.username });
         form.setValues({ username: userResponse.username });
 
-        // 根據使用者 username 過濾該使用者發表的文章（假設 author 對應 username）
-        // const postsResponse: PostsQueryResponseDto = await postsApi.apiPostsGet({ author: userResponse.username });
-        
-        // postsResponse.posts 是 PostQueryResponseDto[]
-        // 將之轉換為 Proposal[]
-        // const proposals = (postsResponse.posts || []).map((p) => convertPostToProposal(p));
-        // setPublishedProposals(proposals);
+        // 根據 userId 查詢該使用者發表的文章，取得文章 id
+        const postsResponse: PostsQueryResponseDto = await postsApi.apiPostsGet({ author: userResponse.username });
+
+        // 取得所有文章的 id
+        const postIds = postsResponse.posts?.map((post) => post.id) || [];
+
+        // 使用所有的 id 來逐一取得每篇文章的詳細資訊
+        const proposals: Proposal[] = [];
+        for (const postId of postIds) {
+          const postDetail: PostQueryResponseDto = await postsApi.apiPostsIdGet({ id: postId });
+          proposals.push(convertPostToProposal(postDetail)); // 轉換為 Proposal 格式並加入結果
+        }
+
+        setPublishedProposals(proposals);
       } catch (err) {
         console.error('錯誤:', err);
         setError('無法取得使用者或貼文資料');
@@ -64,7 +90,6 @@ const ProfilePage = ({ userId }: ProfilePageProps) => {
 
     fetchData();
   }, [userId]);
-  
 
   // 獲取當前登入的使用者資料
   useEffect(() => {
