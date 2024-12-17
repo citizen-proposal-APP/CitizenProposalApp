@@ -165,17 +165,18 @@ You should now be able to access the frontend at `localhost:80`.
 
 ### Components
 
-| Component    | Description                       | Note                                                              |
-| ------------ | --------------------------------- | ----------------------------------------------------------------- |
-| ActionToggle | Color scheme toggle               |                                                                   |
-| HeaderMenu   | Desktop navigation                | This component should not be used directly. Use `Layout` instead. |
-| Layout       | Default layout structure          |                                                                   |
-| LinkCard     | External link                     | Use with `SimpleGrid` or `Container` is recommended.              |
-| Logo         | Logo of the application           |                                                                   |
-| NavbarNested | Mobile navigation                 | This component should not be used directly. Use `Layout` instead. |
-| ProposalCard | Unified way to display proposals  | Use with `SimpleGrid` or `Container` is recommended.              |
-| SignIn       | Allows users to sign in           | Includes username and password validation.                        |
-| SignUp       | Allows users to create an account | Includes username, password, and confirm password validation.     |
+| Component     | Description                       | Note                                                              |
+|---------------|-----------------------------------|-------------------------------------------------------------------|
+| ActionToggle  | Color scheme toggle               |                                                                   |
+| HeaderMenu    | Desktop navigation                | This component should not be used directly. Use `Layout` instead. |
+| ImageCarousel | Multiple images                   | The images are displayed in a 16:9 aspect ratio.                  |
+| Layout        | Default layout structure          |                                                                   |
+| LinkCard      | External link                     | Use with `SimpleGrid` or `Container` is recommended.              |
+| Logo          | Logo of the application           |                                                                   |
+| NavbarNested  | Mobile navigation                 | This component should not be used directly. Use `Layout` instead. |
+| ProposalCard  | Unified way to display proposals  | Use with `SimpleGrid` or `Container` is recommended.              |
+| SignIn        | Allows users to sign in           | Includes username and password validation.                        |
+| SignUp        | Allows users to create an account | Includes username, password, and confirm password validation.     |
 
 ## AI Development
 
