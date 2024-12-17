@@ -11,7 +11,7 @@ import classes from './HeaderMenu.module.css';
 import { useRouter } from 'next/router';
 
 const configuration = new Configuration({
-  basePath: 'http://localhost:8080',
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   credentials: 'include',
 });
 const usersApi = new UsersApi(configuration);

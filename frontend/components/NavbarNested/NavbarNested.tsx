@@ -10,7 +10,7 @@ import classes from './NavbarNested.module.css';
 import { useRouter } from 'next/router';
 
 const configuration = new Configuration({
-  basePath: 'http://localhost:8080',
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH,
 });
 const usersApi = new UsersApi(configuration);
 

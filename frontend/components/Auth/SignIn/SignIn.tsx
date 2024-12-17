@@ -21,7 +21,7 @@ interface AuthenticationTitleProps {
 
 export function AuthenticationTitle({ onToggle, onClose, onLoginSuccess }: AuthenticationTitleProps) {
   const configuration = new Configuration({
-    basePath: 'http://localhost:8080',
+    basePath: process.env.NEXT_PUBLIC_BASE_PATH,
     credentials: 'include',
   });
   const api = new UsersApi(configuration);
