@@ -18,7 +18,7 @@ const images = [
 ];
 
 export default function HomePage() {
-  const items = data.map((item) => <ProposalCard data={item} key={item.id} />);
+  const items = data.map((item) => <ProposalCard data={item} key={item.id} height="auto" />);
 
   return (
     <Layout>
