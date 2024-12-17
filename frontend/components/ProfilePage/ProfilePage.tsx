@@ -4,6 +4,7 @@ import { useForm } from '@mantine/form'; // 引入 Mantine 的 useForm
 import UserInfoSection from './UserInfoSection';
 import PostSection from './PostSection';
 import { Proposal } from '@/types/Proposal'; // 引入 Proposal 類型
+import { Configuration, UsersApi, PostsApi } from '@/openapi';
 
 interface User {
   id: number;
@@ -13,6 +14,14 @@ interface User {
 interface ProfilePageProps {
   userId: string; // 接收 userId 作為屬性
 }
+
+const configuration = new Configuration({
+    basePath: 'http://localhost:8080',
+    credentials: 'include',
+  });
+
+  const usersApi = new UsersApi(configuration);
+  const postsApi = new PostsApi(configuration);
 
 const ProfilePage = ({ userId }: ProfilePageProps) => {
   const [user, setUser] = useState<User | null>(null);
@@ -33,40 +42,41 @@ const ProfilePage = ({ userId }: ProfilePageProps) => {
 
   // 獲取指定 userId 的使用者資料
   useEffect(() => {
-    fetch(`/api/Users/${userId}`)  // 使用 `userId` 來獲取該用戶的資料
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('無法取得使用者資料');
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setUser(data); // 更新使用者資料
-        setPublishedProposals(data.publishedProposals || []); // 設定已發表的提案
-        form.setValues({ username: data.username }); // 設定表單預設值
-      })
-      .catch((error) => {
-        console.error('錯誤:', error);
-        setError('無法取得使用者資料'); // 顯示錯誤訊息
-      });
-  }, [userId]);  // 當 userId 變更時重新執行
+    const fetchData = async () => {
+      try {
+        // 取得使用者資料
+        const userResponse = await usersApi.apiUsersIdGet({ id: Number(userId) });
+        setUser({ id: userResponse.id, username: userResponse.username });
+        form.setValues({ username: userResponse.username });
+
+        // 根據使用者 username 過濾該使用者發表的文章（假設 author 對應 username）
+        // const postsResponse: PostsQueryResponseDto = await postsApi.apiPostsGet({ author: userResponse.username });
+        
+        // postsResponse.posts 是 PostQueryResponseDto[]
+        // 將之轉換為 Proposal[]
+        // const proposals = (postsResponse.posts || []).map((p) => convertPostToProposal(p));
+        // setPublishedProposals(proposals);
+      } catch (err) {
+        console.error('錯誤:', err);
+        setError('無法取得使用者或貼文資料');
+      }
+    };
+
+    fetchData();
+  }, [userId]);
+  
 
   // 獲取當前登入的使用者資料
   useEffect(() => {
-    fetch('/api/Users/current')  // 獲取當前登入的使用者資料
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('無法取得當前使用者資料');
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setCurrentUser(data);  // 更新當前使用者資料
-      })
-      .catch((error) => {
-        console.error('錯誤:', error);
-        setError('無法取得當前使用者資料'); // 顯示錯誤訊息
-      });
+      usersApi
+        .apiUsersCurrentGet()
+        .then((data) => {
+          setCurrentUser(data); // 設定當前使用者資料
+        })
+        .catch((error) => {
+          console.error('錯誤:', error);
+          setError('無法取得當前使用者資料');
+        });
   }, []);
 
   // 檢查資料是否加載完成，還沒加載完成時顯示 loading
@@ -84,28 +94,15 @@ const ProfilePage = ({ userId }: ProfilePageProps) => {
     setIsModalOpen(false);
 
     // 提交更新 (只傳遞必要的資料)
-    fetch(`/api/Users/${userId}`, {  // 修改這裡，使用正確的 `userId` 來發送 PUT 請求
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: form.values.username, // 使用 form.values.username 提交更新
-      }),
+    usersApi
+    .apiUsersIdGet({ id: Number(userId) }) // 假設你有 API 可用於更新
+    .then(() => {
+      console.log('Updated username:', form.values.username);
     })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('更新失敗');
-        }
-        return res.json();
-      })
-      .then(() => {
-        console.log('Updated username:', form.values.username);
-      })
-      .catch((error) => {
-        console.error('錯誤:', error);
-        setError('更新失敗'); // 顯示錯誤訊息
-      });
+    .catch((error) => {
+      console.error('錯誤:', error);
+      setError('更新失敗');
+    });
   };
 
   return (
