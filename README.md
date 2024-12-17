@@ -103,7 +103,7 @@ and debugging. In that case, follow these steps:
    and `- 8081:8081` under `services.backend.ports` in `compose.yml`. You can
    customize the port number to your liking.
 
-6. Run `docker compose --profile backend up -d` to start the backend app and the DB.
+6. Run `docker compose up backend db -d` to start the backend app and the DB.
 7. After a few seconds, check the logs of the DB service with either `docker
    compose logs` or with the Docker Desktop GUI. You should see the line
    `GENERATED ROOT PASSWORD: ...`. This will be the root password of the DB.
