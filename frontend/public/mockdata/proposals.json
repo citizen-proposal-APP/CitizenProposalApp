@@ -128,5 +128,54 @@
       { "id": 2, "tagType": "topic", "name": "產業推廣" },
       { "id": 3, "tagType": "topic", "name": "國際文化交流" }
     ]
+  },
+  {
+    "id": 0,
+    "status": "",
+    "title": "相似提案 1",
+    "thumbnail": "https://via.placeholder.com/150",
+    "postedTime": "",
+    "tags": [
+      { "id": 1, "tagType": "department", "name": "交通部" },
+      { "id": 7, "tagType": "topic", "name": "asdfg" }
+    ]
+  },
+  {
+    "id": 1,
+    "status": "",
+    "title": "相似提案 2",
+    "thumbnail": "https://via.placeholder.com/150",
+    "postedTime": "",
+    "tags": [
+      { "id": 2, "tagType": "department", "name": "文化部" },
+      { "id": 5, "tagType": "topic", "name": "文化幣" },
+      { "id": 12, "tagType": "topic", "name": "" }
+    ]
+  },
+  {
+    "id": 2,
+    "status": "",
+    "title": "相似提案 3",
+    "thumbnail": "https://via.placeholder.com/150",
+    "postedTime": "",
+    "tags": [
+      { "id": 3, "tagType": "department", "name": "國防部" }
+    ]
+  },
+  {
+    "id": 3,
+    "status": "",
+    "title": "相似提案 4",
+    "thumbnail": "https://via.placeholder.com/150",
+    "postedTime": "",
+    "tags": [
+      { "id": 4, "tagType": "department", "name": "想不到了" },
+      { "id": 10, "tagType": "topic", "name": "bbbb bbbbbb bbb" },
+      { "id": 6, "tagType": "topic", "name": "食品安全" },
+      { "id": 9, "tagType": "topic", "name": "1234567" },
+      { "id": 8, "tagType": "topic", "name": "還有啥來著" },
+      { "id": 11, "tagType": "topic", "name": "🍌" },
+      { "id": 12, "tagType": "topic", "name": "" }
+    ]
   }
 ]

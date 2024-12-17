@@ -1,0 +1,17 @@
+.openapi-generator-ignore
+apis/AttachmentsApi.ts
+apis/PostsApi.ts
+apis/UsersApi.ts
+apis/index.ts
+index.ts
+models/CommentQueryResponseDto.ts
+models/CommentsQueryResponseDto.ts
+models/PostQueryResponseDto.ts
+models/PostSortKey.ts
+models/PostsQueryResponseDto.ts
+models/ProblemDetails.ts
+models/SortDirection.ts
+models/TagQueryResponseDto.ts
+models/UserQueryResponseDto.ts
+models/index.ts
+runtime.ts

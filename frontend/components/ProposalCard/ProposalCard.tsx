@@ -3,15 +3,49 @@ import { Proposal } from '@/types/Proposal';
 import { TagType } from '@/types/Tag';
 import classes from './ProposalCard.module.css';
 
-export function ProposalCard({ data }: { data: Proposal }) {
-  const tags = data.tags.map((tag) => (
-    <Badge key={tag.id} tt="none" variant={tag.tagType === TagType.department ? 'white' : 'light'}>
-      {tag.name}
+function getTagVariant(tagType: string) {
+  const variants = {
+    [TagType.department]: 'outline',
+    [TagType.topic]: 'light',
+  };
+  return variants[tagType] || 'default';
+}
+
+const MAX_PILL_LENGTH = 5;
+const MAX_TAGS_DISPLAYED = 3;
+
+interface ProposalCardProps {
+  data: Proposal;
+  height?: string | number;
+  width?: string | number;
+}
+
+export function ProposalCard({ data, height = '100%', width = 'auto' }: ProposalCardProps) {
+  const tags = data.tags.slice(0, MAX_TAGS_DISPLAYED).map((tag) => (
+    <Badge key={tag.id} tt="none" variant={getTagVariant(tag.tagType)}>
+      {tag.tagType !== TagType.topic || tag.name.length <= MAX_PILL_LENGTH
+        ? tag.name
+        : `${tag.name.slice(0, MAX_PILL_LENGTH)}...`}
     </Badge>
   ));
+  if (data.tags.length > MAX_TAGS_DISPLAYED) {
+    tags.push(
+      <Badge key="more" tt="none" variant={getTagVariant(TagType.topic)}>
+        {`+${data.tags.length - MAX_TAGS_DISPLAYED} 更多`}
+      </Badge>
+    );
+  }
 
   return (
-    <Card withBorder radius="md" component="a" href="#" className={classes.card}>
+    <Card
+      withBorder
+      radius="md"
+      component="a"
+      href="#"
+      className={classes.card}
+      h={height}
+      w={width}
+    >
       <AspectRatio ratio={16 / 9}>
         <Image src={data.thumbnail} />
       </AspectRatio>
