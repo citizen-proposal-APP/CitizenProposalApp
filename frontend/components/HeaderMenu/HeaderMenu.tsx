@@ -8,9 +8,11 @@ import { Logo } from '@/components/Logo/Logo';
 import { links } from '@/data/links';
 import { Configuration, UsersApi } from '@/openapi';
 import classes from './HeaderMenu.module.css';
+import { useRouter } from 'next/router';
 
 const configuration = new Configuration({
   basePath: 'http://localhost:8080',
+  credentials: 'include',
 });
 const usersApi = new UsersApi(configuration);
 
@@ -23,6 +25,8 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
   const [authModalOpen, setAuthModalOpen] = useState(false); // 控制 Modal 的開關
   const [isSignUp, setIsSignUp] = useState(false); // 控制是登入還是註冊
   const [user, setUser] = useState<{ id: number; username: string } | null>(null); // 管理登入狀態
+
+  const router = useRouter();
 
   // 打開 Modal
   const openAuthModal = (signUp = false) => {
@@ -100,7 +104,7 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
               {/* <username> 按鈕 */}
               <Button
                 variant="subtle"
-                onClick={() => console.log('跳轉到個人頁面')} // 這裡加上個人頁面邏輯
+                onClick={() => router.push(`/u/${user.id}`)} // 跳轉到個人頁面
               >
                 {user.username}，您好
               </Button>

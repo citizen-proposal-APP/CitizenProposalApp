@@ -7,6 +7,7 @@ import { links } from '@/data/links';
 import { Configuration, UsersApi } from '@/openapi';
 import { LinksGroup } from './LinksGroup';
 import classes from './NavbarNested.module.css';
+import { useRouter } from 'next/router';
 
 const configuration = new Configuration({
   basePath: 'http://localhost:8080',
@@ -19,6 +20,7 @@ export function NavbarNested() {
   const [user, setUser] = useState<{ id: number; username: string } | null>(null); // 管理登入狀態
   
   const items = links.map((item) => <LinksGroup {...item} key={item.label} />);
+  const router = useRouter();
 
   // 打開登入或註冊 Modal，並設定模式
   const openAuthModal = (signUp = false) => {
@@ -51,7 +53,7 @@ export function NavbarNested() {
       <div className={classes.header}>
         <Group justify="space-between">
           {user ? (
-            <Button variant="subtle" onClick={() => console.log('跳轉到個人頁面')}>
+            <Button variant="subtle" onClick={() => router.push(`/u/${user.id}`)}>
               {user.username}，您好
             </Button>
           ) : (
