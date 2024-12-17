@@ -11,10 +11,10 @@ public record PostsQueryRequestDto
     /// The start index of the post to get. The default value is 0.
     /// </summary>
     [Range(0, int.MaxValue)]
-    public int Start { get; init; } = 0;
+    public int Start { get; init; }
 
     /// <summary>
-    /// How many posts to get. The default value is 10.
+    /// How many posts to get. The default value is 10. The total number of returned posts may be less than this if there aren't enough posts to return.
     /// </summary>
     [Range(0, int.MaxValue)]
     public int Range { get; init; } = 10;
@@ -42,14 +42,13 @@ public record PostsQueryRequestDto
     public string? Tag { get; init; }
 
     /// <summary>
-    /// The title of the posts to search. Posts that have this as their substrings in their titles are included in the result. The search is case-insensitive.
+    /// The title or the content of the posts to search. Posts that have this as their substrings in their titles or contents are included in the result. The search is case-insensitive.
     /// </summary>
-    [MaxLength(100)]
-    public string? Title { get; init; }
+    [MaxLength(500)]
+    public string? Keyword { get; init; }
 
     /// <summary>
-    /// The content of the posts to search. Posts that have this as their substrings in their contents are included in the result. The search is case-insensitive.
+    /// Controls whether the keyword search does a fuzzy search using AI. If enabled, the keyword will only search titles of posts, and SortBy and SortDirection are ignored. The fuzzy search will be performed after all other criteria have finished filtering posts. The default value is false.
     /// </summary>
-    [MaxLength(2000)]
-    public string? Content { get; init; }
+    public bool IsAiEnabled { get; init; }
 }

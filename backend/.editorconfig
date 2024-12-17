@@ -157,6 +157,7 @@ dotnet_diagnostic.CA2227.severity = silent
 dotnet_diagnostic.CA1812.severity = silent
 
 dotnet_code_quality.api_surface = all
+dotnet_code_quality.CA1002.api_surface = public
 
 [Migrations/**]
 generated_code = true

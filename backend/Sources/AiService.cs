@@ -44,4 +44,24 @@ internal sealed class AiService(HttpClient httpClient) : IAiService
         HttpResponseMessage response = await httpClient.PostAsync(new Uri("add", UriKind.Relative), formContent);
         return response.IsSuccessStatusCode;
     }
+
+    public async Task<IEnumerable<int>?> SearchPostIdsByTitle(string title, int postCount)
+    {
+        using FormUrlEncodedContent formContent = new(new Dictionary<string, string>
+        {
+            { "query", title },
+            { "topk", postCount.ToString(CultureInfo.InvariantCulture) }
+        });
+        HttpResponseMessage response = await httpClient.PostAsync(new Uri("rank", UriKind.Relative), formContent);
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
+        AiSearchPostsByTitleResponseDto? responseObject = await JsonSerializer.DeserializeAsync<AiSearchPostsByTitleResponseDto>(await response.Content.ReadAsStreamAsync());
+        if (responseObject is null)
+        {
+            return null;
+        }
+        return responseObject.RankedResults.OrderBy(result => result.Distance).Select(result => result.PostId);
+    }
 }

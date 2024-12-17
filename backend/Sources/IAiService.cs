@@ -23,4 +23,12 @@ public interface IAiService
     /// <param name="title">The title of the <see cref="Post"/> to add to the AI DB. This will be used as the search key when searching <see cref="Post"/>s with AI.</param>
     /// <returns>Whether the AI DB has successfully added the <see cref="Post"/>.</returns>
     public Task<bool> AddPostToAiDb(int id, string title);
+
+    /// <summary>
+    /// Searches <see cref="Post.Title"/>s fuzzily using AI.
+    /// </summary>
+    /// <param name="title">The title to search.</param>
+    /// <param name="postCount">Max number of <see cref="Post.Id"/>s to return. The return value may contain less IDs than <paramref name="postCount"/>.</param>
+    /// <returns>A <see cref="IEnumerable{T}"/> of <see cref="Post.Id"/>s sorted from the most similiar to the least similiar to <paramref name="title"/>. <see langword="null"/> is the AI service is unavailable.</returns>
+    public Task<IEnumerable<int>?> SearchPostIdsByTitle(string title, int postCount);
 }
