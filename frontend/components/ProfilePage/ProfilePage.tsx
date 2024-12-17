@@ -116,7 +116,7 @@ const ProfilePage = ({ userId }: ProfilePageProps) => {
         )}
         {user && <PostSection title="已發表" proposals={publishedProposals} />}
 
-        <Modal
+        {/* <Modal
           opened={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           title="編輯個人資料"
@@ -133,7 +133,7 @@ const ProfilePage = ({ userId }: ProfilePageProps) => {
             />
             <Button onClick={handleSave}>確認修改</Button>
           </Stack>
-        </Modal>
+        </Modal> */}
       </Stack>
     </Container>
   );
