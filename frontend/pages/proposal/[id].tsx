@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Title, Badge, Image, Modal, Text, TextInput, Button, Grid, Group, Box, Flex, Stack, Paper,Avatar } from '@mantine/core';
-import { Carousel } from '@mantine/carousel';
+import { Container, Title, Badge, Image, Modal, Text, TextInput, Button, Grid, Group, Box, Flex, Stack, Paper, Avatar, AspectRatio, SimpleGrid } from '@mantine/core';
 import { Layout } from '../../components/Layout/Layout';
 import { ProposalData } from '../../types/ProposalData';
 
@@ -54,7 +53,7 @@ export default function ProposalSubpage({ proposalData }) {
 
    const handleCommentSubmit = () => {
     if (newComment.trim() === '') return; // 禁止提交空白留言
-
+cols
     const newCommentData = {
       id: Date.now(),
       name: proposalData.user_name || '匿名用戶', // 使用者名稱，預設匿名
@@ -81,33 +80,24 @@ export default function ProposalSubpage({ proposalData }) {
           ))}
         </Group>
 
-        {/* 提案附件部分 */}
-        <Box mt={90} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Carousel
-            withIndicators
-            height={250}
-            slideSize="33.333%"
-            align="start"
-            loop
-            sx={{
-              maxWidth: 850, // Carousel 最大寬度
-              margin: '0 auto', // 水平居中
-            }}
-          >
+        <Box mt={50}>
+          <SimpleGrid  
+            cols={{ base: 2, sm: 3, lg: 5 }}
+            spacing={{ base: 'md', sm: 'xl' }}
+            verticalSpacing={{ base: 'md', sm: 'xl' }}
+            >
             {proposalData.attachments.map((attachment) => (
-              <Carousel.Slide key={attachment.id} sx={{ paddingRight: 50 }}>
+              <AspectRatio ratio={1} key={attachment.id}>
                 <Image
                   src={`/${attachment.content}`}
-                  alt={`Slide ${attachment.id}`}
+                  alt={`Attachment ${attachment.id}`}
                   fit="contain"
-                  width={250}
-                  height={250}
-                  sx={{ cursor: 'pointer' }}
+                  radius="md"
                   onClick={() => handleImageClick(`/${attachment.content}`)}
                 />
-              </Carousel.Slide>
+              </AspectRatio>
             ))}
-          </Carousel>
+          </SimpleGrid>
         </Box>
 
         {/* Modal 用於顯示較大的圖片 */}
