@@ -14,7 +14,6 @@ export function KeywordSearch() {
   return (
     <TextInput
       placeholder="輸入關鍵字"
-      mb="md"
       leftSection={<IconSearch size={16} />}
       // value={search}
       // onChange={handleSearchChange}

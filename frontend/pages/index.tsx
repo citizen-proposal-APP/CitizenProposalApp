@@ -28,7 +28,7 @@ export default function HomePage() {
           熱門議題
         </Title>
         <KeywordSearch />
-        <SimpleGrid cols={{ base: 1, sm: 3 }}>
+        <SimpleGrid cols={{ base: 1, sm: 3 }} mt="md">
           {Array.from({ length: 3 }).map((_, index) => (
             <Stack key={index}>
               {items.slice((index * items.length) / 3, ((index + 1) * items.length) / 3)}
