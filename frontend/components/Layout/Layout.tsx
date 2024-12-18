@@ -18,7 +18,11 @@ export function Layout({ children, aside }: LayoutProps) {
     <AppShell
       header={{ height: 60 }}
       navbar={{ width: 300, breakpoint: 'sm', collapsed: { desktop: true, mobile: !opened } }}
-      aside={{ width: '25%', breakpoint: 'sm', collapsed: { desktop: true, mobile: !asideOpened } }}
+      aside={{
+        width: 350,
+        breakpoint: 'sm',
+        collapsed: { desktop: !aside, mobile: !aside || !asideOpened },
+      }}
       padding="md"
     >
       <AppShell.Header>
@@ -29,8 +33,10 @@ export function Layout({ children, aside }: LayoutProps) {
           <NavbarNested />
         </AppShell.Navbar>
       )}
+
+      <AppShell.Aside p="md">{aside}</AppShell.Aside>
+
       <AppShell.Main>{children}</AppShell.Main>
-      {aside && <AppShell.Aside p="md">{aside}</AppShell.Aside>}
     </AppShell>
   );
 }
