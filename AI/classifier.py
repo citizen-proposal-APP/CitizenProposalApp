@@ -9,6 +9,10 @@ from usearch.index import Index
 from collections import Counter
 import pickle
 import os
+import io
+import torch
+from PIL import Image
+from transformers import AutoModelForImageClassification, ViTImageProcessor
 
 class EmsembleSVM():
     def __init__(self, dir) -> None:
@@ -90,4 +94,24 @@ class Ranker():
         
         return department_label, topic_label
 
- 
+class Moderator():
+    def __init__(self, model_path: str) -> None:
+        self.processor = ViTImageProcessor.from_pretrained(f'{model_path}/nsfw_classify/preprocessor_config.json', local_files_only=True)
+        self.model = AutoModelForImageClassification.from_pretrained(f"{model_path}/nsfw_classify", local_files_only=True)
+        
+    def image_moderation(self, image_bytes: io.BytesIO) -> bool:
+        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        
+        with torch.no_grad():
+            inputs = self.processor(images=image, return_tensors="pt")
+            outputs = self.model(**inputs)
+            logits = outputs.logits
+        
+        predicted_label = logits.argmax(-1).item()
+        
+        return predicted_label
+    
+    def text_moderation(self, text: str):
+        raise NotImplementedError
+
+
