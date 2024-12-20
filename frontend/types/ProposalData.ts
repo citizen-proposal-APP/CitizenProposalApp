@@ -1,4 +1,5 @@
 import { Tag } from './Tag'
+import { Comment } from './Comment'
 export interface ProposalData {
     id: number;
     title: string;
@@ -10,5 +11,5 @@ export interface ProposalData {
     is_like: boolean;
     attachments: { id: number; content: string }[];
     similar_attachments: { id: number; content: string; title: string; link: string }[];
-    comments: { id: number; name: string; icon: string; content: string }[];
+    comments: Comment[];
   }

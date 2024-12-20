@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
+import { GetServerSidePropsContext, GetServerSideProps } from 'next';
 import { Container, Title, Badge, Image, Modal, Text, Textarea, Button, Grid, Group, Box, Flex, Stack, Paper, Avatar, AspectRatio, SimpleGrid } from '@mantine/core';
 import { Layout } from '../../components/Layout/Layout';
 import { ProposalData } from '../../types/ProposalData';
+import { Comment } from '@/types/Comment';
+import { Tag } from '@/types/Tag';
 
 
-export async function getServerSideProps(context: any) {
-  const { id } = context.params;
+export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
+  const { id } = context.params!; // 使用 "!" 來告訴 TypeScript id 是必定存在的
 
   // 透過 fetch 讀取 public/mockdata/${id}.json
   const response = await fetch(`http://localhost:3000/mockdata/${id}.json`);
@@ -20,20 +23,24 @@ export async function getServerSideProps(context: any) {
   return {
     props: { proposalData }, // 將 proposalData 傳給頁面組件
   };
+};
+
+interface ProposalSubpageProps {
+  proposalData: ProposalData; // 明確指定 proposalData 的類型
 }
 
-export default function ProposalSubpage({ proposalData }) {
+const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData }) => {
   // 狀態管理
-  const [opened, setOpened] = useState(false);
-  const [selectedImage, setSelectedImage] = useState('');
-  const [liked, setLiked] = useState(proposalData.is_like);
-  const [numLikes, setNumLikes] = useState(proposalData.num_like); // 初始化按讚數量
-  const [newComment, setNewComment] = useState('');
-  const [commentList, setCommentList] = useState(proposalData.comments);
-  const [isModalOpen, setIsModalOpen] = useState(false); // 控制 Modal 開關
+  const [opened, setOpened] = useState<boolean>(false);
+  const [selectedImage, setSelectedImage] = useState<string>('');
+  const [liked, setLiked] = useState<boolean>(proposalData.is_like);
+  const [numLikes, setNumLikes] = useState<number>(proposalData.num_like); // 初始化按讚數量
+  const [newComment, setNewComment] = useState<string>('');
+  const [commentList, setCommentList] = useState<Comment[]>(proposalData.comments);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 控制 Modal 開關
   const maxChars = 300; //留言最大字數
   // 點擊圖片時的處理函數
-  const handleImageClick = (imageSrc) => {
+  const handleImageClick = (imageSrc:string):void => {
     setSelectedImage(imageSrc);
     setOpened(true);
   };
@@ -53,7 +60,7 @@ export default function ProposalSubpage({ proposalData }) {
   };
   
   const confirmSubmit = () => {
-    const newCommentData = {
+    const newCommentData:Comment = {
       id: Date.now(),
       name: proposalData.user_name || '匿名用戶', // 使用者名稱，預設匿名
       icon: proposalData.user_icon || 'default-icon.png', // 使用者頭像，預設圖示
@@ -72,10 +79,10 @@ export default function ProposalSubpage({ proposalData }) {
           {proposalData.title}
         </Title>
         {/* 標籤部分 */}
-        <Group mt="md" spacing="xs">
-          {proposalData.tags.map((tag) => (
-            <Badge key={tag} size="lg" color="gray">
-              {tag}
+        <Group mt="md">
+          {proposalData.tags.map((tag: Tag) => (
+            <Badge key={tag.id} size="lg" color="gray">
+              {tag.name}
             </Badge>
           ))}
         </Group>
@@ -86,7 +93,7 @@ export default function ProposalSubpage({ proposalData }) {
             spacing={{ base: 'md', sm: 'xl' }}
             verticalSpacing={{ base: 'md', sm: 'xl' }}
             >
-            {proposalData.attachments.map((attachment) => (
+            {proposalData.attachments.map((attachment: { id: number; content: string }) => (
               <AspectRatio ratio={1} key={attachment.id}>
                 <Image
                   src={`/${attachment.content}`}
@@ -110,7 +117,8 @@ export default function ProposalSubpage({ proposalData }) {
             src={selectedImage}
             alt="Large view"
             fit="contain"
-            sx={{ width: '100%', height: 'auto' }}
+            w="100%"
+            h="auto"
           />
         </Modal>
 
@@ -121,20 +129,23 @@ export default function ProposalSubpage({ proposalData }) {
 
         <Box mt={30}>
           <Text size="xl" component="div">
-            {proposalData.content.split('\n').map((line, index) => (
-              <div key={index}>{line}</div>
+            {proposalData.content.split('\n').map((line: string, index: number) => (
+              // 使用 Text 元素來保證一致的樣式
+              <Text key={index} mb="sm">
+                {line}
+              </Text>
             ))}
           </Text>
         </Box>
 
         <div>
           {/* 其他相似提案 標題 */}
-          <Title order={1} mt={40} sx={{ marginTop: 50, fontSize: 28 }}>
+          <Title order={1} mt={50} fz={28}>
             其他相似提案 | 猜你想看...
           </Title>
           {/* 三個附件的縮圖與標題 */}
           <Grid mt={20}>
-            {proposalData.similar_attachments.map((similar_attachment) => (
+            {proposalData.similar_attachments.map((similar_attachment:{id: number; content: string; title: string; link: string}) => (
               <Grid.Col
                 key={similar_attachment.id}
                 span={{ base: 12, sm: 8, md: 4 }} // 手機版每行 1 個，平板每行 2(2*4=8) 個，電腦每行 3(3*4=12) 個
@@ -144,19 +155,6 @@ export default function ProposalSubpage({ proposalData }) {
                   href={similar_attachment.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  sx={{
-                    textDecoration: 'none',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    textAlign: 'center',
-                    gap: '10px', // 子元素之間的間距
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease', // 平滑過渡效果
-                    "&:hover": {
-                      transform: 'scale(1.05)', // 懸停時輕微放大
-                      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // 加入陰影效果
-                    },
-                  }}
                 >
                   <Image
                     src={`/${similar_attachment.content}`}
@@ -168,16 +166,9 @@ export default function ProposalSubpage({ proposalData }) {
                   />
                   <Text
                     size="lg" // 字體大小，lg 表示較大
-                    weight={600} // 半粗字體
-                    sx={{
-                      lineHeight: 1.5,
-                      textAlign: 'center', // 文字置中
-                      textDecoration: 'none', // 移除底線
-                      transition: 'color 0.2s ease',
-                      "&:hover": {
-                        color: 'blue', // 懸停時變色
-                      },
-                    }}
+                    fw={600} // 半粗字體
+                    lh="md"
+                    ta="center"
                   >
                     {similar_attachment.title}
                   </Text>
@@ -187,7 +178,7 @@ export default function ProposalSubpage({ proposalData }) {
           </Grid>
         </div>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', mt: 50 }}>
+        <Box>
           <Flex align="center" mt={50} gap={8}>
             <Image
               src={liked ? '../mockdata/image/iine-blue.png' : '../mockdata/image/iine.png'}
@@ -196,11 +187,6 @@ export default function ProposalSubpage({ proposalData }) {
               width={40} // 寬度
               height={40} // 高度
               fit="contain" // 確保圖片完整顯示
-              sx={{
-                cursor: 'pointer', // 鼠標懸停時變成手型
-                transition: 'transform 0.2s ease',
-                '&:hover': { transform: 'scale(1.1)' }, // 懸停時微微放大
-              }}
             />
 
             {/* 顯示按讚數量 */}
@@ -221,7 +207,7 @@ export default function ProposalSubpage({ proposalData }) {
 
           {/* 留言輸入框 */}
           <form onSubmit={handleCommentSubmit}>
-            <Stack spacing="sm">
+            <Stack>
               <Textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
@@ -242,7 +228,7 @@ export default function ProposalSubpage({ proposalData }) {
             centered
           >
             <Text>確定發表這則留言嗎?</Text>
-            <Group position="right" mt="md">
+            <Group mt="md">
               <Button variant="default" onClick={() => setIsModalOpen(false)}>
                 取消
               </Button>
@@ -262,14 +248,14 @@ export default function ProposalSubpage({ proposalData }) {
                 p="md"
                 mb="md"
               >
-                <Stack spacing="xs">
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+                <Stack>
+                  <Box>
                     <Avatar src={`/${comment.icon}`} radius="xl" size="md" alt={`${comment.name} 的頭像`} />
-                    <Text weight={700} sx={{ marginLeft: '10px'}}>
+                    <Text fw={500}>
                       {comment.name}
                     </Text>
                   </Box>
-                  <Text size="lg" weight={700} sx={{ lineHeight: 1.5 }}>
+                  <Text size="lg" fw={700} lh="lg">
                     {comment.content}
                   </Text>
                 </Stack>
@@ -280,4 +266,5 @@ export default function ProposalSubpage({ proposalData }) {
       </Container>
     </Layout>
   );
-}
+};
+export default ProposalSubpage;
