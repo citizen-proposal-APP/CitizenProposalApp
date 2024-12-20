@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Title, Badge, Image, Modal, Text, TextInput, Button, Grid, Group, Box, Flex, Stack, Paper, Avatar, AspectRatio, SimpleGrid } from '@mantine/core';
+import { Container, Title, Badge, Image, Modal, Text, Textarea, Button, Grid, Group, Box, Flex, Stack, Paper, Avatar, AspectRatio, SimpleGrid } from '@mantine/core';
 import { Layout } from '../../components/Layout/Layout';
 import { ProposalData } from '../../types/ProposalData';
 
@@ -30,6 +30,7 @@ export default function ProposalSubpage({ proposalData }) {
   const [numLikes, setNumLikes] = useState(proposalData.num_like); // 初始化按讚數量
   const [newComment, setNewComment] = useState('');
   const [commentList, setCommentList] = useState(proposalData.comments);
+  const [isModalOpen, setIsModalOpen] = useState(false); // 控制 Modal 開關
   const maxChars = 300; //留言最大字數
   // 點擊圖片時的處理函數
   const handleImageClick = (imageSrc) => {
@@ -44,25 +45,24 @@ export default function ProposalSubpage({ proposalData }) {
     });
   };
 
-  const handleCommentChange = (event) => {
-    const input = event.currentTarget.value;
-    if (input.length <= maxChars) {
-      setNewComment(input);
-    }
-  };
-
-   const handleCommentSubmit = () => {
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     if (newComment.trim() === '') return; // 禁止提交空白留言
-cols
+  
+    setIsModalOpen(true); // 打開確認 Modal
+  };
+  
+  const confirmSubmit = () => {
     const newCommentData = {
       id: Date.now(),
       name: proposalData.user_name || '匿名用戶', // 使用者名稱，預設匿名
       icon: proposalData.user_icon || 'default-icon.png', // 使用者頭像，預設圖示
       content: newComment,
     };
-
-    setCommentList((prevComments) => [...prevComments, newCommentData]);
+  
+    setCommentList((prevComments) => [...prevComments, newCommentData]); // 新增留言
     setNewComment(''); // 清空輸入框
+    setIsModalOpen(false); // 關閉確認 Modal
   };
 
   return (
@@ -189,7 +189,6 @@ cols
 
         <Box sx={{ display: 'flex', alignItems: 'center', mt: 50 }}>
           <Flex align="center" mt={50} gap={8}>
-            {/* 留言區圖標 */}
             <Image
               src={liked ? '../mockdata/image/iine-blue.png' : '../mockdata/image/iine.png'}
               alt="good"
@@ -221,25 +220,37 @@ cols
           </Title>
 
           {/* 留言輸入框 */}
-          <Stack spacing="sm">
-            <TextInput
-              value={newComment}
-              onChange={handleCommentChange}
-              placeholder="請輸入留言... 限300字內"
-              radius="md"
-              size="md"
-              rightSection={
-                <Text size="xs" color={newComment.length >= maxChars ? 'red' : 'gray'}>
-                  {newComment.length}/{maxChars}
-                </Text>
-              }
-              withAsterisk
-            />
-            <Button onClick={handleCommentSubmit} color="blue" size="md" disabled={newComment.trim() === ''}>
-              提交留言
-            </Button>
-          </Stack>
-
+          <form onSubmit={handleCommentSubmit}>
+            <Stack spacing="sm">
+              <Textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="請輸入留言... 限300字內"
+                radius="md"
+                size="lg"
+              />
+              <Button type="submit" color="blue" size="md" disabled={newComment.trim() === ''}>
+                提交留言
+              </Button>
+            </Stack>
+          </form>
+          {/* Mantine Modal 確認框 */}
+          <Modal
+            opened={isModalOpen}
+            onClose={() => setIsModalOpen(false)} // 關閉 Modal
+            title="確認送出留言"
+            centered
+          >
+            <Text>確定發表這則留言嗎?</Text>
+            <Group position="right" mt="md">
+              <Button variant="default" onClick={() => setIsModalOpen(false)}>
+                取消
+              </Button>
+              <Button color="blue" onClick={confirmSubmit}>
+                確定送出
+              </Button>
+            </Group>
+          </Modal>
           {/* 留言列表 */}
           <Box mt={30}>
             {commentList.map((comment) => (
