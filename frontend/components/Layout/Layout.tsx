@@ -28,11 +28,10 @@ export function Layout({ children, aside }: LayoutProps) {
       <AppShell.Header>
         <HeaderMenu opened={opened} toggle={toggle} />
       </AppShell.Header>
-      {opened && (
-        <AppShell.Navbar px="md">
-          <NavbarNested />
-        </AppShell.Navbar>
-      )}
+
+      <AppShell.Navbar px="md">
+        <NavbarNested />
+      </AppShell.Navbar>
 
       <AppShell.Aside p="md">{aside}</AppShell.Aside>
 
