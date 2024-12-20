@@ -4,7 +4,6 @@ import { Container, Title, Badge, Image, Modal, Text, Textarea, Button, Grid, Gr
 import { Layout } from '../../components/Layout/Layout';
 import { ProposalData } from '../../types/ProposalData';
 import { Comment } from '@/types/Comment';
-import { Tag } from '@/types/Tag';
 
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
@@ -80,7 +79,7 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData }) => {
         </Title>
         {/* 標籤部分 */}
         <Group mt="md">
-          {proposalData.tags.map((tag: Tag) => (
+          {proposalData.tags.map((tag:{id:number ,name:string}) => (
             <Badge key={tag.id} size="lg" color="gray">
               {tag.name}
             </Badge>
