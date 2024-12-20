@@ -16,11 +16,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <AppShell.Header>
         <HeaderMenu opened={opened} toggle={toggle} />
       </AppShell.Header>
-      {opened && (
-        <AppShell.Navbar px="md">
-          <NavbarNested />
-        </AppShell.Navbar>
-      )}
+
+      <AppShell.Navbar px="md">
+        <NavbarNested />
+      </AppShell.Navbar>
+
       <AppShell.Main>{children}</AppShell.Main>
     </AppShell>
   );
