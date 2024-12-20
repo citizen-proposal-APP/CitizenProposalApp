@@ -213,6 +213,12 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData }) => {
                 placeholder="請輸入留言... 限300字內"
                 radius="md"
                 size="lg"
+                maxLength={300}
+                rightSection={
+                  <Text size="xs" c={newComment.length >= maxChars ? 'red' : 'orange'}>
+                    {newComment.length}/300
+                  </Text>
+                }
               />
               <Button type="submit" color="blue" size="md" disabled={newComment.trim() === ''}>
                 提交留言
