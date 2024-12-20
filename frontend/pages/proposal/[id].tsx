@@ -74,7 +74,7 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData }) => {
   return (
     <Layout>
       <Container>
-        <Title order={1} mt="md" size={40}>
+        <Title order={1} mt="md" size={36}>
           {proposalData.title}
         </Title>
         {/* 標籤部分 */}
