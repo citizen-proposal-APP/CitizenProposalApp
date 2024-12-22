@@ -20,13 +20,16 @@
     "storybook:build": "storybook build"
   },
   "dependencies": {
-    "@mantine/carousel": "7.13.4",
+    "@mantine/carousel": "^7.13.4",
     "@mantine/core": "7.13.4",
-    "@mantine/form": "^7.14.3",
+    "@mantine/dropzone": "^7.14.1",
+    "@mantine/form": "^7.15.0",
     "@mantine/hooks": "7.13.4",
+    "@mantine/notifications": "^7.14.1",
     "@next/bundle-analyzer": "^14.2.4",
     "@tabler/icons-react": "^3.6.0",
-    "embla-carousel-react": "7",
+    "embla-carousel-autoplay": "^7.1.0",
+    "embla-carousel-react": "^7.1.0",
     "next": "15.0.1",
     "react": "18.3.1",
     "react-dom": "18.3.1"
