@@ -12,20 +12,11 @@ import '@mantine/dropzone/styles.css';
 import { Notifications, notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 import { IconPhoto, IconVideo } from '@tabler/icons-react';
+import { Configuration, PostsApi } from '@/openapi';
 
 export default function EditPage() {
-  /*
-	const [{ value: titleValue, valid: titleValid }, setTitleValue] = useValidatedState(
-    '',
-    (val) => val.length > 0 && val.length <= 100,
-    true
-  );
-	const [{ value: contentValue, valid: contentValid }, setContentValue] = useValidatedState(
-    '',
-    (val) => val.length > 0 && val.length <= 2000,
-    true
-  );
-  */
+	const [titleValue, setTitleValue] = useState<string>("");
+	const [contentValue, setContentValue] = useState<string>("");
   const [fileValue, setFileValue] = useState<File[]>([]);
   const [replacingQueue, setReplacingQueue] = useState<File[]>([]);
   const [currentReplacingFile, setCurrentReplacingFile] = useState<File | null>(null);
@@ -34,11 +25,9 @@ export default function EditPage() {
   const [saveModalOpened, { open: openSaveModal, close: closeSaveModal }] = useDisclosure(false);
   const [publishModalOpened, { open: openPublishModal, close: closePublishModal }] = useDisclosure(false);
   const [replaceModalOpened, setReplaceModalOpened] = useState(false);  
-  /*
   const [tagSearch, setTagSearch] = useState('');
   const [tagValue, setTagValue] = useState<any[]>([]);
   const [tagNameValue, setTagNameValue] = useState<string[]>([]);
-  */
   const MAX_FILE_SIZE = 50 * 1024 ** 2;
   const WIDTH_OFFSET = 65;
   /*
@@ -68,7 +57,6 @@ export default function EditPage() {
           : null,
     }),
   });
-
   
   const tagList = [
     { id: 1, tagType: TagType.department, name: "交通部" },
@@ -297,13 +285,27 @@ export default function EditPage() {
     ));
 	*/
 
+  const conf = new Configuration({
+    basePath: process.env.NEXT_PROCESS_BASE_PATH!,
+  });
+
+  const postsApi = new PostsApi(conf)
+
+  const publishProposal = async () => {
+    try {
+      await postsApi.apiPostsPost({title: titleValue, content: contentValue, tags: tagNameValue, attachments: fileValue})
+    } catch (error) {
+      console.error("錯誤：", error);
+    }
+  };
+
 	return (
     <Layout>
       <Notifications position="top-right" zIndex={1000}/>
       <Modal opened={publishModalOpened} onClose={closePublishModal} title="送出確認" centered size={"lg"}>
         <Text size={"md"}>確認送出提案？</Text>
         <Group justify="flex-end" gap={"xl"}>
-          <Button variant="filled" size={"md"}>是</Button>
+          <Button variant="filled" size={"md"} onClick={() => publishProposal()}>是</Button>
           <Button variant="default" size={"md"} onClick={closePublishModal}>否</Button>
         </Group>
       </Modal>
@@ -358,6 +360,8 @@ export default function EditPage() {
                 minRows={2}
                 key={form.key('title')}
                 {...form.getInputProps('title')}
+                value={titleValue}
+                onChange={(event) => setTitleValue(event.currentTarget.value)}
               />
               <Title size="lg">
                 提案內容或建議事項（必填）
@@ -371,6 +375,8 @@ export default function EditPage() {
                 minRows={10}
                 key={form.key('content')}
                 {...form.getInputProps('content')}
+                value={contentValue}
+                onChange={(event) => setContentValue(event.currentTarget.value)}
               />
               <Title size="lg">
                 上傳附件（支援圖片、影像格式）
@@ -499,6 +505,8 @@ export default function EditPage() {
               data={extractTagNames(tagList)}
               defaultValue={extractTagNames(autoTags)}
               clearable
+              value={tagNameValue}
+              onChange={setTagNameValue}
             />
             <Title size="lg">
               或許你想看看...？
