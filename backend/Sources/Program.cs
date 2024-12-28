@@ -52,6 +52,8 @@ internal sealed class Program
                     .AllowCredentials();
                 });
             })
+            .AddHttpClient<IAiService, AiService>(client => client.BaseAddress = new("http://CitizenProposalAppAi:5001/"));
+        builder.Services
             .AddControllers(options => options.Filters.Add(new ProducesAttribute(Application.Json)))
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         builder.Services.AddAuthentication().AddScheme<SessionTokenAuthenticationHandlerOptions, SessionTokenAuthenticationHandler>("session", "Session token authentication handler", null);

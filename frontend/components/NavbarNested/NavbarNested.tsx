@@ -5,7 +5,6 @@ import { links } from '@/data/links';
 import { AuthenticationTitle } from '@/components/Auth/SignIn/SignIn';
 import { SignUp } from '@/components/Auth/SignUp/SignUp';
 import classes from './NavbarNested.module.css';
-import Link from 'next/link';
 
 export function NavbarNested() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -40,12 +39,6 @@ export function NavbarNested() {
         <Button variant="default" onClick={() => openAuthModal(false)}>Log in</Button>
         <Button onClick={() => openAuthModal(true)}>Sign up</Button>
       </div>
-
-      <Link href="/SiteMap/SiteMap" passHref>
-        <Button component="a" variant="outline">
-          網站導覽
-        </Button>
-      </Link>
 
       {/* Modal 彈出介面，根據 isSignUp 狀態顯示不同內容 */}
       <Modal
