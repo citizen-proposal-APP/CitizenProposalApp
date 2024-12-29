@@ -8539,12 +8539,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"embla-carousel-autoplay@npm:^7.1.0":
-  version: 7.1.0
-  resolution: "embla-carousel-autoplay@npm:7.1.0"
+"embla-carousel-autoplay@npm:^8.5.1":
+  version: 8.5.1
+  resolution: "embla-carousel-autoplay@npm:8.5.1"
   peerDependencies:
-    embla-carousel: 7.1.0
-  checksum: 10c0/27b80fceee448c6e62144d68cd474f62d388feb93f61adcb00e4a12c80595235cd0e865e3dd305eef28591bfc5ffd40181aa8fa29ce6f85bd3331fecada071bc
+    embla-carousel: 8.5.1
+  checksum: 10c0/14618f46d99fd1fe9850c1db17a2a16e0b04679cae1486b4f58bdc0c4042b9182e17fff11f16bb0b821f746dd6bc0e44c53b406d00bc0017d431ad379dda12e7
   languageName: node
   linkType: hard
 
@@ -12464,7 +12464,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^7.13.1"
     "@typescript-eslint/parser": "npm:^7.13.1"
     babel-loader: "npm:^9.1.3"
-    embla-carousel-autoplay: "npm:^7.1.0"
+    embla-carousel-autoplay: "npm:^8.5.1"
     embla-carousel-react: "npm:^7.1.0"
     eslint: "npm:^8.57.0"
     eslint-config-airbnb: "npm:19.0.4"
