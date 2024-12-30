@@ -25,6 +25,7 @@ export default function EditPage() {
   const [saveModalOpened, { open: openSaveModal, close: closeSaveModal }] = useDisclosure(false);
   const [publishModalOpened, { open: openPublishModal, close: closePublishModal }] = useDisclosure(false);
   const [replaceModalOpened, setReplaceModalOpened] = useState(false);  
+  const [confirmModalOpened, setConfirmModalOpened] = useState(false);  
   const [tagSearch, setTagSearch] = useState('');
   const [tagValue, setTagValue] = useState<any[]>([]);
   const [tagNameValue, setTagNameValue] = useState<string[]>([]);
@@ -39,23 +40,23 @@ export default function EditPage() {
   const timelineProgress = onFirstStep ? 0 : 1
   const { height, width } = useViewportSize();
 
-  const form = useForm<{ title: string; content: string }>({
+  const form = useForm({
     mode: 'uncontrolled',
     validateInputOnChange: true,
     validateInputOnBlur: true,
     initialValues: { title: '', content: '' },
-    validate: (values) => ({
-      title: values.title.length == 0 
+    validate: {
+      title: () => titleValue.length == 0 
         ? '此欄位為必填' 
-        : values.title.length > 100
+        : titleValue.length > 100
           ? '此欄位字數不得超過100字'
           : null,
-      content: values.content.length == 0 
+      content: () => contentValue.length == 0 
         ? '此欄位為必填' 
-        : values.content.length > 2000
+        : contentValue.length > 2000
           ? '此欄位字數不得超過2000字'
           : null,
-    }),
+    },
   });
   
   const tagList = [
@@ -296,6 +297,8 @@ export default function EditPage() {
       await postsApi.apiPostsPost({title: titleValue, content: contentValue, tags: tagNameValue, attachments: fileValue})
     } catch (error) {
       console.error("錯誤：", error);
+    } finally {
+      setConfirmModalOpened(true);
     }
   };
 
@@ -321,6 +324,12 @@ export default function EditPage() {
         <Group justify="flex-end" gap={"xl"}>
           <Button variant="filled" size={"md"} onClick={replaceFile}>是</Button>
           <Button variant="default" size={"md"} onClick={skipFile}>否</Button>
+        </Group>
+      </Modal>
+      <Modal opened={confirmModalOpened} onClose={() => setConfirmModalOpened(false)} title="成功！" centered size={"lg"}>
+        <Text size={"md"}>提案已送出！</Text>
+        <Group justify="flex-end" gap={"xl"}>
+          <Button variant="filled" size={"md"} onClick={() => setConfirmModalOpened(false)}>確認</Button>
         </Group>
       </Modal>
     <MantineProvider>
@@ -353,7 +362,6 @@ export default function EditPage() {
               </Title>
               <Textarea 
                 placeholder="請輸入主題，100字以內，必填" 
-                required
                 radius={"lg"}
                 size={"lg"}
                 autosize
@@ -368,7 +376,6 @@ export default function EditPage() {
               </Title>
               <Textarea 
                 placeholder="請輸入內容或建議事項，2000字以內，必填" 
-                required
                 radius={"lg"}
                 size={"lg"}
                 autosize
