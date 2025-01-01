@@ -20,7 +20,7 @@ public class User
     public int Id { get; init; }
 
     /// <summary>
-    /// The username.
+    /// The username. The max length is 32.
     /// </summary>
     [MaxLength(32)]
     public required string Username { get; set; }
@@ -41,13 +41,13 @@ public class User
     public int IterationCount { get; set; }
 
     /// <summary>
-    /// Password salt used by the Argon2id algorithm.
+    /// Password salt used by the Argon2id algorithm. The max length is 64 bytes.
     /// </summary>
     [MaxLength(64)]
     public required byte[] Salt { get; set; }
 
     /// <summary>
-    /// Argon2id hash of the password.
+    /// Argon2id hash of the password. The max length is 64 bytes.
     /// </summary>
     [MaxLength(64)]
     public required byte[] PasswordHash { get; set; }

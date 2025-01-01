@@ -20,7 +20,7 @@ public class Attachment
     public required byte[] Content { get; set; }
 
     /// <summary>
-    /// The filename of the attachment.
+    /// The filename of the attachment. The max length is 256.
     /// </summary>
     [MaxLength(256)]
     public required string Filename { get; set; }
