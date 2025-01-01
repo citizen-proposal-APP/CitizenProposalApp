@@ -1,15 +1,8 @@
-import { Tag } from './Tag'
-import { Comment } from './Comment'
-export interface ProposalData {
-    id: number;
-    title: string;
-    tags: Tag[];
-    content: string;
-    user_name: string;
-    user_icon: string;  //url?
-    num_like: number;
-    is_like: boolean;
-    attachments: { id: number; content: string }[];
-    similar_attachments: { id: number; content: string; title: string; link: string }[];
-    comments: Comment[];
-  }
+// proposalData.ts
+import { PostQueryResponseDto } from '../openapi/models/PostQueryResponseDto'; 
+import { CommentsQueryResponseDto } from '../openapi/models/CommentsQueryResponseDto';
+
+export type ProposalData = PostQueryResponseDto 
+    & { current_user: string }
+    & { comments: CommentsQueryResponseDto; }
+    ;

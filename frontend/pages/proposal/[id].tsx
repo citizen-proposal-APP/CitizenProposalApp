@@ -1,41 +1,62 @@
 import React, { useState } from 'react';
 import { GetServerSidePropsContext, GetServerSideProps } from 'next';
 import { Container, Title, Badge, Image, Modal, Text, Textarea, Button, Grid, Group, Box, Flex, Stack, Paper, Avatar, AspectRatio, SimpleGrid } from '@mantine/core';
+import { PostsApi } from '../../openapi/apis/PostsApi';
+import { UsersApi } from '../../openapi/apis/UsersApi'
+import { PostQueryResponseDto } from '../../openapi/models/PostQueryResponseDto'; 
+import { UserQueryResponseDto } from '../../openapi/models/UserQueryResponseDto';
+import { CommentQueryResponseDto } from '../../openapi/models/CommentQueryResponseDto';
 import { Layout } from '../../components/Layout/Layout';
 import { ProposalData } from '../../types/ProposalData';
-import { Comment } from '@/types/Comment';
 
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  const { id } = context.params!; // 使用 "!" 來告訴 TypeScript id 是必定存在的
-
-  // 透過 fetch 讀取 public/mockdata/${id}.json
-  const response = await fetch(`http://localhost:3000/mockdata/${id}.json`);
+  const { id } = context.params!;
   
-  // 確保資料讀取成功
-  if (!response.ok) {
-    return { notFound: true }; // 如果沒有找到資料，回傳 404
+  // 初始化 API 實例
+  const postsApi = new PostsApi();
+  const usersApi = new UsersApi();
+  
+  try {
+    // 並行獲取數據
+    const [post, currentUser] = await Promise.all([
+      postsApi.apiPostsIdGet({ id: Number(id) }),
+      usersApi.apiUsersCurrentGet(),
+    ]);
+
+    // 組合數據為 ProposalData 格式
+    const proposalData: ProposalData = {
+      ...post,
+      current_user: currentUser.username, // 提取當前用戶名稱
+      comments: await postsApi.apiPostsPostIdCommentsGet({ postId: Number(id) }), // 獲取評論數據
+    };
+
+    return {
+      props: { proposalData }, // 將數據傳遞給頁面
+    };
+
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return { notFound: true }; // 如果出現錯誤，返回 404 頁面
   }
-
-  const proposalData: ProposalData = await response.json();
-
-  return {
-    props: { proposalData }, // 將 proposalData 傳給頁面組件
-  };
 };
+
 
 interface ProposalSubpageProps {
   proposalData: ProposalData; // 明確指定 proposalData 的類型
+  postsApi: PostsApi;
 }
 
-const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData }) => {
+const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData, postsApi }) => {
   // 狀態管理
   const [opened, setOpened] = useState<boolean>(false);
   const [selectedImage, setSelectedImage] = useState<string>('');
-  const [liked, setLiked] = useState<boolean>(proposalData.is_like);
-  const [numLikes, setNumLikes] = useState<number>(proposalData.num_like); // 初始化按讚數量
+  //const [liked, setLiked] = useState<boolean>(proposalData.is_like);
+  //const [numLikes, setNumLikes] = useState<number>(proposalData.num_like); // 初始化按讚數量
   const [newComment, setNewComment] = useState<string>('');
-  const [commentList, setCommentList] = useState<Comment[]>(proposalData.comments);
+  const [isSubmitting, setIsSubmitting] = useState(false); // 用來控制提交狀態（顯示加載指示器）
+  const [commentList, setCommentList] = useState<CommentQueryResponseDto[]>(proposalData.comments.comments); // 存儲留言數組
+  const [commentCount, setCommentCount] = useState<number>(proposalData.comments.count); // 存儲留言數量
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 控制 Modal 開關
   const maxChars = 300; //留言最大字數
   // 點擊圖片時的處理函數
@@ -43,33 +64,45 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData }) => {
     setSelectedImage(imageSrc);
     setOpened(true);
   };
-  const handleLikeClick = () => {
-    setLiked((prevLiked) => {
-      const newLiked = !prevLiked; // 切換點擊狀態
-      setNumLikes((prevNumLikes) => newLiked ? prevNumLikes + 1 : prevNumLikes - 1); // 更新按讚數量
-      return newLiked;
-    });
-  };
 
-  const handleCommentSubmit = (e: React.FormEvent) => {
+  // const handleLikeClick = () => {
+  //   setLiked((prevLiked) => {
+  //     const newLiked = !prevLiked; // 切換點擊狀態
+  //     setNumLikes((prevNumLikes) => newLiked ? prevNumLikes + 1 : prevNumLikes - 1); // 更新按讚數量
+  //     return newLiked;
+  //   });
+  // };
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.trim() === '') return; // 禁止提交空白留言
-  
-    setIsModalOpen(true); // 打開確認 Modal
+
+    setIsSubmitting(true); // 顯示加載狀態
+
+    try {
+        // 使用 postsApi 來調用 API 提交留言
+        await postsApi.apiPostsPostIdCommentsPost({
+            postId: proposalData.id,
+            content: newComment,
+        });
+
+        // 提交成功後重新獲取最新的留言
+        const updatedComments = await postsApi.apiPostsPostIdCommentsGet({
+            postId: proposalData.id,
+        });
+
+        setCommentList(updatedComments.comments); // 更新本地留言列表
+        setCommentCount(updatedComments.count); // 更新留言數量
+
+        setNewComment(''); // 清空輸入框
+    } catch (error) {
+        console.error('Error submitting comment:', error);
+        alert('提交留言失敗，請稍後再試。');
+    } finally {
+        setIsSubmitting(false); // 隱藏加載狀態
+    }
   };
   
-  const confirmSubmit = () => {
-    const newCommentData:Comment = {
-      id: Date.now(),
-      name: proposalData.user_name || '匿名用戶', // 使用者名稱，預設匿名
-      icon: proposalData.user_icon || 'default-icon.png', // 使用者頭像，預設圖示
-      content: newComment,
-    };
-  
-    setCommentList((prevComments) => [...prevComments, newCommentData]); // 新增留言
-    setNewComment(''); // 清空輸入框
-    setIsModalOpen(false); // 關閉確認 Modal
-  };
 
   return (
     <Layout>
@@ -177,7 +210,7 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData }) => {
           </Grid>
         </div>
 
-        <Box>
+        {/* <Box>
           <Flex align="center" mt={50} gap={8}>
             <Image
               src={liked ? '../mockdata/image/iine-blue.png' : '../mockdata/image/iine.png'}
@@ -188,7 +221,7 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData }) => {
               fit="contain" // 確保圖片完整顯示
             />
 
-            {/* 顯示按讚數量 */}
+            
             <Text
               size="xl" // Mantine 預設較大字體
               fw={500} // 半粗體字
@@ -196,7 +229,7 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData }) => {
               {numLikes}
             </Text>
           </Flex>
-        </Box>
+        </Box> */}
         
         <Box>
           {/* 留言區標題 */}
