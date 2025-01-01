@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { GetServerSidePropsContext, GetServerSideProps } from 'next';
 import { Container, Title, Badge, Image, Modal, Text, Textarea, Button, Grid, Group, Box, Flex, Stack, Paper, Avatar, AspectRatio, SimpleGrid } from '@mantine/core';
 import { PostsApi } from '../../openapi/apis/PostsApi';
-import { UsersApi } from '../../openapi/apis/UsersApi'
+import { UsersApi } from '../../openapi/apis/UsersApi';
+import { AttachmentsApi } from '../../openapi/apis/AttachmentsApi';
 import { PostQueryResponseDto } from '../../openapi/models/PostQueryResponseDto'; 
 import { UserQueryResponseDto } from '../../openapi/models/UserQueryResponseDto';
 import { CommentQueryResponseDto } from '../../openapi/models/CommentQueryResponseDto';
@@ -12,10 +13,11 @@ import { ProposalData } from '../../types/ProposalData';
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
   const { id } = context.params!;
-  
+
   // 初始化 API 實例
   const postsApi = new PostsApi();
   const usersApi = new UsersApi();
+  const attachmentsApi = new AttachmentsApi();
   
   try {
     // 並行獲取數據
@@ -24,13 +26,24 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
       usersApi.apiUsersCurrentGet(),
     ]);
 
+    // 獲取附件並轉換為 URL 陣列
+    const attachments = await Promise.all(
+      post.attachmentIds.map(async (attachmentID: number) => {
+        const attachment = await attachmentsApi.apiAttachmentsIdGet({ id: attachmentID });
+        // 使用 URL.createObjectURL() 將 Blob 轉換為 URL
+        const objectUrl = URL.createObjectURL(attachment);
+        return objectUrl; // 返回 URL
+      })
+    );
+
     // 組合數據為 ProposalData 格式
     const proposalData: ProposalData = {
       ...post,
       current_user: currentUser.username, // 提取當前用戶名稱
       comments: await postsApi.apiPostsPostIdCommentsGet({ postId: Number(id) }), // 獲取評論數據
+      attachments, // 將附件 URL 存入 proposalData (attachments 是陣列)
     };
-
+    
     return {
       props: { proposalData }, // 將數據傳遞給頁面
     };
@@ -40,7 +53,6 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     return { notFound: true }; // 如果出現錯誤，返回 404 頁面
   }
 };
-
 
 interface ProposalSubpageProps {
   proposalData: ProposalData; // 明確指定 proposalData 的類型
@@ -59,11 +71,7 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData, postsAp
   const [commentCount, setCommentCount] = useState<number>(proposalData.comments.count); // 存儲留言數量
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 控制 Modal 開關
   const maxChars = 300; //留言最大字數
-  // 點擊圖片時的處理函數
-  const handleImageClick = (imageSrc:string):void => {
-    setSelectedImage(imageSrc);
-    setOpened(true);
-  };
+  
 
   // const handleLikeClick = () => {
   //   setLiked((prevLiked) => {
@@ -73,34 +81,43 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData, postsAp
   //   });
   // };
 
-  const handleCommentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newComment.trim() === '') return; // 禁止提交空白留言
-
-    setIsSubmitting(true); // 顯示加載狀態
-
+  const handleCommentSubmit = async () => {
+    if (newComment.trim() === '') return;
+  
+    setIsSubmitting(true);
     try {
-        // 使用 postsApi 來調用 API 提交留言
-        await postsApi.apiPostsPostIdCommentsPost({
-            postId: proposalData.id,
-            content: newComment,
-        });
-
-        // 提交成功後重新獲取最新的留言
-        const updatedComments = await postsApi.apiPostsPostIdCommentsGet({
-            postId: proposalData.id,
-        });
-
-        setCommentList(updatedComments.comments); // 更新本地留言列表
-        setCommentCount(updatedComments.count); // 更新留言數量
-
-        setNewComment(''); // 清空輸入框
+      await postsApi.apiPostsPostIdCommentsPost({
+        postId: proposalData.id,
+        content: newComment,
+      });
+  
+      const updatedComments = await postsApi.apiPostsPostIdCommentsGet({
+        postId: proposalData.id,
+      });
+  
+      setCommentList(updatedComments.comments);
+      setCommentCount(updatedComments.count);
+      setNewComment('');
     } catch (error) {
-        console.error('Error submitting comment:', error);
-        alert('提交留言失敗，請稍後再試。');
+      console.error('Error submitting comment:', error);
+      alert('提交留言失敗，請稍後再試。');
     } finally {
-        setIsSubmitting(false); // 隱藏加載狀態
+      setIsSubmitting(false);
     }
+  };
+  
+  // Modal 確認提交邏輯
+  const confirmSubmit = async () => {
+    setIsModalOpen(false);
+    await handleCommentSubmit();
+  };
+  
+  // 表單提交邏輯
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newComment.trim() === '') return;
+  
+    setIsModalOpen(true);
   };
   
 
@@ -120,39 +137,80 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData, postsAp
         </Group>
 
         <Box mt={50}>
-          <SimpleGrid  
-            cols={{ base: 2, sm: 3, lg: 5 }}
-            spacing={{ base: 'md', sm: 'xl' }}
-            verticalSpacing={{ base: 'md', sm: 'xl' }}
-            >
-            {proposalData.attachments.map((attachment: { id: number; content: string }) => (
-              <AspectRatio ratio={1} key={attachment.id}>
-                <Image
-                  src={`/${attachment.content}`}
-                  alt={`Attachment ${attachment.id}`}
-                  fit="contain"
-                  radius="md"
-                  onClick={() => handleImageClick(`/${attachment.content}`)}
-                />
-              </AspectRatio>
-            ))}
-          </SimpleGrid>
-        </Box>
+          <SimpleGrid cols={{ base: 2, sm: 3, lg: 5 }} spacing={{ base: 'md', sm: 'xl' }} verticalSpacing={{ base: 'md', sm: 'xl' }}>
+            {proposalData.attachments.map((attachmentUrl, index) => {
+              const contentType = attachmentUrl.split('.').pop();
 
-        {/* Modal 用於顯示較大的圖片 */}
-        <Modal
-          opened={opened}
-          onClose={() => setOpened(false)}
-          size="lg" // 可以根據需要調整大小
-        >
-          <Image
-            src={selectedImage}
-            alt="Large view"
-            fit="contain"
-            w="100%"
-            h="auto"
-          />
-        </Modal>
+              if (!contentType) {
+                return (
+                  <Box key={index}>
+                    <Text>不明的檔案類型或檔案擴展名遺失</Text>
+                  </Box>
+                );
+              }
+
+              if (['jpg', 'jpeg', 'png', 'gif'].includes(contentType)) {
+                // 顯示圖片
+                return (
+                  <Box key={index}>
+                    <Image src={attachmentUrl} alt={`Attachment ${index + 1}`} fit="contain" w="100%" h="auto" onClick={() => {
+                      setSelectedImage(attachmentUrl);
+                      setOpened(true);
+                    }} />
+                  </Box>
+                );
+              } else if (['mp4', 'webm', 'ogg'].includes(contentType)) {
+                // 顯示影片，無需透過 Modal
+                return (
+                  <Box key={index}>
+                    <video controls width="100%">
+                      <source src={attachmentUrl} type={`video/${contentType}`} />
+                      您的瀏覽器不支援該影片類型
+                    </video>
+                  </Box>
+                );
+              } else if (['pdf'].includes(contentType)) {
+                // 顯示 PDF 並支持在 Modal 中查看
+                return (
+                  <Box key={index}>
+                    <Text onClick={() => {
+                      setSelectedImage(attachmentUrl); // 假設是 PDF URL
+                      setOpened(true);
+                    }}>瀏覽PDF</Text>
+                  </Box>
+                );
+              } else {
+                // 其他類型的文件（可根據需要添加更多類型處理）
+                return (
+                  <Box key={index}>
+                    <Text>不支援的檔案類型</Text>
+                  </Box>
+                );
+              }
+            })}
+          </SimpleGrid>
+
+          {/* Modal 用於顯示較大的圖片或 PDF */}
+          <Modal
+            opened={opened}
+            onClose={() => setOpened(false)}
+            size="lg"
+          >
+            {selectedImage.endsWith('.pdf') ? (
+              // 使用 <embed> 顯示 PDF
+              <embed src={selectedImage} type="application/pdf" width="100%" height="400px" />
+            ) : (
+              // 顯示圖片
+              <Image
+                src={selectedImage}
+                alt="Large view"
+                fit="contain"
+                w="100%"
+                h="auto"
+              />
+            )}
+          </Modal>
+        </Box>
 
         {/* 提案內容 標題及文本 */}
         <Title order={1} mt={50}>
@@ -170,12 +228,11 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData, postsAp
           </Text>
         </Box>
 
-        <div>
-          {/* 其他相似提案 標題 */}
+        {/* <div>
           <Title order={1} mt={50} fz={28}>
             其他相似提案 | 猜你想看...
           </Title>
-          {/* 三個附件的縮圖與標題 */}
+          
           <Grid mt={20}>
             {proposalData.similar_attachments.map((similar_attachment:{id: number; content: string; title: string; link: string}) => (
               <Grid.Col
@@ -208,7 +265,7 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData, postsAp
               </Grid.Col>
             ))}
           </Grid>
-        </div>
+        </div> */}
 
         {/* <Box>
           <Flex align="center" mt={50} gap={8}>
@@ -238,7 +295,7 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData, postsAp
           </Title>
 
           {/* 留言輸入框 */}
-          <form onSubmit={handleCommentSubmit}>
+          <form onSubmit={handleFormSubmit}>
             <Stack>
               <Textarea
                 value={newComment}
@@ -258,6 +315,7 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData, postsAp
               </Button>
             </Stack>
           </form>
+
           {/* Mantine Modal 確認框 */}
           <Modal
             opened={isModalOpen}
@@ -275,11 +333,12 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData, postsAp
               </Button>
             </Group>
           </Modal>
+
           {/* 留言列表 */}
           <Box mt={30}>
-            {commentList.map((comment) => (
+            {proposalData.comments.comments.map((comment_map) => (
               <Paper
-                key={comment.id}
+                key={comment_map.id}
                 withBorder
                 shadow="sm"
                 radius="md"
@@ -287,14 +346,15 @@ const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData, postsAp
                 mb="md"
               >
                 <Stack>
+                  {/* 顯示留言者名稱 */}
                   <Box>
-                    <Avatar src={`/${comment.icon}`} radius="xl" size="md" alt={`${comment.name} 的頭像`} />
                     <Text fw={500}>
-                      {comment.name}
+                      {comment_map.author.username}
                     </Text>
                   </Box>
+                  {/* 顯示留言內容 */}
                   <Text size="lg" fw={700} lh="lg">
-                    {comment.content}
+                    {comment_map.content}
                   </Text>
                 </Stack>
               </Paper>

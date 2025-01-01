@@ -4,5 +4,6 @@ import { CommentsQueryResponseDto } from '../openapi/models/CommentsQueryRespons
 
 export type ProposalData = PostQueryResponseDto 
     & { current_user: string }
+    & { attachments: string[] }
     & { comments: CommentsQueryResponseDto; }
     ;
