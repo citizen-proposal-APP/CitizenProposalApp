@@ -133,6 +133,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         {
             // This is a compatibility fix for a bug in NSwag where if you use OpenAPI 3, arrays sent as form fields are sent as comma-separated lists instead of one element per field in the Swagger UI.
             // https://github.com/swagger-api/swagger-ui/issues/10221
+            // This also conveniently trims all tags.
             tagsString = post.Tags.SelectMany(tag => tag.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
             await AddMissingTagsToDb(tagsString);
             // Since AddMissingTagsToDb never adds duplicate tags to the DB, this part will also not have duplicate tags.

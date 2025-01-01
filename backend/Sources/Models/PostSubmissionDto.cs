@@ -28,6 +28,7 @@ public record PostSubmissionDto
     /// The names of the tags to use.
     /// </summary>
     [ElementMaxLength(32)]
+    [ElementRequired]
     public ICollection<string>? Tags { get; init; }
 
     /// <summary>
