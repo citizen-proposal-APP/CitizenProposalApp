@@ -1,5 +1,6 @@
 namespace CitizenProposalApp;
 
+/// <summary>
 /// The DTO used to associate an attachment's ID and filename when querying posts.
 /// </summary>
 public record PostQueryAttachmentResponseDto
