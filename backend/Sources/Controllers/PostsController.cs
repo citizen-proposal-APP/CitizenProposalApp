@@ -97,10 +97,10 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         }
         PostsQueryResponseDto result = new()
         {
-            Count = posts.Count(), // Can't use CountAsync here because HandlePostsQueryWithAi returns a fake IQueryable for convenience
+            Count = posts.Count(), // Can't use CountAsync here because HandlePostsQueryWithAi returns a fake IQueryable for convenience, which throws when used with CountAsync.
             Posts = mapper.Map<IEnumerable<Post>, IEnumerable<PostQueryResponseDto>>(posts)
         };
-        return Ok(result);
+        return result;
     }
 
     /// <summary>
