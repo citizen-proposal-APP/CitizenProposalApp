@@ -15,13 +15,13 @@ public class Post
     public int Id { get; init; }
 
     /// <summary>
-    /// The title of this post.
+    /// The title of this post. The max length is 100.
     /// </summary>
     [MaxLength(100)]
     public required string Title { get; set; }
 
     /// <summary>
-    /// The text of this post.
+    /// The text of this post. The max length is 2000.
     /// </summary>
     [MaxLength(2000)]
     public required string Content { get; set; }

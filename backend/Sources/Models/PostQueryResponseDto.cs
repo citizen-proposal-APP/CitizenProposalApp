@@ -31,7 +31,7 @@ public record PostQueryResponseDto
     public required UserQueryResponseDto Author { get; init; }
 
     /// <summary>
-    /// The IDs of the attachments on this post. To get the attachments themselves, query them at <code>/api/Attachments/{id}</code>.
+    /// The IDs and filenames of the attachments on this post. To get the attachments themselves, query them at <code>/api/Attachments/{id}</code>.
     /// </summary>
-    public required IList<int> AttachmentIds { get; init; }
+    public required IList<PostQueryAttachmentResponseDto> Attachments { get; init; }
 }
