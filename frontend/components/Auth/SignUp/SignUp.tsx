@@ -63,7 +63,7 @@ export function SignUp({ onToggle, onClose, onLoginSuccess }: SignUpProps) {
 
               // 登入成功後，調用 apiUsersCurrentGet() 獲取用戶資訊
               const userData = await api.apiUsersCurrentGet();
-              
+
               if (userData?.id && userData?.username) {
                 // 確保 userData 正確
                 console.log('用戶資訊:', userData);
@@ -72,8 +72,23 @@ export function SignUp({ onToggle, onClose, onLoginSuccess }: SignUpProps) {
               } else {
                 console.error('無法獲取用戶資訊');
               }
-            } catch (error) {
-              console.error('註冊失敗', error);
+            } catch (error: any) {
+              if (error.response) {
+                const status = error.response.status;
+                if (status === 400) {
+                  console.error('錯誤: 無效的請求', error.response.data);
+                  window.alert('註冊失敗：無效的請求，請檢查資料');
+                } else if (status === 409) {
+                  console.error('錯誤: 使用者名稱重複', error.response.data);
+                  window.alert('註冊失敗：使用者名稱已被使用，請更換名稱');
+                } else {
+                  console.error('伺服器錯誤', error.response.data);
+                  window.alert('註冊失敗：伺服器錯誤，請稍後再試');
+                }
+              } else {
+                console.error('未知錯誤', error.message);
+                window.alert('發生未知錯誤，請稍後重試');
+              }
             } finally {
               setIsSubmitting(false);
             }

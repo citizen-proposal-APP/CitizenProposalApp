@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { Button, Code, Group, Modal, ScrollArea } from '@mantine/core';
 import { AuthenticationTitle } from '@/components/Auth/SignIn/SignIn';
 import { SignUp } from '@/components/Auth/SignUp/SignUp';
@@ -7,7 +8,6 @@ import { links } from '@/data/links';
 import { Configuration, UsersApi } from '@/openapi';
 import { LinksGroup } from './LinksGroup';
 import classes from './NavbarNested.module.css';
-import { useRouter } from 'next/router';
 
 const configuration = new Configuration({
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
@@ -18,7 +18,7 @@ export function NavbarNested() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false); // 狀態用於切換登入或註冊頁面
   const [user, setUser] = useState<{ id: number; username: string } | null>(null); // 管理登入狀態
-  
+
   const items = links.map((item) => <LinksGroup {...item} key={item.label} />);
   const router = useRouter();
 
@@ -43,8 +43,9 @@ export function NavbarNested() {
       await usersApi.apiUsersLogoutDelete();
       setUser(null); // 清除登入狀態
       console.log('使用者已成功登出');
-    } catch (error) {
+    } catch (error: any) {
       console.error('登出失敗:', error);
+      window.alert('登出失敗，請稍後再試');
     }
   };
 

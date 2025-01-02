@@ -1,4 +1,5 @@
 import React, { use, useState } from 'react';
+import { useRouter } from 'next/router';
 import { IconChevronDown } from '@tabler/icons-react';
 import { Burger, Button, Center, Container, Group, Menu, Modal } from '@mantine/core';
 import { ActionToggle } from '@/components/ActionToggle/ActionToggle';
@@ -8,7 +9,6 @@ import { Logo } from '@/components/Logo/Logo';
 import { links } from '@/data/links';
 import { Configuration, UsersApi } from '@/openapi';
 import classes from './HeaderMenu.module.css';
-import { useRouter } from 'next/router';
 
 const configuration = new Configuration({
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
@@ -51,8 +51,9 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
       await usersApi.apiUsersLogoutDelete();
       setUser(null); // 清除登入狀態
       console.log('使用者已成功登出');
-    } catch (error) {
+    } catch (error: any) {
       console.error('登出失敗:', error);
+      window.alert('登出失敗，請稍後再試');
     }
   };
 
@@ -133,7 +134,7 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
           <SignUp
             onToggle={toggleAuthPage} // 切換到登入
             onClose={() => setAuthModalOpen(false)} // 關閉 Modal
-            onLoginSuccess={handleLoginSuccess}// 設定使用者名稱
+            onLoginSuccess={handleLoginSuccess} // 設定使用者名稱
           />
         ) : (
           <AuthenticationTitle
