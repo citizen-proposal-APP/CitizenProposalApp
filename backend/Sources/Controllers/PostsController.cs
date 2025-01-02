@@ -16,6 +16,7 @@ using System.IO;
 using static System.Net.Mime.MediaTypeNames;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using AutoMapper.QueryableExtensions;
 
 namespace CitizenProposalApp;
 
@@ -75,6 +76,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         {
             return Problem("\"SortDirection\" or \"SortBy\" contain invalid values.", statusCode: Status400BadRequest);
         }
+        // These Include calls are needed even though ProjectTo is used instead of Map, probably because HandlePostsQueryWithAi returns an IEnumerable wrapped as an IQueryable by calling AsQueryable.
         IQueryable<Post> posts = context.Posts
             .Include(post => post.Tags)
                 .ThenInclude(tag => tag.TagType)
@@ -98,7 +100,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         PostsQueryResponseDto result = new()
         {
             Count = posts.Count(), // Can't use CountAsync here because HandlePostsQueryWithAi returns a fake IQueryable for convenience, which throws when used with CountAsync.
-            Posts = mapper.Map<IEnumerable<Post>, IEnumerable<PostQueryResponseDto>>(posts)
+            Posts = posts.ProjectTo<PostQueryResponseDto>(mapper.ConfigurationProvider)
         };
         return result;
     }
@@ -222,17 +224,18 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         {
             return Problem("\"SortDirection\" contain invalid values.", statusCode: Status400BadRequest);
         }
-        IQueryable<Comment> comments = context.Comments.Include(comment => comment.Author).Where(comment => comment.ParentPost.Id == postId);
+        IQueryable<Comment> comments = context.Comments.Where(comment => comment.ParentPost.Id == postId);
         comments = parameters.SortDirection switch
         {
             Ascending => comments.OrderBy(comment => comment.PostedTime),
             Descending => comments.OrderByDescending(comment => comment.PostedTime),
             _ => throw new NotImplementedException("Impossible situation")
         };
+        comments = comments.Skip(parameters.Start).Take(parameters.Range);
         CommentsQueryResponseDto result = new()
         {
             Count = await comments.CountAsync(),
-            Comments = mapper.Map<IEnumerable<Comment>, IEnumerable<CommentQueryResponseDto>>(comments.Skip(parameters.Start).Take(parameters.Range))
+            Comments = comments.ProjectTo<CommentQueryResponseDto>(mapper.ConfigurationProvider)
         };
         return Ok(result);
     }
