@@ -155,16 +155,22 @@ export default function EditPage() {
       case "text":
         notifications.show({
           title: '無法送出',
-          message: '請依照要求填寫必填欄位！'
+          message: '請依照要求填寫必填欄位'
         })
         break;
       case "file":
         notifications.show({
           title: '檔案無法上傳',
-          message: '請確認欲上傳檔案之大小和格式！'
+          message: '請確認欲上傳檔案之大小和格式'
         })
         break
-    
+      case "sighin":
+        notifications.show({
+          title: '尚未登入',
+          message: '請先登入後即可發布提案'
+        })
+        break
+  
       default:
         break;
     }
@@ -295,9 +301,24 @@ export default function EditPage() {
   const publishProposal = async () => {
     try {
       await postsApi.apiPostsPost({title: titleValue, content: contentValue, tags: tagNameValue, attachments: fileValue})
-    } catch (error) {
-      console.error("錯誤：", error);
+    } catch (error: any) {
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            console.error('錯誤: 格式不符', error.response.data)
+            handleNotification("text")
+            break;
+          case 401:
+              console.error('錯誤: 使用者未登入', error.response.data)
+              handleNotification("sighin")
+              break;
+            
+          default:
+            break;
+        }
+      }
     } finally {
+      closePublishModal();
       setConfirmModalOpened(true);
     }
   };
