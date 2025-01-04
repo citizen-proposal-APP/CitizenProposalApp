@@ -42,31 +42,33 @@ To build and deploy the AI container, follow these steps:
 
 1. Change to AI directory and install mysql-connector:
 
-```bash
-cd AI
-pip install mysql-connector-python==9.1.0
-```
+   ```bash
+   cd AI
+   pip install mysql-connector-python==9.1.0
+   ```
 
-2. Build the docker image with the following command:
+2. Create `.env` and paste your openrouter api in it
 
-```bash
-docker build -t citizenproposalapp-ai .
-```
+3. Build the docker image with the following command:
 
-3. Run the docker container with the following command:
+   ```bash
+   docker build -t citizenproposalapp-ai .
+   ```
 
-```bash
-docker run -d -p 5001:5001 -v vector-db:/app/db citizenproposalapp-ai
-```
+4. Run the docker container with the following command:
 
-4. (optional) Add fake data to MySQL:
+   ```bash
+   docker run -d -p 5001:5001 -v vector-db:/app/db citizenproposalapp-ai
+   ```
 
-```bash
-python3 insert_fake_data.py
-```
+5. (optional) Add fake data to MySQL:
 
-5. Sync vector-db with MySQL:
+   ```bash
+   python3 insert_fake_data.py
+   ```
 
-```bash
-python3 vector_db_sync.py
-```
+6. Sync vector-db with MySQL:
+
+   ```bash
+   python3 vector_db_sync.py
+   ```
