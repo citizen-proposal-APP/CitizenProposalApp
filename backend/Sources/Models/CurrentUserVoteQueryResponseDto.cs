@@ -6,7 +6,7 @@ namespace CitizenProposalApp;
 public record CurrentUserVoteQueryResponseDto
 {
     /// <summary>
-    /// The kind of vote. Possible values are "None", "Like", and "Dislike".
+    /// The kind of vote.
     /// </summary>
     public required VoteKind VoteKind { get; init; }
 }
