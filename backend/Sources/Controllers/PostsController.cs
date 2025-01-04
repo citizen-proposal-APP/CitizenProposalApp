@@ -16,6 +16,9 @@ using System.IO;
 using static System.Net.Mime.MediaTypeNames;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using AutoMapper.QueryableExtensions;
+using System.Security.Claims;
+using System.Globalization;
 
 namespace CitizenProposalApp;
 
@@ -75,6 +78,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         {
             return Problem("\"SortDirection\" or \"SortBy\" contain invalid values.", statusCode: Status400BadRequest);
         }
+        // These Include calls are needed even though ProjectTo is used instead of Map, probably because HandlePostsQueryWithAi returns an IEnumerable wrapped as an IQueryable by calling AsQueryable.
         IQueryable<Post> posts = context.Posts
             .Include(post => post.Tags)
                 .ThenInclude(tag => tag.TagType)
@@ -97,10 +101,10 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         }
         PostsQueryResponseDto result = new()
         {
-            Count = posts.Count(), // Can't use CountAsync here because HandlePostsQueryWithAi returns a fake IQueryable for convenience
-            Posts = mapper.Map<IEnumerable<Post>, IEnumerable<PostQueryResponseDto>>(posts)
+            Count = posts.Count(), // Can't use CountAsync here because HandlePostsQueryWithAi returns a fake IQueryable for convenience, which throws when used with CountAsync.
+            Posts = posts.ProjectTo<PostQueryResponseDto>(mapper.ConfigurationProvider)
         };
-        return Ok(result);
+        return result;
     }
 
     /// <summary>
@@ -133,6 +137,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         {
             // This is a compatibility fix for a bug in NSwag where if you use OpenAPI 3, arrays sent as form fields are sent as comma-separated lists instead of one element per field in the Swagger UI.
             // https://github.com/swagger-api/swagger-ui/issues/10221
+            // This also conveniently trims all tags.
             tagsString = post.Tags.SelectMany(tag => tag.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
             await AddMissingTagsToDb(tagsString);
             // Since AddMissingTagsToDb never adds duplicate tags to the DB, this part will also not have duplicate tags.
@@ -146,7 +151,9 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
             PostedTime = timeProvider.GetUtcNow(),
             Tags = tags,
             Title = post.Title,
-            Attachments = []
+            Attachments = [],
+            LikedUsers = [],
+            DislikedUsers = []
         };
         if (post.Attachments is not null and not { Count: 0 })
         {
@@ -221,19 +228,133 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         {
             return Problem("\"SortDirection\" contain invalid values.", statusCode: Status400BadRequest);
         }
-        IQueryable<Comment> comments = context.Comments.Include(comment => comment.Author).Where(comment => comment.ParentPost.Id == postId);
+        IQueryable<Comment> comments = context.Comments.Where(comment => comment.ParentPost.Id == postId);
         comments = parameters.SortDirection switch
         {
             Ascending => comments.OrderBy(comment => comment.PostedTime),
             Descending => comments.OrderByDescending(comment => comment.PostedTime),
             _ => throw new NotImplementedException("Impossible situation")
         };
+        comments = comments.Skip(parameters.Start).Take(parameters.Range);
         CommentsQueryResponseDto result = new()
         {
             Count = await comments.CountAsync(),
-            Comments = mapper.Map<IEnumerable<Comment>, IEnumerable<CommentQueryResponseDto>>(comments.Skip(parameters.Start).Take(parameters.Range))
+            Comments = comments.ProjectTo<CommentQueryResponseDto>(mapper.ConfigurationProvider)
         };
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Likes a post. If the post has already been liked, nothing will be done and 200 will be returned. If the post was originally disliked, the dislike will be removed and the post will be liked.
+    /// </summary>
+    /// <param name="postId">The ID of the post to like.</param>
+    /// <returns>Nothing if successful.</returns>
+    /// <response code="200">The post has been successfully liked or it has already been liked.</response>
+    /// <response code="400">The provided ID is not a valid integer.</response>
+    /// <response code="401">The user has not logged in or the session has expired.</response>
+    /// <response code="404">No post with the specified ID exists.</response>
+    [HttpPost("{postId}/like")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType(typeof(void), Status401Unauthorized, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
+    [Authorize]
+    public async Task<IActionResult> LikePost(int postId)
+    {
+        // If the user has already liked this post
+        if (await context.Posts.AnyAsync(post => post.Id == postId && post.LikedUsers.Any(user => user.Id == GetUserId())))
+        {
+            return Ok();
+        }
+        Post? likingPost = await context.Posts
+            .Include(post => post.LikedUsers)
+            .Include(post => post.DislikedUsers)
+            .FirstOrDefaultAsync(post => post.Id == postId);
+        if (likingPost is null)
+        {
+            return Problem($"No post with the ID {postId} exists.", statusCode: Status404NotFound);
+        }
+        User currentUser = (await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User))!;
+        likingPost.DislikedUsers.Remove(currentUser);
+        likingPost.LikedUsers.Add(currentUser);
+        await context.SaveChangesAsync();
+        return Ok();
+    }
+
+    /// <summary>
+    /// Dislikes a post. If the post has already been disliked, nothing will be done and 200 will be returned. If the post was originally liked, the like will be removed and the post will be disliked.
+    /// </summary>
+    /// <param name="postId">The ID of the post to dislike.</param>
+    /// <returns>Nothing if successful.</returns>
+    /// <response code="200">The post has been successfully disliked or it has already been disliked.</response>
+    /// <response code="400">The provided ID is not a valid integer.</response>
+    /// <response code="401">The user has not logged in or the session has expired.</response>
+    /// <response code="404">No post with the specified ID exists.</response>
+    [HttpPost("{postId}/dislike")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType(typeof(void), Status401Unauthorized, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
+    [Authorize]
+    public async Task<IActionResult> DislikePost(int postId)
+    {
+        // If the user has already disliked this post
+        if (await context.Posts.AnyAsync(post => post.Id == postId && post.DislikedUsers.Any(user => user.Id == GetUserId())))
+        {
+            return Ok();
+        }
+        Post? dislikingPost = await context.Posts
+            .Include(post => post.LikedUsers)
+            .Include(post => post.DislikedUsers)
+            .FirstOrDefaultAsync(post => post.Id == postId);
+        if (dislikingPost is null)
+        {
+            return Problem($"No post with the ID {postId} exists.", statusCode: Status404NotFound);
+        }
+        User currentUser = (await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User))!;
+        dislikingPost.DislikedUsers.Add(currentUser);
+        dislikingPost.LikedUsers.Remove(currentUser);
+        await context.SaveChangesAsync();
+        return Ok();
+    }
+
+    /// <summary>
+    /// Removes the like or dislike on a post. If the post hasn't been liked nor disliked, nothing will be done and 200 will be returned.
+    /// </summary>
+    /// <param name="postId">The ID of the post to remove a like or dislike from.</param>
+    /// <returns>Nothing if successful.</returns>
+    /// <response code="200">The like of dislike on the post has been successfully removed or it didn't have a like nor dislike.</response>
+    /// <response code="400">The provided ID is not a valid integer.</response>
+    /// <response code="401">The user has not logged in or the session has expired.</response>
+    /// <response code="404">No post with the specified ID exists.</response>
+    [HttpPost("{postId}/unvote")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType(typeof(void), Status401Unauthorized, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
+    [Authorize]
+    public async Task<IActionResult> Unvote(int postId)
+    {
+        Post? unvotingPost = await context.Posts
+            .Include(post => post.LikedUsers)
+            .Include(post => post.DislikedUsers)
+            .FirstOrDefaultAsync(post => post.Id == postId);
+        if (unvotingPost is null)
+        {
+            return Problem($"No post with the ID {postId} exists.", statusCode: Status404NotFound);
+        }
+        User currentUser = (await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User))!;
+        unvotingPost.DislikedUsers.Remove(currentUser);
+        unvotingPost.LikedUsers.Remove(currentUser);
+        await context.SaveChangesAsync();
+        return Ok();
+    }
+
+    private int GetUserId()
+    {
+        Claim? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
+            ?? throw new InvalidOperationException($"{nameof(User)} doesn't contain a {nameof(Claim)} that has type {nameof(ClaimTypes.NameIdentifier)}.");
+        return int.Parse(userIdClaim.Value, CultureInfo.InvariantCulture);
     }
 
     private async Task AddMissingTagsToDb(IEnumerable<string> tagsToAddToNewPost)
