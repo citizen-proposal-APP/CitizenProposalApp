@@ -41,6 +41,15 @@ RUN wget https://huggingface.co/alan314159/CitizenProposalApp/resolve/main/propo
 RUN wget https://huggingface.co/alan314159/CitizenProposalApp/resolve/main/proposal_cluster_labels.pkl \
     && mv proposal_cluster_labels.pkl model/topic_label/proposal_cluster_labels.pkl
 
+RUN wget https://huggingface.co/Falconsai/nsfw_image_detection/resolve/main/model.safetensors \
+    && wget https://huggingface.co/Falconsai/nsfw_image_detection/resolve/main/config.json \
+    && wget https://huggingface.co/Falconsai/nsfw_image_detection/resolve/main/preprocessor_config.json \
+    && mv model.safetensors model/nsfw_classify/model.safetensors \
+    && mv config.json model/nsfw_classify/config.json \
+    && mv preprocessor_config.json model/nsfw_classify/preprocessor_config.json
+
+
+
 # Expose port and set entrypoint
 EXPOSE 5001
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5001"]
