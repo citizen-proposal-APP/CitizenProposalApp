@@ -11,6 +11,8 @@ import pickle
 import os
 import io
 import torch
+import json
+import requests
 from PIL import Image
 from transformers import AutoModelForImageClassification, ViTImageProcessor
 
@@ -98,6 +100,15 @@ class Moderator():
     def __init__(self, model_path: str) -> None:
         self.processor = ViTImageProcessor.from_pretrained(f'{model_path}/nsfw_classify/preprocessor_config.json', local_files_only=True)
         self.model = AutoModelForImageClassification.from_pretrained(f"{model_path}/nsfw_classify", local_files_only=True)
+        self.url = "https://openrouter.ai/api/v1/chat/completions"
+        try:
+            with open(".env", 'r', encoding='utf-8') as f:
+                OPENROUTER_API_KEY = f.read().strip('\n')
+        except:
+            print("invalid api key. exiting...")
+            os._exit(1)
+        
+        self.headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
         
     def image_moderation(self, image_bytes: io.BytesIO) -> bool:
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
@@ -109,9 +120,46 @@ class Moderator():
         
         predicted_label = logits.argmax(-1).item()
         
-        return predicted_label
+        return True if predicted_label else False
     
     def text_moderation(self, text: str):
-        raise NotImplementedError
+        prompt = f"""請判斷以下內容是否為 NSFW (不適合工作場所) 內容：
 
+                    *   **內容：** {text}
+
+                    *   **判斷標準：**
+
+                        *   **NSFW：** 包含裸露、性暗示、性描寫、性行為畫面等內容，或是包含髒話。
+                        *   **SFW：** 不包含任何 NSFW 內容。
+
+                    *   **額外指示：**
+                        *   應寬鬆看待政治相關內容，除非內容明顯違法或煽動暴力。政治相關內容本身 *不構成* NSFW。
+                        *   若內容包含理性、客觀的政治討論，即使立場與政府不同，也應視為 SFW。
+                        *   判斷是否為 NSFW 時，應著重於內容是否具有性暗示或性相關的本質。
+
+                    *   **輸出格式：** 請輸出 NSFW 或是 SFW 代表分類結果，不要做任何解釋或輸出其他內容。
+                    """
+        response = requests.post(
+                    url=self.url,
+                    headers=self.headers,
+                    data=json.dumps({
+                                "model": "google/gemini-flash-1.5",
+                                "messages": [
+                                    {
+                                        "role": "user",
+                                        "content": (
+                                            prompt
+                                        ),
+                                    }
+                                ],
+                            }
+                        )
+                    )
+        
+        result = response.json()["choices"][0]["message"]["content"].strip('\n')
+        if result != "NSFW" and result != "SFW":
+            result = False
+        else:
+            result = True if result == "NSFW" else False
+        return result
 
