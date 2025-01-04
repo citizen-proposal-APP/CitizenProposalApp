@@ -21,7 +21,7 @@ export function Layout({ children, aside }: LayoutProps) {
       aside={{
         width: 350,
         breakpoint: 'sm',
-        collapsed: { desktop: !aside, mobile: !aside || !asideOpened },
+        collapsed: { desktop: !aside || !asideOpened, mobile: !aside || !asideOpened },
       }}
       padding="md"
     >
@@ -35,7 +35,11 @@ export function Layout({ children, aside }: LayoutProps) {
 
       <AppShell.Aside p="md">{aside}</AppShell.Aside>
 
-      <AppShell.Main>{children}</AppShell.Main>
+      <AppShell.Main>
+        <button onClick={() => setAsideOpened(!asideOpened)}>Toggle Aside</button>
+        {/* FIXME: remove this button */}
+        {children}
+      </AppShell.Main>
     </AppShell>
   );
 }

@@ -1,7 +1,6 @@
 import { IconBook, IconBubbleText, IconBuildingBank, IconInfoCircle } from '@tabler/icons-react';
 
 export const links = [
-  { link: '/proposals', label: '議題與討論', icon: IconBubbleText },
   { link: '/departments', label: '認識部門', icon: IconBuildingBank },
   { link: '/manual/manual', label: '使用說明', icon: IconBook },
   {

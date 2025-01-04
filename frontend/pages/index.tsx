@@ -1,4 +1,12 @@
-import { Container, SimpleGrid, Stack, Title } from '@mantine/core';
+import {
+  Container,
+  MultiSelect,
+  NativeSelect,
+  Select,
+  SimpleGrid,
+  Stack,
+  Title,
+} from '@mantine/core';
 import { KeywordSearch } from '@/components/KeywordSearch/KeywordSearch';
 import { Layout } from '@/components/Layout/Layout';
 import { ProposalCard } from '@/components/ProposalCard/ProposalCard';
@@ -21,7 +29,47 @@ export default function HomePage() {
   const items = data.map((item) => <ProposalCard data={item} key={item.id} height="auto" />);
 
   return (
-    <Layout>
+    <Layout
+      aside={
+        <>
+          <Title order={4} mb="sm">
+            排序結果
+          </Title>
+          <NativeSelect
+            //  value={value}
+            //  onChange={(event) => setValue(event.currentTarget.value)}
+            data={['根據議題 ID 升序', '根據議題 ID 升序', '根據發佈時間升序', '根據發佈時間降序']}
+            mb="xl"
+          />
+
+          <Title order={4} mb="sm">
+            選擇相關標籤
+          </Title>
+          <MultiSelect
+            placeholder="標籤名稱"
+            data={['eee', 'ddd', 'ccc', 'bbb', 'aaa']}
+            limit={5}
+            hidePickedOptions
+            searchable
+            clearable
+            nothingFoundMessage="找不到標籤"
+            mb="xl"
+          />
+
+          <Title order={4} mb="sm">
+            根據發佈者查詢
+          </Title>
+          <Select
+            placeholder="使用者名稱"
+            data={['蔡維元', '蔡元培', '陸維元', '高為元', '高位元']}
+            limit={5}
+            searchable
+            clearable
+            nothingFoundMessage="找不到使用者"
+          />
+        </>
+      }
+    >
       <Container size="xl">
         <ImageCarousel images={images} />
         <Title order={2} mt="md" mb="md">
