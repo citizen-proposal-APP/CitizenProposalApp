@@ -23,22 +23,25 @@ export function NavbarNested() {
   const router = useRouter();
 
   useEffect(() => {
-      async function checkLoginStatus() {
-        try {
-          const userData = await usersApi.apiUsersCurrentGet();
-          if (userData?.id && userData?.username) {
-            setUser({ id: userData.id, username: userData.username });
-            console.log('使用者已登入:', userData);
-          } else {
-            console.log('尚未登入');
-          }
-        } catch (error:any) {
+    async function checkLoginStatus() {
+      try {
+        const userData = await usersApi.apiUsersCurrentGet();
+        if (userData?.id && userData?.username) {
+          setUser({ id: userData.id, username: userData.username });
+          console.log('使用者已登入:', userData);
+        }
+      } catch (error: any) {
+        if (error.response.status === 401) {
+          console.log('尚未登入');
+          setUser(null);
+        } else {
           console.error('檢查登入狀態失敗:', error);
         }
       }
-  
-      checkLoginStatus();
-    }, []);
+    }
+
+    checkLoginStatus();
+  }, []);
 
   // 打開登入或註冊 Modal，並設定模式
   const openAuthModal = (signUp = false) => {

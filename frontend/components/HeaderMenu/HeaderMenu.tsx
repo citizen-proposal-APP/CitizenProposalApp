@@ -35,14 +35,17 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
         if (userData?.id && userData?.username) {
           setUser({ id: userData.id, username: userData.username });
           console.log('使用者已登入:', userData);
-        } else {
+        } 
+      } catch (error: any) {
+        if (error.response.status === 401) {
           console.log('尚未登入');
+          setUser(null);
+        } else {
+          console.error('檢查登入狀態失敗:', error);
         }
-      } catch (error:any) {
-        console.error('檢查登入狀態失敗:', error);
       }
     }
-
+  
     checkLoginStatus();
   }, []);
 
