@@ -38,7 +38,7 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
         } else {
           console.log('尚未登入');
         }
-      } catch (error) {
+      } catch (error:any) {
         console.error('檢查登入狀態失敗:', error);
       }
     }
