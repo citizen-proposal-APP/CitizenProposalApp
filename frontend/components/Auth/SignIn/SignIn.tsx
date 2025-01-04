@@ -74,22 +74,16 @@ export function AuthenticationTitle({
                 console.error('無法獲取用戶資訊');
               }
             } catch (error: any) {
-              if (error.response) {
-                const status = error.response.status;
-                const detail = error.response.data.detail || '發生未知錯誤';
-                if (status === 400) {
-                  console.error('請求錯誤:', detail);
-                  window.alert('登入失敗：請檢查輸入的使用者名稱或密碼');
-                } else if (status === 401) {
-                  console.error('驗證失敗:', detail);
-                  window.alert('登入失敗：使用者名稱或密碼不正確');
-                } else {
-                  console.error('伺服器錯誤:', detail);
-                  window.alert('伺服器錯誤，請稍後再試');
-                }
+              const status = error.response.status;
+              if (status === 400) {
+                console.error('請求錯誤:');
+                window.alert('登入失敗：請檢查輸入的使用者名稱或密碼');
+              } else if (status === 401) {
+                console.error('驗證失敗:');
+                window.alert('登入失敗：使用者名稱或密碼不正確');
               } else {
-                console.error('未知錯誤:', error.message);
-                window.alert('發生未知錯誤，請稍後重試');
+                console.error('伺服器錯誤:');
+                window.alert('伺服器錯誤，請稍後再試');
               }
             } finally {
               setIsSubmitting(false);
