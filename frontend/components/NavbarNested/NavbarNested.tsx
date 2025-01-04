@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Button, Code, Group, Modal, ScrollArea } from '@mantine/core';
@@ -21,6 +21,24 @@ export function NavbarNested() {
 
   const items = links.map((item) => <LinksGroup {...item} key={item.label} />);
   const router = useRouter();
+
+  useEffect(() => {
+      async function checkLoginStatus() {
+        try {
+          const userData = await usersApi.apiUsersCurrentGet();
+          if (userData?.id && userData?.username) {
+            setUser({ id: userData.id, username: userData.username });
+            console.log('使用者已登入:', userData);
+          } else {
+            console.log('尚未登入');
+          }
+        } catch (error) {
+          console.error('檢查登入狀態失敗:', error);
+        }
+      }
+  
+      checkLoginStatus();
+    }, []);
 
   // 打開登入或註冊 Modal，並設定模式
   const openAuthModal = (signUp = false) => {

@@ -1,4 +1,4 @@
-import React, { use, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { IconChevronDown } from '@tabler/icons-react';
 import { Burger, Button, Center, Container, Group, Menu, Modal } from '@mantine/core';
@@ -27,6 +27,24 @@ export function HeaderMenu({ opened, toggle }: HeaderMenuProps) {
   const [user, setUser] = useState<{ id: number; username: string } | null>(null); // 管理登入狀態
 
   const router = useRouter();
+
+  useEffect(() => {
+    async function checkLoginStatus() {
+      try {
+        const userData = await usersApi.apiUsersCurrentGet();
+        if (userData?.id && userData?.username) {
+          setUser({ id: userData.id, username: userData.username });
+          console.log('使用者已登入:', userData);
+        } else {
+          console.log('尚未登入');
+        }
+      } catch (error) {
+        console.error('檢查登入狀態失敗:', error);
+      }
+    }
+
+    checkLoginStatus();
+  }, []);
 
   // 打開 Modal
   const openAuthModal = (signUp = false) => {
