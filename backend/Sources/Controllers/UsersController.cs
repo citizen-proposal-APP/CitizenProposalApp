@@ -195,7 +195,9 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
             Loginable = true,
             Posts = [],
             Sessions = [],
-            Comments = []
+            Comments = [],
+            LikedPosts = [],
+            DislikedPosts = []
         };
         context.Users.Add(newUser);
         await context.SaveChangesAsync();

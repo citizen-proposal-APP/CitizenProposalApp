@@ -17,6 +17,8 @@ using static System.Net.Mime.MediaTypeNames;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using AutoMapper.QueryableExtensions;
+using System.Security.Claims;
+using System.Globalization;
 
 namespace CitizenProposalApp;
 
@@ -149,7 +151,9 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
             PostedTime = timeProvider.GetUtcNow(),
             Tags = tags,
             Title = post.Title,
-            Attachments = []
+            Attachments = [],
+            LikedUsers = [],
+            DislikedUsers = []
         };
         if (post.Attachments is not null and not { Count: 0 })
         {
@@ -238,6 +242,119 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
             Comments = comments.ProjectTo<CommentQueryResponseDto>(mapper.ConfigurationProvider)
         };
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Likes a post. If the post has already been liked, nothing will be done and 200 will be returned. If the post was originally disliked, the dislike will be removed and the post will be liked.
+    /// </summary>
+    /// <param name="postId">The ID of the post to like.</param>
+    /// <returns>Nothing if successful.</returns>
+    /// <response code="200">The post has been successfully liked or it has already been liked.</response>
+    /// <response code="400">The provided ID is not a valid integer.</response>
+    /// <response code="401">The user has not logged in or the session has expired.</response>
+    /// <response code="404">No post with the specified ID exists.</response>
+    [HttpPost("{postId}/like")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType(typeof(void), Status401Unauthorized, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
+    [Authorize]
+    public async Task<IActionResult> LikePost(int postId)
+    {
+        // If the user has already liked this post
+        if (await context.Posts.AnyAsync(post => post.Id == postId && post.LikedUsers.Any(user => user.Id == GetUserId())))
+        {
+            return Ok();
+        }
+        Post? likingPost = await context.Posts
+            .Include(post => post.LikedUsers)
+            .Include(post => post.DislikedUsers)
+            .FirstOrDefaultAsync(post => post.Id == postId);
+        if (likingPost is null)
+        {
+            return Problem($"No post with the ID {postId} exists.", statusCode: Status404NotFound);
+        }
+        User currentUser = (await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User))!;
+        likingPost.DislikedUsers.Remove(currentUser);
+        likingPost.LikedUsers.Add(currentUser);
+        await context.SaveChangesAsync();
+        return Ok();
+    }
+
+    /// <summary>
+    /// Dislikes a post. If the post has already been disliked, nothing will be done and 200 will be returned. If the post was originally liked, the like will be removed and the post will be disliked.
+    /// </summary>
+    /// <param name="postId">The ID of the post to dislike.</param>
+    /// <returns>Nothing if successful.</returns>
+    /// <response code="200">The post has been successfully disliked or it has already been disliked.</response>
+    /// <response code="400">The provided ID is not a valid integer.</response>
+    /// <response code="401">The user has not logged in or the session has expired.</response>
+    /// <response code="404">No post with the specified ID exists.</response>
+    [HttpPost("{postId}/dislike")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType(typeof(void), Status401Unauthorized, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
+    [Authorize]
+    public async Task<IActionResult> DislikePost(int postId)
+    {
+        // If the user has already disliked this post
+        if (await context.Posts.AnyAsync(post => post.Id == postId && post.DislikedUsers.Any(user => user.Id == GetUserId())))
+        {
+            return Ok();
+        }
+        Post? dislikingPost = await context.Posts
+            .Include(post => post.LikedUsers)
+            .Include(post => post.DislikedUsers)
+            .FirstOrDefaultAsync(post => post.Id == postId);
+        if (dislikingPost is null)
+        {
+            return Problem($"No post with the ID {postId} exists.", statusCode: Status404NotFound);
+        }
+        User currentUser = (await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User))!;
+        dislikingPost.DislikedUsers.Add(currentUser);
+        dislikingPost.LikedUsers.Remove(currentUser);
+        await context.SaveChangesAsync();
+        return Ok();
+    }
+
+    /// <summary>
+    /// Removes the like or dislike on a post. If the post hasn't been liked nor disliked, nothing will be done and 200 will be returned.
+    /// </summary>
+    /// <param name="postId">The ID of the post to remove a like or dislike from.</param>
+    /// <returns>Nothing if successful.</returns>
+    /// <response code="200">The like of dislike on the post has been successfully removed or it didn't have a like nor dislike.</response>
+    /// <response code="400">The provided ID is not a valid integer.</response>
+    /// <response code="401">The user has not logged in or the session has expired.</response>
+    /// <response code="404">No post with the specified ID exists.</response>
+    [HttpPost("{postId}/unvote")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType(typeof(void), Status401Unauthorized, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
+    [Authorize]
+    public async Task<IActionResult> Unvote(int postId)
+    {
+        Post? unvotingPost = await context.Posts
+            .Include(post => post.LikedUsers)
+            .Include(post => post.DislikedUsers)
+            .FirstOrDefaultAsync(post => post.Id == postId);
+        if (unvotingPost is null)
+        {
+            return Problem($"No post with the ID {postId} exists.", statusCode: Status404NotFound);
+        }
+        User currentUser = (await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User))!;
+        unvotingPost.DislikedUsers.Remove(currentUser);
+        unvotingPost.LikedUsers.Remove(currentUser);
+        await context.SaveChangesAsync();
+        return Ok();
+    }
+
+    private int GetUserId()
+    {
+        Claim? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
+            ?? throw new InvalidOperationException($"{nameof(User)} doesn't contain a {nameof(Claim)} that has type {nameof(ClaimTypes.NameIdentifier)}.");
+        return int.Parse(userIdClaim.Value, CultureInfo.InvariantCulture);
     }
 
     private async Task AddMissingTagsToDb(IEnumerable<string> tagsToAddToNewPost)
