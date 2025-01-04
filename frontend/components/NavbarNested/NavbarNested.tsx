@@ -104,12 +104,6 @@ export function NavbarNested() {
         )}
       </div>
 
-      <Link href="/SiteMap/SiteMap" passHref>
-        <Button component="a" variant="outline">
-          網站導覽
-        </Button>
-      </Link>
-
       {/* Modal 彈出介面，根據 isSignUp 狀態顯示不同內容 */}
       <Modal
         opened={authModalOpen}

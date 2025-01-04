@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Http;
 using static Microsoft.AspNetCore.Http.StatusCodes;
 using static CitizenProposalApp.SortDirection;
 using static CitizenProposalApp.PostSortKey;
@@ -13,6 +14,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using static System.Net.Mime.MediaTypeNames;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CitizenProposalApp;
 
@@ -22,8 +25,9 @@ namespace CitizenProposalApp;
 /// <param name="context">The injected <see cref="CitizenProposalAppDbContext"/>.</param>
 /// <param name="mapper">The AutoMapper mapper.</param>
 /// <param name="timeProvider">A <see cref="TimeProvider"/> that will be used to provide the current UTC time.</param>
+/// <param name="logger">The injected <see cref="ILogger"/>.</param>
 [Route("api/[controller]")]
-public class PostsController(CitizenProposalAppDbContext context, IMapper mapper, TimeProvider timeProvider) : ControllerBase
+public class PostsController(CitizenProposalAppDbContext context, IMapper mapper, TimeProvider timeProvider, ILogger<PostsController> logger) : ControllerBase
 {
     /// <summary>
     /// Quries a post by its ID.
@@ -56,51 +60,45 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     /// Queries posts by various query parameters. If multiple criteria are given, this searches for posts that satisfy all of them.
     /// </summary>
     /// <param name="parameters">Contains the conditions about which posts to query.</param>
+    /// <param name="aiService">Injected <see cref="IAiService"/> from <see cref="HttpClientFactoryServiceCollectionExtensions.AddHttpClient{TClient, TImplementation}(IServiceCollection, Action{HttpClient})"/>.</param>
     /// <returns>The posts that meet the conditions speficied by <paramref name="parameters"/>.</returns>
     /// <response code="200">An object that contains the total number of posts in the database that satisfy the given parameters and an array of those posts. The array can be empty if no post satisfy the given parameters.</response>
     /// <response code="400">The query parameters are malformed.</response>
+    /// <response code="503">The AI service failed to search the posts with the specified keyword.</response>
     [HttpGet]
     [ProducesResponseType(Status200OK)]
     [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
-    public async Task<ActionResult<PostsQueryResponseDto>> GetPostsByParameters([FromQuery] PostsQueryRequestDto parameters)
+    [ProducesResponseType<ProblemDetails>(Status503ServiceUnavailable, Application.ProblemJson)]
+    public async Task<ActionResult<PostsQueryResponseDto>> GetPostsByParameters([FromQuery] PostsQueryRequestDto parameters, [FromServices] IAiService aiService)
     {
         if (!Enum.IsDefined(parameters.SortDirection) || !Enum.IsDefined(parameters.SortBy))
         {
             return Problem("\"SortDirection\" or \"SortBy\" contain invalid values.", statusCode: Status400BadRequest);
         }
-        IQueryable<Post> unsortedPosts = context.Posts
+        IQueryable<Post> posts = context.Posts
             .Include(post => post.Tags)
                 .ThenInclude(tag => tag.TagType)
             .Include(post => post.Author)
             .Include(post => post.Attachments);
-        if (parameters.Author is not null)
+        if (parameters is { IsAiEnabled: true, Keyword: not null })
         {
-            unsortedPosts = unsortedPosts.Where(post => post.Author.Username.Contains(parameters.Author, InvariantCultureIgnoreCase));
+            IEnumerable<int>? aiSearchResultPostIds = await aiService.SearchPostIdsByTitle(parameters.Keyword, parameters.Range);
+            if (aiSearchResultPostIds is null)
+            {
+                return Problem($"The AI service failed to search the posts with the specified keyword (\"{parameters.Keyword}\").", statusCode: Status503ServiceUnavailable);
+            }
+            List<int> aiSearchResultPostIdsList = aiSearchResultPostIds.ToList();
+            posts = HandlePostsQueryWithAi(posts, parameters, aiSearchResultPostIdsList);
         }
-        if (parameters.Tag is not null)
+        // Includes the case where the keyword is null but AI is enabled, but it doesn't matter because it would just not filter by keyword at all
+        else
         {
-            unsortedPosts = unsortedPosts.Where(post => post.Tags.Any(tag => tag.Name.Contains(parameters.Tag, InvariantCultureIgnoreCase)));
+            posts = HandlePostsQueryWithoutAi(posts, parameters);
         }
-        if (parameters.Title is not null)
-        {
-            unsortedPosts = unsortedPosts.Where(post => post.Title.Contains(parameters.Title, InvariantCultureIgnoreCase));
-        }
-        if (parameters.Content is not null)
-        {
-            unsortedPosts = unsortedPosts.Where(post => post.Content.Contains(parameters.Content, InvariantCultureIgnoreCase));
-        }
-        IOrderedQueryable<Post> sortedPosts = (parameters.SortDirection, parameters.SortBy) switch
-        {
-            (Ascending, ById) => unsortedPosts.OrderBy(post => post.Id),
-            (Ascending, ByDate) => unsortedPosts.OrderBy(post => post.PostedTime).ThenBy(post => post.Id),
-            (Descending, ById) => unsortedPosts.OrderByDescending(post => post.Id),
-            (Descending, ByDate) => unsortedPosts.OrderByDescending(post => post.PostedTime).ThenByDescending(post => post.Id),
-            _ => throw new NotImplementedException("Impossible situation")
-        };
         PostsQueryResponseDto result = new()
         {
-            Count = await sortedPosts.CountAsync(),
-            Posts = mapper.Map<IEnumerable<Post>, IEnumerable<PostQueryResponseDto>>(sortedPosts.Skip(parameters.Start).Take(parameters.Range))
+            Count = posts.Count(), // Can't use CountAsync here because HandlePostsQueryWithAi returns a fake IQueryable for convenience
+            Posts = mapper.Map<IEnumerable<Post>, IEnumerable<PostQueryResponseDto>>(posts)
         };
         return Ok(result);
     }
@@ -109,6 +107,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     /// Submits a new post. Tags that were not known by the DB are automatically added to it as "topic" tags.
     /// </summary>
     /// <param name="post">The post to submit.</param>
+    /// <param name="aiService">Injected <see cref="IAiService"/> from <see cref="HttpClientFactoryServiceCollectionExtensions.AddHttpClient{TClient, TImplementation}(IServiceCollection, Action{HttpClient})"/>.</param>
     /// <returns>Nothing if successful.</returns>
     /// <response code="201">The new post has been successfully created.</response>
     /// <response code="400">The request body is malformed, lacks required fields, has form fields larger than 50 MiB, has a title longer than 100 characters, has a content longer than 2000 characters, has tag names longer than 32 characters, or the total size of the request body is over 100 MiB.</response>
@@ -120,7 +119,7 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
     [RequestFormLimits(MultipartBodyLengthLimit = postSubmissionMultipartLimit)]
     [RequestSizeLimit(postSubmissionTotalLimit)]
     [Authorize]
-    public async Task<IActionResult> AddPost([FromForm] PostSubmissionDto post)
+    public async Task<IActionResult> AddPost([FromForm] PostSubmissionDto post, [FromServices] IAiService aiService)
     {
         User author = (await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User))!;
         IEnumerable<string> tagsString;
@@ -155,6 +154,10 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         }
         context.Posts.Add(newPost);
         await context.SaveChangesAsync();
+        if (!await aiService.AddPostToAiDb(newPost.Id, newPost.Title))
+        {
+            logger.LogFailureToAddPostToAiDb(newPost.Id, newPost.Title);
+        }
         return CreatedAtAction(nameof(GetPostById), new { id = newPost.Id }, null);
     }
 
@@ -268,6 +271,55 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
             )
         );
         return result;
+    }
+
+    private static IQueryable<Post> HandlePostsQueryCommonLogic(IQueryable<Post> posts, PostsQueryRequestDto parameters)
+    {
+        if (parameters.Author is not null)
+        {
+            posts = posts.Where(post => post.Author.Username.Contains(parameters.Author, InvariantCultureIgnoreCase));
+        }
+        if (parameters.Tag is not null)
+        {
+            posts = posts.Where(post => post.Tags.Any(tag => tag.Name.Contains(parameters.Tag, InvariantCultureIgnoreCase)));
+        }
+        return posts;
+    }
+
+    private static IQueryable<Post> HandlePostsQueryWithoutAi(IQueryable<Post> posts, PostsQueryRequestDto parameters)
+    {
+        posts = HandlePostsQueryCommonLogic(posts, parameters);
+        if (parameters.Keyword is not null)
+        {
+            posts = posts.Where(post =>
+                post.Title.Contains(parameters.Keyword, InvariantCultureIgnoreCase) ||
+                post.Content.Contains(parameters.Keyword, InvariantCultureIgnoreCase));
+        }
+        IOrderedQueryable<Post> sortedPosts = (parameters.SortDirection, parameters.SortBy) switch
+        {
+            (Ascending, ById) => posts.OrderBy(post => post.Id),
+            (Ascending, ByDate) => posts.OrderBy(post => post.PostedTime).ThenBy(post => post.Id),
+            (Descending, ById) => posts.OrderByDescending(post => post.Id),
+            (Descending, ByDate) => posts.OrderByDescending(post => post.PostedTime).ThenByDescending(post => post.Id),
+            _ => throw new NotImplementedException("Impossible situation")
+        };
+        return sortedPosts.Skip(parameters.Start).Take(parameters.Range);
+    }
+
+    private static IQueryable<Post> HandlePostsQueryWithAi(IQueryable<Post> posts, PostsQueryRequestDto parameters, List<int> aiSearchResultPostIds)
+    {
+        posts = HandlePostsQueryCommonLogic(posts, parameters);
+        if (parameters.Keyword is not null)
+        {
+            posts = posts.Where(post => aiSearchResultPostIds.Contains(post.Id));
+            IEnumerable<Post> postsEnumerable = posts;
+            // Sorts the AI result based on the order specified in aiSearchResultPostIds
+            // This can't be translated to SQL, so do it as an IEnumerable
+            postsEnumerable = postsEnumerable.OrderBy(post => aiSearchResultPostIds.IndexOf(post.Id));
+            return postsEnumerable.AsQueryable();
+        }
+        // No need to Skip and Take here because aiSearchResultPostIds only contains parameters.Range elements, so posts already only has parameters.Range elements
+        return posts;
     }
 
     private const long postSubmissionMultipartLimit = 50 * 1024 * 1024;

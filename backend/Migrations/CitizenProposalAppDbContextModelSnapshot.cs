@@ -487,6 +487,78 @@ namespace CitizenProposalApp.Migrations
                             Id = 40,
                             Name = "教育部",
                             TagTypeId = 1
+                        },
+                        new
+                        {
+                            Id = 41,
+                            Name = "中央選舉委員會",
+                            TagTypeId = 1
+                        },
+                        new
+                        {
+                            Id = 42,
+                            Name = "僑務委員會",
+                            TagTypeId = 1
+                        },
+                        new
+                        {
+                            Id = 43,
+                            Name = "勞動部",
+                            TagTypeId = 1
+                        },
+                        new
+                        {
+                            Id = 44,
+                            Name = "國軍退除役官兵輔導委員會",
+                            TagTypeId = 1
+                        },
+                        new
+                        {
+                            Id = 45,
+                            Name = "外交部",
+                            TagTypeId = 1
+                        },
+                        new
+                        {
+                            Id = 46,
+                            Name = "客家委員會",
+                            TagTypeId = 1
+                        },
+                        new
+                        {
+                            Id = 47,
+                            Name = "法務部",
+                            TagTypeId = 1
+                        },
+                        new
+                        {
+                            Id = 48,
+                            Name = "環境部",
+                            TagTypeId = 1
+                        },
+                        new
+                        {
+                            Id = 49,
+                            Name = "經濟部",
+                            TagTypeId = 1
+                        },
+                        new
+                        {
+                            Id = 50,
+                            Name = "行政院人事行政總處",
+                            TagTypeId = 1
+                        },
+                        new
+                        {
+                            Id = 51,
+                            Name = "財政部",
+                            TagTypeId = 1
+                        },
+                        new
+                        {
+                            Id = 52,
+                            Name = "金融監督管理委員會",
+                            TagTypeId = 1
                         });
                 });
 

@@ -1,0 +1,33 @@
+.card {
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+
+  /* 
+  BUG: `Slide`s gets clipped by `Carousel` when scaled up, this issue cannot be resolved by adjusting the `overflow` property.
+  HACK: As a solution, the `Slide`s is kept smaller by default and reverts to its original size on hover.
+  */
+  transform: scale(0.99);
+  &:hover {
+    transform: scale(1);
+    box-shadow: var(--mantine-shadow-md);
+  }
+}
+
+.indicator {
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+}
+
+.controls {
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+  transition: opacity 150ms ease;
+  opacity: 0;
+}
+
+.root {
+  &:hover {
+    .controls {
+      opacity: 1;
+    }
+  }
+}
