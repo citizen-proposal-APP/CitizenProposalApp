@@ -1,368 +1,274 @@
-import React, { useState } from 'react';
-import { GetServerSidePropsContext, GetServerSideProps } from 'next';
-import { Container, Title, Badge, Image, Modal, Text, Textarea, Button, Grid, Group, Box, Flex, Stack, Paper, Avatar, AspectRatio, SimpleGrid } from '@mantine/core';
-import { PostsApi } from '../../openapi/apis/PostsApi';
-import { UsersApi } from '../../openapi/apis/UsersApi';
-import { AttachmentsApi } from '../../openapi/apis/AttachmentsApi';
-import { PostQueryResponseDto } from '../../openapi/models/PostQueryResponseDto'; 
-import { UserQueryResponseDto } from '../../openapi/models/UserQueryResponseDto';
-import { CommentQueryResponseDto } from '../../openapi/models/CommentQueryResponseDto';
+import React, { useState, useEffect } from 'react';
+import { 
+  Container, Title, Badge, 
+  Group, Box, SimpleGrid,
+  Button, Text, Image,
+  AspectRatio, Modal, Stack,
+  Paper,  Textarea
+} from '@mantine/core';
+
+import { 
+  Configuration, PostsApi, UsersApi, 
+  AttachmentsApi, PostQueryResponseDto, UserQueryResponseDto, 
+  CommentsQueryResponseDto, TagQueryResponseDto, PostsQueryResponseDto 
+} from '@/openapi';
+
 import { Layout } from '../../components/Layout/Layout';
-import { ProposalData } from '../../types/ProposalData';
+import { Proposal, Tag } from '@/types';
+import { ProposalCard } from '@/components/ProposalCard/ProposalCard';
+import { useRouter } from 'next/router';
 
+const configuration = new Configuration({
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH!,
+  credentials: 'include',
+});
 
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  const { id } = context.params!;
+const postsApi = new PostsApi(configuration);
+const userApi = new UsersApi(configuration);
+const attachmentsApi = new AttachmentsApi(configuration);
 
-  // 初始化 API 實例
-  const postsApi = new PostsApi();
-  const usersApi = new UsersApi();
-  const attachmentsApi = new AttachmentsApi();
-  
-  try {
-    // 並行獲取數據
-    const [post, currentUser] = await Promise.all([
-      postsApi.apiPostsIdGet({ id: Number(id) }),
-      usersApi.apiUsersCurrentGet(),
-    ]);
+const proposalSubpage = () => {
+  const router = useRouter();
+  const { id } = router.query;
 
-    // 獲取附件並轉換為 URL 陣列
-    const attachments = await Promise.all(
-      post.attachmentIds.map(async (attachmentID: number) => {
-        const attachment = await attachmentsApi.apiAttachmentsIdGet({ id: attachmentID });
-        // 使用 URL.createObjectURL() 將 Blob 轉換為 URL
-        const objectUrl = URL.createObjectURL(attachment);
-        return objectUrl; // 返回 URL
-      })
-    );
+  const [proposalData, setProposalData] = useState<PostQueryResponseDto | null>(null);
+  const [currentUser, setCurrentUser] = useState<UserQueryResponseDto | null>(null);
+  const [attachments, setAttachments] = useState<{ id: number; name: string; blob: Blob; url:string }[]>([]);
+  const [comments, setComments] = useState<CommentsQueryResponseDto | null>(null);
+  const [newComment, setNewComment] = useState<string>(''); 
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const maxChars = 200;
 
-    // 組合數據為 ProposalData 格式
-    const proposalData: ProposalData = {
-      ...post,
-      current_user: currentUser.username, // 提取當前用戶名稱
-      comments: await postsApi.apiPostsPostIdCommentsGet({ postId: Number(id) }), // 獲取評論數據
-      attachments, // 將附件 URL 存入 proposalData (attachments 是陣列)
-    };
-    
-    return {
-      props: { proposalData }, // 將數據傳遞給頁面
-    };
-
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    return { notFound: true }; // 如果出現錯誤，返回 404 頁面
-  }
-};
-
-interface ProposalSubpageProps {
-  proposalData: ProposalData; // 明確指定 proposalData 的類型
-  postsApi: PostsApi;
-}
-
-const ProposalSubpage: React.FC<ProposalSubpageProps> = ({ proposalData, postsApi }) => {
-  // 狀態管理
-  const [opened, setOpened] = useState<boolean>(false);
+  //onclick 狀態
   const [selectedImage, setSelectedImage] = useState<string>('');
-  //const [liked, setLiked] = useState<boolean>(proposalData.is_like);
-  //const [numLikes, setNumLikes] = useState<number>(proposalData.num_like); // 初始化按讚數量
-  const [newComment, setNewComment] = useState<string>('');
-  const [isSubmitting, setIsSubmitting] = useState(false); // 用來控制提交狀態（顯示加載指示器）
-  const [commentList, setCommentList] = useState<CommentQueryResponseDto[]>(proposalData.comments.comments); // 存儲留言數組
-  const [commentCount, setCommentCount] = useState<number>(proposalData.comments.count); // 存儲留言數量
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 控制 Modal 開關
-  const maxChars = 300; //留言最大字數
-  
+  const [opened, setOpened] = useState<boolean>(false);
+  const handleImageClick = (imageSrc: string): void => {
+    setSelectedImage(imageSrc);
+    setOpened(true);
+  };
 
-  // const handleLikeClick = () => {
-  //   setLiked((prevLiked) => {
-  //     const newLiked = !prevLiked; // 切換點擊狀態
-  //     setNumLikes((prevNumLikes) => newLiked ? prevNumLikes + 1 : prevNumLikes - 1); // 更新按讚數量
-  //     return newLiked;
-  //   });
-  // };
-
-  const handleCommentSubmit = async () => {
-    if (newComment.trim() === '') return;
+  const handleSubmitComment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newComment.trim() === '') return; // 禁止提交空白留言
   
-    setIsSubmitting(true);
+    setIsModalOpen(true); // 打開確認 Modal
+  };
+  
+  const confirmSubmit = async () => {
+    if (!newComment.trim()) return; // 確保有留言才進行提交
+  
     try {
+      // 創建 PostsApi 實例，並提交留言
+      const postsApi = new PostsApi(configuration);
+      const postId = Number(id); // 確保 postId 是數字
+      const content = newComment; // 要提交的留言內容
+      
+      // 執行 API 請求來提交留言
       await postsApi.apiPostsPostIdCommentsPost({
-        postId: proposalData.id,
-        content: newComment,
+        postId, // 傳遞 postId
+        content, // 傳遞留言內容
       });
   
-      const updatedComments = await postsApi.apiPostsPostIdCommentsGet({
-        postId: proposalData.id,
+      // 提交成功後，重置輸入框並關閉確認 Modal
+      setNewComment(''); // 清空輸入框
+      setIsModalOpen(false); // 關閉確認 Modal
+  
+      // 重新請求留言列表，獲取最新留言
+      const response = await postsApi.apiPostsPostIdCommentsGet({
+        postId, // 傳遞 postId 以獲取該帖子的留言
       });
   
-      setCommentList(updatedComments.comments);
-      setCommentCount(updatedComments.count);
-      setNewComment('');
-    } catch (error) {
-      console.error('Error submitting comment:', error);
-      alert('提交留言失敗，請稍後再試。');
-    } finally {
-      setIsSubmitting(false);
+      // 更新狀態顯示最新的留言
+      setComments(response); // 更新留言狀態為最新留言
+  
+    } catch (err) {
+      setError('提交評論失敗'); // 發生錯誤時設置錯誤信息
+      setIsModalOpen(false); // 即使提交失敗，也關閉 Modal
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!id) return;
   
-  // Modal 確認提交邏輯
-  const confirmSubmit = async () => {
-    setIsModalOpen(false);
-    await handleCommentSubmit();
-  };
+      try {
+        setLoading(true);
   
-  // 表單提交邏輯
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newComment.trim() === '') return;
+        // 獲取提案資料
+        const proposalResponse = await postsApi.apiPostsIdGet({ id: Number(id) });
+        setProposalData(proposalResponse);
   
-    setIsModalOpen(true);
-  };
+        // 獲取當前用戶資料
+        const userResponse = await userApi.apiUsersCurrentGet();
+        setCurrentUser(userResponse);
   
+        // 獲取附件資料
+        if (proposalResponse.attachments) {
+          const attachmentPromises = proposalResponse.attachments.map(async (attachment) => {
+            const response = await attachmentsApi.apiAttachmentsIdGet({ id: attachment.id });
+            return {
+              id: attachment.id,
+              name: attachment.filename,
+              blob: response,
+              url: URL.createObjectURL(response),
+            };
+          });
+          const fetchedAttachments = await Promise.all(attachmentPromises);
+          setAttachments(fetchedAttachments);
+        }
+  
+        // 獲取評論資料
+        const commentsResponse = await postsApi.apiPostsPostIdCommentsGet({
+          postId: Number(id),
+          start: 0,
+          range: 10,
+          sortDirection: 'ascending',
+        });
+        setComments(commentsResponse);
+
+        setLoading(false);
+      } catch (err) {
+        setError('無法獲取資料');
+        setLoading(false);
+      }
+    };
+  
+    fetchData();
+  }, [id]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <Layout>
       <Container>
-        <Title order={1} mt="md" size={36}>
-          {proposalData.title}
-        </Title>
-        {/* 標籤部分 */}
-        <Group mt="md">
-          {proposalData.tags.map((tag:{id:number ,name:string}) => (
-            <Badge key={tag.id} size="lg" color="gray">
-              {tag.name}
-            </Badge>
-          ))}
-        </Group>
+        {proposalData ? (
+          <>
+            {/* 提案標題與標籤 */}
+            <Title order={1} mt="md" size={36}>
+              {proposalData.title}
+            </Title>
 
-        <Box mt={50}>
-          <SimpleGrid cols={{ base: 2, sm: 3, lg: 5 }} spacing={{ base: 'md', sm: 'xl' }} verticalSpacing={{ base: 'md', sm: 'xl' }}>
-            {proposalData.attachments.map((attachmentUrl, index) => {
-              const contentType = attachmentUrl.split('.').pop();
-
-              if (!contentType) {
-                return (
-                  <Box key={index}>
-                    <Text>不明的檔案類型或檔案擴展名遺失</Text>
-                  </Box>
-                );
-              }
-
-              if (['jpg', 'jpeg', 'png', 'gif'].includes(contentType)) {
-                // 顯示圖片
-                return (
-                  <Box key={index}>
-                    <Image src={attachmentUrl} alt={`Attachment ${index + 1}`} fit="contain" w="100%" h="auto" onClick={() => {
-                      setSelectedImage(attachmentUrl);
-                      setOpened(true);
-                    }} />
-                  </Box>
-                );
-              } else if (['mp4', 'webm', 'ogg'].includes(contentType)) {
-                // 顯示影片，無需透過 Modal
-                return (
-                  <Box key={index}>
-                    <video controls width="100%">
-                      <source src={attachmentUrl} type={`video/${contentType}`} />
-                      您的瀏覽器不支援該影片類型
-                    </video>
-                  </Box>
-                );
-              } else if (['pdf'].includes(contentType)) {
-                // 顯示 PDF 並支持在 Modal 中查看
-                return (
-                  <Box key={index}>
-                    <Text onClick={() => {
-                      setSelectedImage(attachmentUrl); // 假設是 PDF URL
-                      setOpened(true);
-                    }}>瀏覽PDF</Text>
-                  </Box>
-                );
-              } else {
-                // 其他類型的文件（可根據需要添加更多類型處理）
-                return (
-                  <Box key={index}>
-                    <Text>不支援的檔案類型</Text>
-                  </Box>
-                );
-              }
-            })}
-          </SimpleGrid>
-
-          {/* Modal 用於顯示較大的圖片或 PDF */}
-          <Modal
-            opened={opened}
-            onClose={() => setOpened(false)}
-            size="lg"
-          >
-            {selectedImage.endsWith('.pdf') ? (
-              // 使用 <embed> 顯示 PDF
-              <embed src={selectedImage} type="application/pdf" width="100%" height="400px" />
-            ) : (
-              // 顯示圖片
-              <Image
-                src={selectedImage}
-                alt="Large view"
-                fit="contain"
-                w="100%"
-                h="auto"
-              />
-            )}
-          </Modal>
-        </Box>
-
-        {/* 提案內容 標題及文本 */}
-        <Title order={1} mt={50}>
-          提案內容
-        </Title>
-
-        <Box mt={30}>
-          <Text size="xl" component="div">
-            {proposalData.content.split('\n').map((line: string, index: number) => (
-              // 使用 Text 元素來保證一致的樣式
-              <Text key={index} mb="sm">
-                {line}
-              </Text>
-            ))}
-          </Text>
-        </Box>
-
-        {/* <div>
-          <Title order={1} mt={50} fz={28}>
-            其他相似提案 | 猜你想看...
-          </Title>
-          
-          <Grid mt={20}>
-            {proposalData.similar_attachments.map((similar_attachment:{id: number; content: string; title: string; link: string}) => (
-              <Grid.Col
-                key={similar_attachment.id}
-                span={{ base: 12, sm: 8, md: 4 }} // 手機版每行 1 個，平板每行 2(2*4=8) 個，電腦每行 3(3*4=12) 個
-              >
-                <Box
-                  component="a"
-                  href={similar_attachment.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Image
-                    src={`/${similar_attachment.content}`}
-                    alt={`Thumbnail for ${similar_attachment.title}`}
-                    width={200}
-                    height={200}
-                    fit="cover"
-                    radius="md" // 添加圓角
-                  />
-                  <Text
-                    size="lg" // 字體大小，lg 表示較大
-                    fw={600} // 半粗字體
-                    lh="md"
-                    ta="center"
-                  >
-                    {similar_attachment.title}
-                  </Text>
-                </Box>
-              </Grid.Col>
-            ))}
-          </Grid>
-        </div> */}
-
-        {/* <Box>
-          <Flex align="center" mt={50} gap={8}>
-            <Image
-              src={liked ? '../mockdata/image/iine-blue.png' : '../mockdata/image/iine.png'}
-              alt="good"
-              onClick={handleLikeClick}
-              width={40} // 寬度
-              height={40} // 高度
-              fit="contain" // 確保圖片完整顯示
-            />
-
-            
-            <Text
-              size="xl" // Mantine 預設較大字體
-              fw={500} // 半粗體字
-            >
-              {numLikes}
-            </Text>
-          </Flex>
-        </Box> */}
-        
-        <Box>
-          {/* 留言區標題 */}
-          <Title order={2} mt={50} mb={20} size="h2">
-            留言區
-          </Title>
-
-          {/* 留言輸入框 */}
-          <form onSubmit={handleFormSubmit}>
-            <Stack>
-              <Textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="請輸入留言... 限300字內"
-                radius="md"
-                size="lg"
-                maxLength={300}
-                rightSection={
-                  <Text size="xs" c={newComment.length >= maxChars ? 'red' : 'orange'}>
-                    {newComment.length}/300
-                  </Text>
-                }
-              />
-              <Button type="submit" color="blue" size="md" disabled={newComment.trim() === ''}>
-                提交留言
-              </Button>
-            </Stack>
-          </form>
-
-          {/* Mantine Modal 確認框 */}
-          <Modal
-            opened={isModalOpen}
-            onClose={() => setIsModalOpen(false)} // 關閉 Modal
-            title="確認送出留言"
-            centered
-          >
-            <Text>確定發表這則留言嗎?</Text>
             <Group mt="md">
-              <Button variant="default" onClick={() => setIsModalOpen(false)}>
-                取消
-              </Button>
-              <Button color="blue" onClick={confirmSubmit}>
-                確定送出
-              </Button>
+              {proposalData.tags.map((tag) => (
+                <Badge key={tag.id} size="lg" color="gray">
+                  {tag.name}
+                </Badge>
+              ))}
             </Group>
-          </Modal>
 
-          {/* 留言列表 */}
-          <Box mt={30}>
-            {proposalData.comments.comments.map((comment_map) => (
-              <Paper
-                key={comment_map.id}
-                withBorder
-                shadow="sm"
-                radius="md"
-                p="md"
-                mb="md"
-              >
-                <Stack>
-                  {/* 顯示留言者名稱 */}
-                  <Box>
-                    <Text fw={500}>
-                      {comment_map.author.username}
-                    </Text>
-                  </Box>
-                  {/* 顯示留言內容 */}
-                  <Text size="lg" fw={700} lh="lg">
-                    {comment_map.content}
+            {/* 提案附件 */}
+            <Box mt={30}>
+              <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing={{ base: 'md', sm: 'xl' }} verticalSpacing={{ base: 'md', sm: 'xl' }}>
+                {attachments.map((attachment) => (
+                  <div key={attachment.id}>
+                    {attachment.name.endsWith('.jpg') || attachment.name.endsWith('.png') || attachment.name.endsWith('.jpeg') ? (
+                      <div>
+                        <AspectRatio ratio={4 / 3} key={attachment.id} style={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)' }}>
+                          <Image src={attachment.url} alt={`Attachment ${attachment.id}`} fit="cover" onClick={() => handleImageClick(attachment.url)} />
+                        </AspectRatio>
+                      </div>
+                    ) : (
+                      <Button variant="outline" component="a" href={attachment.url} target="_blank" rel="noopener noreferrer">
+                        {attachment.name} - Download
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </SimpleGrid>
+            </Box>
+            <Modal opened={opened} onClose={() => setOpened(false)} size="lg">
+              <Image src={selectedImage} alt="Large view" fit="contain" w="100%" h="auto" />
+            </Modal>
+
+            {/* 提案內容 */}
+            <Title order={1} mt={50}>
+              提案內容
+            </Title>
+            <Box mt={30}>
+              <Text size="xl" component="div">
+                {proposalData.content.split('\n').map((line: string, index: number) => (
+                  <Text key={index} mb="sm">
+                    {line}
                   </Text>
-                </Stack>
-              </Paper>
-            ))}
+                ))}
+              </Text>
+            </Box>
+
+            <Title order={2} mt={30}>
+              留言區
+            </Title>
+            {/* 按讚或倒讚 */}
+            {/* 相似提案 */}
+
+            {/* 留言輸入區 */}
+            
+            <form onSubmit={handleSubmitComment}>
+              <Stack>
+                <Textarea
+                  mt={30}
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="請輸入留言... 限300字內"
+                  radius="md"
+                  size="lg"
+                  maxLength={300}
+                  rightSection={
+                    <Text size="xs" c={newComment.length >= maxChars ? 'red' : 'orange'}>
+                      {newComment.length}/300
+                    </Text>
+                  }
+                />
+                <Button type="submit" color="blue" size="md" disabled={newComment.trim() === ''}>
+                  提交留言
+                </Button>
+              </Stack>
+            </form>
+            {/* Mantine Modal 確認框 */}
+            <Modal
+              opened={isModalOpen}
+              onClose={() => setIsModalOpen(false)} // 關閉 Modal
+              title="確認送出留言"
+              centered
+            >
+              <Text>確定發表這則留言嗎?</Text>
+              <Group mt="md">
+                <Button variant="default" onClick={() => setIsModalOpen(false)}>
+                  取消
+                </Button>
+                <Button color="blue" onClick={confirmSubmit}>
+                  確定送出
+                </Button>
+              </Group>
+            </Modal>
+
+
+            {/* 留言顯示區 */}
+            <Box mt={30}>
+            {comments && comments.comments && comments.comments.length > 0 ? (
+              comments.comments.map((comment) => (
+                <Paper key={comment.id} withBorder shadow="sm" radius="md" p="md" mb="md">
+                  <Stack>
+                    <Box>
+                      <Text fw={500}>{comment.author.username}</Text>
+                    </Box>
+                    <Text size="lg" fw={700} lh="lg">{comment.content}</Text>
+                  </Stack>
+                </Paper>
+              ))
+            ) : (
+              <Text>目前沒有留言。</Text> // When no comments are present
+            )}
           </Box>
-        </Box>
+          </>
+        ) : (
+          <div>Loading proposal details...</div>
+        )}
       </Container>
     </Layout>
   );
 };
-export default ProposalSubpage;
+
+export default proposalSubpage;
