@@ -5,7 +5,7 @@ services:
     networks:
       - citizen-proposal-app
     ports:
-      - 80:443
+      - 3000:3000
 
   backend:
     container_name: CitizenProposalApp
