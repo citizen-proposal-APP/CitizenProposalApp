@@ -12,7 +12,7 @@ import '@mantine/dropzone/styles.css';
 import { Notifications, notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 import { IconPhoto, IconVideo } from '@tabler/icons-react';
-import { Configuration, PostsApi, TagsApi } from '@/openapi';
+import { Configuration, AiApi, PostsApi, TagsApi } from '@/openapi';
 
 export default function EditPage() {
 	const [titleValue, setTitleValue] = useState<string>("");
@@ -26,10 +26,11 @@ export default function EditPage() {
   const [publishModalOpened, { open: openPublishModal, close: closePublishModal }] = useDisclosure(false);
   const [replaceModalOpened, setReplaceModalOpened] = useState(false);  
   const [confirmModalOpened, setConfirmModalOpened] = useState(false);  
+  /*
   const [tagSearch, setTagSearch] = useState('');
   const [tagValue, setTagValue] = useState<any[]>([]);
+  */
   const [tagList, setTagList] = useState<any[]>([]);
-  const [autoTagValue, setAutoTagValue] = useState<any[]>([]);
   const [tagNameValue, setTagNameValue] = useState<string[]>([]);
   const MAX_FILE_SIZE = 50 * 1024 ** 2;
   const WIDTH_OFFSET = 65;
@@ -285,6 +286,7 @@ export default function EditPage() {
     credentials: 'include',
   });
 
+  const aiApi = new AiApi(conf)
   const postsApi = new PostsApi(conf)
   const tagsApi = new TagsApi(conf)
 
@@ -325,6 +327,15 @@ export default function EditPage() {
       } catch (error) {
         console.error("錯誤: ", error);
       }
+    }
+  }
+
+  const autoGenerateTags = async () => {
+    try {
+      const response = await aiApi.apiAiGuesstagsGet({title: titleValue})
+      setTagNameValue(response)
+    } catch (error) {
+      console.error("錯誤: ", error);
     }
   }
 
@@ -536,12 +547,14 @@ export default function EditPage() {
               size={"lg"}
               placeholder="請輸入關鍵字，並選取推薦標籤"
               data={extractTagNames(tagList)}
-              defaultValue={extractTagNames(autoTagValue)}
               clearable
               value={tagNameValue}
               onChange={setTagNameValue}
               onSearchChange={(keyword) => searchTagList(keyword)}
             />
+            <Group justify="space-between" gap={"xl"} grow>
+              <Button variant="filled" size="lg" onClick={autoGenerateTags}>自動生成標籤</Button>
+            </Group>
             <Title size="lg">
               或許你想看看...？
             </Title>
