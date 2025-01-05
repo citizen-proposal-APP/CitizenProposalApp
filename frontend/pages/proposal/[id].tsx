@@ -115,8 +115,8 @@ const proposalSubpage = () => {
         const userResponse = await userApi.apiUsersCurrentGet();
         setCurrentUser(userResponse);
 
-        const likeResponse = await postsApi.apiPostsPostIdVotesGet({ postId: Number(id) });
-        setLike(likeResponse);
+        // const likeResponse = await postsApi.apiPostsPostIdVotesGet({ postId: Number(id) });
+        // setLike(likeResponse);
 
         // 獲取附件資料
         if (proposalResponse.attachments) {
