@@ -12,7 +12,7 @@ import '@mantine/dropzone/styles.css';
 import { Notifications, notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 import { IconPhoto, IconVideo } from '@tabler/icons-react';
-import { Configuration, PostsApi } from '@/openapi';
+import { Configuration, PostsApi, TagsApi } from '@/openapi';
 
 export default function EditPage() {
 	const [titleValue, setTitleValue] = useState<string>("");
@@ -28,6 +28,8 @@ export default function EditPage() {
   const [confirmModalOpened, setConfirmModalOpened] = useState(false);  
   const [tagSearch, setTagSearch] = useState('');
   const [tagValue, setTagValue] = useState<any[]>([]);
+  const [tagList, setTagList] = useState<any[]>([]);
+  const [autoTagValue, setAutoTagValue] = useState<any[]>([]);
   const [tagNameValue, setTagNameValue] = useState<string[]>([]);
   const MAX_FILE_SIZE = 50 * 1024 ** 2;
   const WIDTH_OFFSET = 65;
@@ -58,27 +60,7 @@ export default function EditPage() {
           : null,
     },
   });
-  
-  const tagList = [
-    { id: 1, tagType: TagType.department, name: "交通部" },
-    { id: 2, tagType: TagType.department, name: "文化部" },
-    { id: 3, tagType: TagType.department, name: "國防部" },
-    { id: 4, tagType: TagType.department, name: "想不到了" },
-    { id: 5, tagType: TagType.topic, name: "文化幣" },
-    { id: 6, tagType: TagType.topic, name: "食品安全" },
-    { id: 7, tagType: TagType.topic, name: "asdfg" },
-    { id: 8, tagType: TagType.topic, name: "還有啥來著" },
-    { id: 9, tagType: TagType.topic, name: "1234567" },
-    { id: 10, tagType: TagType.topic, name: "bbbb bbbbbb bbb" },
-    { id: 11, tagType: TagType.topic, name: "🍌" },
-    { id: 12, tagType: TagType.topic, name: "" },
-  ];
-  const autoTags = [
-    tagList[2],
-    tagList[5],
-    tagList[7],
-    tagList[8],
-  ];
+
   const similarProposals: Proposal[] = [
     {
       id: 0,
@@ -293,10 +275,12 @@ export default function EditPage() {
 	*/
 
   const conf = new Configuration({
-    basePath: process.env.NEXT_PROCESS_BASE_PATH!,
+    basePath: process.env.NEXT_PUBLIC_BASE_PATH!,
+    credentials: 'include',
   });
 
   const postsApi = new PostsApi(conf)
+  const tagsApi = new TagsApi(conf)
 
   const publishProposal = async () => {
     try {
@@ -319,9 +303,22 @@ export default function EditPage() {
       }
     } finally {
       closePublishModal();
-      setConfirmModalOpened(true);
     }
   };
+
+  const searchTagList = async (keyword: string) => {
+    if (keyword.length == 0) {
+      setTagList([])
+    }
+    else {
+      try {
+        const response = await tagsApi.apiTagsGet({keyword: keyword})
+        setTagList(response.tags)
+      } catch (error) {
+        console.error("錯誤: ", error);
+    }
+    }
+  }
 
 	return (
     <Layout>
@@ -531,10 +528,11 @@ export default function EditPage() {
               size={"lg"}
               placeholder="請輸入關鍵字，並選取推薦標籤"
               data={extractTagNames(tagList)}
-              defaultValue={extractTagNames(autoTags)}
+              defaultValue={extractTagNames(autoTagValue)}
               clearable
               value={tagNameValue}
               onChange={setTagNameValue}
+              onSearchChange={(keyword) => searchTagList(keyword)}
             />
             <Title size="lg">
               或許你想看看...？
