@@ -14,7 +14,8 @@ import {
 } from '@/openapi';
 
 import { Layout } from '../../components/Layout/Layout';
-import { Proposal, Tag } from '@/types';
+import { Proposal } from '../../types/Proposal';
+import { Tag } from '../../types/Tag';
 import { ProposalCard } from '@/components/ProposalCard/ProposalCard';
 import { useRouter } from 'next/router';
 
@@ -197,14 +198,14 @@ const proposalSubpage = () => {
               </Text>
             </Box>
 
+            {/* 相似提案 */}
+
+            {/* 按讚或倒讚 */}
+            
             <Title order={2} mt={30}>
               留言區
             </Title>
-            {/* 按讚或倒讚 */}
-            {/* 相似提案 */}
-
             {/* 留言輸入區 */}
-            
             <form onSubmit={handleSubmitComment}>
               <Stack>
                 <Textarea
@@ -244,7 +245,6 @@ const proposalSubpage = () => {
               </Group>
             </Modal>
 
-
             {/* 留言顯示區 */}
             <Box mt={30}>
             {comments && comments.comments && comments.comments.length > 0 ? (
@@ -259,7 +259,7 @@ const proposalSubpage = () => {
                 </Paper>
               ))
             ) : (
-              <Text>目前沒有留言。</Text> // When no comments are present
+              <Text>目前沒有留言。</Text> 
             )}
           </Box>
           </>
