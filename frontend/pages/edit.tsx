@@ -152,6 +152,12 @@ export default function EditPage() {
           message: '請先登入後即可發布提案'
         })
         break
+      case "unknown":
+        notifications.show({
+          title: '發生未知錯誤',
+          message: '請稍候再嘗試'
+        })
+        break
   
       default:
         break;
@@ -293,11 +299,13 @@ export default function EditPage() {
             handleNotification("text")
             break;
           case 401:
-              console.error('錯誤: 使用者未登入', error.response.data)
-              handleNotification("sighin")
-              break;
-            
+            console.error('錯誤: 使用者未登入', error.response.data)
+            handleNotification("sighin")
+            break;
+          
           default:
+            console.error('錯誤: 未知錯誤', error.response.data)
+            handleNotification("unknown")
             break;
         }
       }
@@ -316,7 +324,7 @@ export default function EditPage() {
         setTagList(response.tags)
       } catch (error) {
         console.error("錯誤: ", error);
-    }
+      }
     }
   }
 
