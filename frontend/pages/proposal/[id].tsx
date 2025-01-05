@@ -4,20 +4,21 @@ import {
   Group, Box, SimpleGrid,
   Button, Text, Image,
   AspectRatio, Modal, Stack,
-  Paper,  Textarea
+  Paper, Textarea, Flex
 } from '@mantine/core';
 
 import { 
   Configuration, PostsApi, UsersApi, 
   AttachmentsApi, PostQueryResponseDto, UserQueryResponseDto, 
-  CommentsQueryResponseDto, TagQueryResponseDto, PostsQueryResponseDto 
+  CommentsQueryResponseDto, VoteCountsQueryResponseDto 
 } from '@/openapi';
 
 import { Layout } from '../../components/Layout/Layout';
 import { Proposal } from '../../types/Proposal';
-import { Tag } from '../../types/Tag';
+import { Tag, TagType } from '../../types/Tag';
 import { ProposalCard } from '@/components/ProposalCard/ProposalCard';
 import { useRouter } from 'next/router';
+
 
 const configuration = new Configuration({
   basePath: process.env.NEXT_PUBLIC_BASE_PATH!,
@@ -35,7 +36,9 @@ const proposalSubpage = () => {
   const [proposalData, setProposalData] = useState<PostQueryResponseDto | null>(null);
   const [currentUser, setCurrentUser] = useState<UserQueryResponseDto | null>(null);
   const [attachments, setAttachments] = useState<{ id: number; name: string; blob: Blob; url:string }[]>([]);
+  const [likes,setLike] = useState<VoteCountsQueryResponseDto | null>(null);
   const [comments, setComments] = useState<CommentsQueryResponseDto | null>(null);
+  const [relatedPosts, setRelatedPosts] = useState<Proposal[]>([]);
   const [newComment, setNewComment] = useState<string>(''); 
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -49,6 +52,13 @@ const proposalSubpage = () => {
     setSelectedImage(imageSrc);
     setOpened(true);
   };
+
+  interface CommonPost {
+    id: number;
+    title: string;
+    postedTime: string; // 統一為 string 格式
+    tags: Tag[]; // 使用 Tag 型態
+  }
 
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,7 +114,10 @@ const proposalSubpage = () => {
         // 獲取當前用戶資料
         const userResponse = await userApi.apiUsersCurrentGet();
         setCurrentUser(userResponse);
-  
+
+        const likeResponse = await postsApi.apiPostsPostIdVotesGet({ postId: Number(id) });
+        setLike(likeResponse);
+
         // 獲取附件資料
         if (proposalResponse.attachments) {
           const attachmentPromises = proposalResponse.attachments.map(async (attachment) => {
@@ -124,10 +137,37 @@ const proposalSubpage = () => {
         const commentsResponse = await postsApi.apiPostsPostIdCommentsGet({
           postId: Number(id),
           start: 0,
-          range: 10,
+          range: 50,
           sortDirection: 'ascending',
         });
         setComments(commentsResponse);
+
+        // 獲取相關貼文資料
+      const response1 = await postsApi.apiPostsGet({
+        range: 2,
+        tag: proposalResponse.tags[0].name,
+      });
+      const response2 = await postsApi.apiPostsGet({
+        range: 1,
+        tag: proposalResponse.author.username,
+      });
+
+      const mergedPosts: CommonPost[] = [...(response1?.posts?? []), ...(response2?.posts?? [])].map((post) => ({
+        id: post.id,
+        title: post.title,
+        postedTime: new Date(post.postedTime).toISOString(),
+        tags: post.tags.map((tag) => ({ id: tag.id, name: tag.name, tagType: tag.tagType})),
+      }));
+
+      
+      const proposals: Proposal[] = mergedPosts.map((post) => ({
+        ...post,
+        status: '1',
+        thumbnail: '',
+        
+       }));
+       setRelatedPosts(proposals);
+      
 
         setLoading(false);
       } catch (err) {
@@ -199,9 +239,35 @@ const proposalSubpage = () => {
             </Box>
 
             {/* 相似提案 */}
+            <Title order={2} mt={30}>
+              相似的提案 | 猜你想看...
+            </Title>
+            <Flex
+              mt={30}
+              gap="md" // 使用 Mantine 的主题间距：'xs', 'sm', 'md', 'lg', 'xl'
+              wrap="wrap" // 自动换行
+              justify="center" // 设置对齐方式
+            >
+              {relatedPosts.length > 0 ? (
+                relatedPosts.map((proposal) => (
+                  proposal.thumbnail='../mockdata/image/john hutcherson.jpg',
+                  <ProposalCard
 
+                    key={proposal.id}
+                    data={proposal}
+                    height="auto"
+                    width="45%"
+                  />
+                ))
+              ) : (
+                <Text>沒有相似的提案</Text>
+              )}
+            </Flex>
+            
             {/* 按讚或倒讚 */}
             
+
+
             <Title order={2} mt={30}>
               留言區
             </Title>
