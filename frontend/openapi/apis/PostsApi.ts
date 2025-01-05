@@ -16,15 +16,19 @@
 import * as runtime from '../runtime';
 import type {
   CommentsQueryResponseDto,
+  CurrentUserVoteQueryResponseDto,
   PostQueryResponseDto,
   PostSortKey,
   PostsQueryResponseDto,
   ProblemDetails,
   SortDirection,
+  VoteCountsQueryResponseDto,
 } from '../models/index';
 import {
     CommentsQueryResponseDtoFromJSON,
     CommentsQueryResponseDtoToJSON,
+    CurrentUserVoteQueryResponseDtoFromJSON,
+    CurrentUserVoteQueryResponseDtoToJSON,
     PostQueryResponseDtoFromJSON,
     PostQueryResponseDtoToJSON,
     PostSortKeyFromJSON,
@@ -35,6 +39,8 @@ import {
     ProblemDetailsToJSON,
     SortDirectionFromJSON,
     SortDirectionToJSON,
+    VoteCountsQueryResponseDtoFromJSON,
+    VoteCountsQueryResponseDtoToJSON,
 } from '../models/index';
 
 export interface ApiPostsGetRequest {
@@ -44,8 +50,8 @@ export interface ApiPostsGetRequest {
     sortDirection?: SortDirection;
     author?: string;
     tag?: string;
-    title?: string;
-    content?: string;
+    keyword?: string;
+    isAiEnabled?: boolean;
 }
 
 export interface ApiPostsIdGetRequest {
@@ -69,6 +75,26 @@ export interface ApiPostsPostIdCommentsGetRequest {
 export interface ApiPostsPostIdCommentsPostRequest {
     postId: number;
     content: string;
+}
+
+export interface ApiPostsPostIdDislikePostRequest {
+    postId: number;
+}
+
+export interface ApiPostsPostIdLikePostRequest {
+    postId: number;
+}
+
+export interface ApiPostsPostIdUnvotePostRequest {
+    postId: number;
+}
+
+export interface ApiPostsPostIdVotesGetRequest {
+    postId: number;
+}
+
+export interface ApiPostsPostIdVotesMineGetRequest {
+    postId: number;
 }
 
 /**
@@ -106,12 +132,12 @@ export class PostsApi extends runtime.BaseAPI {
             queryParameters['Tag'] = requestParameters['tag'];
         }
 
-        if (requestParameters['title'] != null) {
-            queryParameters['Title'] = requestParameters['title'];
+        if (requestParameters['keyword'] != null) {
+            queryParameters['Keyword'] = requestParameters['keyword'];
         }
 
-        if (requestParameters['content'] != null) {
-            queryParameters['Content'] = requestParameters['content'];
+        if (requestParameters['isAiEnabled'] != null) {
+            queryParameters['IsAiEnabled'] = requestParameters['isAiEnabled'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -344,6 +370,168 @@ export class PostsApi extends runtime.BaseAPI {
      */
     async apiPostsPostIdCommentsPost(requestParameters: ApiPostsPostIdCommentsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.apiPostsPostIdCommentsPostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Dislikes a post. If the post has already been disliked, nothing will be done and 200 will be returned. If the post was originally liked, the like will be removed and the post will be disliked.
+     */
+    async apiPostsPostIdDislikePostRaw(requestParameters: ApiPostsPostIdDislikePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['postId'] == null) {
+            throw new runtime.RequiredError(
+                'postId',
+                'Required parameter "postId" was null or undefined when calling apiPostsPostIdDislikePost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/Posts/{postId}/dislike`.replace(`{${"postId"}}`, encodeURIComponent(String(requestParameters['postId']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Dislikes a post. If the post has already been disliked, nothing will be done and 200 will be returned. If the post was originally liked, the like will be removed and the post will be disliked.
+     */
+    async apiPostsPostIdDislikePost(requestParameters: ApiPostsPostIdDislikePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiPostsPostIdDislikePostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Likes a post. If the post has already been liked, nothing will be done and 200 will be returned. If the post was originally disliked, the dislike will be removed and the post will be liked.
+     */
+    async apiPostsPostIdLikePostRaw(requestParameters: ApiPostsPostIdLikePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['postId'] == null) {
+            throw new runtime.RequiredError(
+                'postId',
+                'Required parameter "postId" was null or undefined when calling apiPostsPostIdLikePost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/Posts/{postId}/like`.replace(`{${"postId"}}`, encodeURIComponent(String(requestParameters['postId']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Likes a post. If the post has already been liked, nothing will be done and 200 will be returned. If the post was originally disliked, the dislike will be removed and the post will be liked.
+     */
+    async apiPostsPostIdLikePost(requestParameters: ApiPostsPostIdLikePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiPostsPostIdLikePostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Removes the like or dislike on a post. If the post hasn\'t been liked nor disliked, nothing will be done and 200 will be returned.
+     */
+    async apiPostsPostIdUnvotePostRaw(requestParameters: ApiPostsPostIdUnvotePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['postId'] == null) {
+            throw new runtime.RequiredError(
+                'postId',
+                'Required parameter "postId" was null or undefined when calling apiPostsPostIdUnvotePost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/Posts/{postId}/unvote`.replace(`{${"postId"}}`, encodeURIComponent(String(requestParameters['postId']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Removes the like or dislike on a post. If the post hasn\'t been liked nor disliked, nothing will be done and 200 will be returned.
+     */
+    async apiPostsPostIdUnvotePost(requestParameters: ApiPostsPostIdUnvotePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiPostsPostIdUnvotePostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Gets the number of likes and dislikes on a post.
+     */
+    async apiPostsPostIdVotesGetRaw(requestParameters: ApiPostsPostIdVotesGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VoteCountsQueryResponseDto>> {
+        if (requestParameters['postId'] == null) {
+            throw new runtime.RequiredError(
+                'postId',
+                'Required parameter "postId" was null or undefined when calling apiPostsPostIdVotesGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/Posts/{postId}/votes`.replace(`{${"postId"}}`, encodeURIComponent(String(requestParameters['postId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => VoteCountsQueryResponseDtoFromJSON(jsonValue));
+    }
+
+    /**
+     * Gets the number of likes and dislikes on a post.
+     */
+    async apiPostsPostIdVotesGet(requestParameters: ApiPostsPostIdVotesGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<VoteCountsQueryResponseDto> {
+        const response = await this.apiPostsPostIdVotesGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Gets what kind of vote the currently logged in user has cast on a post.
+     */
+    async apiPostsPostIdVotesMineGetRaw(requestParameters: ApiPostsPostIdVotesMineGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CurrentUserVoteQueryResponseDto>> {
+        if (requestParameters['postId'] == null) {
+            throw new runtime.RequiredError(
+                'postId',
+                'Required parameter "postId" was null or undefined when calling apiPostsPostIdVotesMineGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/Posts/{postId}/votes/mine`.replace(`{${"postId"}}`, encodeURIComponent(String(requestParameters['postId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CurrentUserVoteQueryResponseDtoFromJSON(jsonValue));
+    }
+
+    /**
+     * Gets what kind of vote the currently logged in user has cast on a post.
+     */
+    async apiPostsPostIdVotesMineGet(requestParameters: ApiPostsPostIdVotesMineGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CurrentUserVoteQueryResponseDto> {
+        const response = await this.apiPostsPostIdVotesMineGetRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

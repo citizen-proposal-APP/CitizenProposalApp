@@ -182,72 +182,35 @@ You should now be able to access the frontend at `localhost:80`.
 
 To build and deploy the AI container, follow these steps:
 
-1. cd into the AI directory:
+1. Change to AI directory and install mysql-connector:
 
    ```bash
    cd AI
+   pip install mysql-connector-python==9.1.0
    ```
 
-2. download machine-learning models from
-   [huggingface](https://huggingface.co/alan314159/CitizenProposalApp), and put
-   them in the `models` directory like this. You can use `download_models.sh` to
-   download the models.
+2. Create `.env` and paste your openrouter api in it
 
-   ```bash
-   .
-   ├── department_label
-   │   ├── 中央選舉委員會.pkl
-   │   ├── 交通部.pkl
-   │   ├── 僑務委員會.pkl
-   │   ├── 內政部.pkl
-   │   ├── 公平交易委員會.pkl
-   │   ├── 勞動部.pkl
-   │   ├── 國家通訊傳播委員會.pkl
-   │   ├── 國軍退除役官兵輔導委員會.pkl
-   │   ├── 國防部.pkl
-   │   ├── 外交部.pkl
-   │   ├── 客家委員會.pkl
-   │   ├── 教育部.pkl
-   │   ├── 文化部.pkl
-   │   ├── 法務部.pkl
-   │   ├── 環境部.pkl
-   │   ├── 經濟部.pkl
-   │   ├── 行政院主計總處.pkl
-   │   ├── 行政院人事行政總處.pkl
-   │   ├── 衛生福利部.pkl
-   │   ├── 財政部.pkl
-   │   ├── 農業部.pkl
-   │   └── 金融監督管理委員會.pkl
-   ├── onnx
-   │   ├── 1_Pooling
-   │   │   └── config.json
-   │   ├── 2_Dense
-   │   │   ├── config.json
-   │   │   └── model.safetensors
-   │   ├── config.json
-   │   ├── config_sentence_transformers.json
-   │   ├── modules.json
-   │   ├── onnx
-   │   │   └── model.onnx
-   │   ├── README.md
-   │   ├── sentence_bert_config.json
-   │   ├── special_tokens_map.json
-   │   ├── tokenizer_config.json
-   │   ├── tokenizer.json
-   │   └── vocab.txt
-   └── topic_label
-      ├── proposal_cluster_labels.pkl
-      └── proposal.index
-   ```
-
-3. build the docker image with the following command:
+3. Build the docker image with the following command:
 
    ```bash
    docker build -t citizenproposalapp-ai .
    ```
 
-4. run the docker container with the following command:
+4. Run the docker container with the following command:
 
    ```bash
-   docker run -d -p 5001:5001 citizenproposalapp-ai
+   docker run -d -p 5001:5001 -v vector-db:/app/db citizenproposalapp-ai
+   ```
+
+5. (optional) Add fake data to MySQL:
+
+   ```bash
+   python3 insert_fake_data.py
+   ```
+
+6. Sync vector-db with MySQL:
+
+   ```bash
+   python3 vector_db_sync.py
    ```

@@ -20,6 +20,13 @@ import {
     UserQueryResponseDtoToJSON,
     UserQueryResponseDtoToJSONTyped,
 } from './UserQueryResponseDto';
+import type { PostQueryAttachmentResponseDto } from './PostQueryAttachmentResponseDto';
+import {
+    PostQueryAttachmentResponseDtoFromJSON,
+    PostQueryAttachmentResponseDtoFromJSONTyped,
+    PostQueryAttachmentResponseDtoToJSON,
+    PostQueryAttachmentResponseDtoToJSONTyped,
+} from './PostQueryAttachmentResponseDto';
 import type { TagQueryResponseDto } from './TagQueryResponseDto';
 import {
     TagQueryResponseDtoFromJSON,
@@ -41,13 +48,13 @@ export interface PostQueryResponseDto {
      */
     id: number;
     /**
-     * The title of this post.
+     * The title of this post. The max length is 100.
      * @type {string}
      * @memberof PostQueryResponseDto
      */
     title: string;
     /**
-     * The text of this post.
+     * The text of this post. The max length is 2000.
      * @type {string}
      * @memberof PostQueryResponseDto
      */
@@ -71,11 +78,11 @@ export interface PostQueryResponseDto {
      */
     author: UserQueryResponseDto;
     /**
-     * The IDs of the attachments on this post. To get the attachments themselves, query them at ```/api/Attachments/{id}```.
-     * @type {Array<number>}
+     * The IDs and filenames of the attachments on this post. To get the attachments themselves, query them at ```/api/Attachments/{id}```.
+     * @type {Array<PostQueryAttachmentResponseDto>}
      * @memberof PostQueryResponseDto
      */
-    attachmentIds: Array<number>;
+    attachments: Array<PostQueryAttachmentResponseDto>;
 }
 
 /**
@@ -88,7 +95,7 @@ export function instanceOfPostQueryResponseDto(value: object): value is PostQuer
     if (!('postedTime' in value) || value['postedTime'] === undefined) return false;
     if (!('tags' in value) || value['tags'] === undefined) return false;
     if (!('author' in value) || value['author'] === undefined) return false;
-    if (!('attachmentIds' in value) || value['attachmentIds'] === undefined) return false;
+    if (!('attachments' in value) || value['attachments'] === undefined) return false;
     return true;
 }
 
@@ -108,7 +115,7 @@ export function PostQueryResponseDtoFromJSONTyped(json: any, ignoreDiscriminator
         'postedTime': (new Date(json['postedTime'])),
         'tags': ((json['tags'] as Array<any>).map(TagQueryResponseDtoFromJSON)),
         'author': UserQueryResponseDtoFromJSON(json['author']),
-        'attachmentIds': json['attachmentIds'],
+        'attachments': ((json['attachments'] as Array<any>).map(PostQueryAttachmentResponseDtoFromJSON)),
     };
 }
 
@@ -129,7 +136,7 @@ export function PostQueryResponseDtoToJSONTyped(value?: PostQueryResponseDto | n
         'postedTime': ((value['postedTime']).toISOString()),
         'tags': ((value['tags'] as Array<any>).map(TagQueryResponseDtoToJSON)),
         'author': UserQueryResponseDtoToJSON(value['author']),
-        'attachmentIds': value['attachmentIds'],
+        'attachments': ((value['attachments'] as Array<any>).map(PostQueryAttachmentResponseDtoToJSON)),
     };
 }
 

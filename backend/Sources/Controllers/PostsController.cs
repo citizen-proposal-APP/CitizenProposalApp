@@ -350,6 +350,73 @@ public class PostsController(CitizenProposalAppDbContext context, IMapper mapper
         return Ok();
     }
 
+    /// <summary>
+    /// Gets the number of likes and dislikes on a post.
+    /// </summary>
+    /// <param name="postId">The ID of the post to query.</param>
+    /// <returns>A <see cref="VoteCountsQueryResponseDto"/> that contains the number of likes and dislikes on a <see cref="Post"/>.</returns>
+    /// <response code="200">An object that contains the number of likes and dislikes on the speficie post.</response>
+    /// <response code="400">The provided ID is not a valid integer.</response>
+    /// <response code="404">No post with the specified ID exists.</response>
+    [HttpGet("{postId}/votes")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
+    public async Task<ActionResult<VoteCountsQueryResponseDto>> GetVoteCounts(int postId)
+    {
+        Post? post = await context.Posts
+            .Include(post => post.LikedUsers)
+            .Include(post => post.DislikedUsers)
+            .FirstOrDefaultAsync(post => post.Id == postId);
+        if (post is null)
+        {
+            return Problem($"No post with the ID {postId} exists.", statusCode: Status404NotFound);
+        }
+        VoteCountsQueryResponseDto result = new()
+        {
+            LikeCount = post.LikedUsers.Count,
+            DislikeCount = post.DislikedUsers.Count
+        };
+        return result;
+    }
+
+    /// <summary>
+    /// Gets what kind of vote the currently logged in user has cast on a post.
+    /// </summary>
+    /// <param name="postId">The ID of the post to query.</param>
+    /// <returns>A <see cref="CurrentUserVoteQueryResponseDto"/> that contains the kind of vote the currently logged in user has cast on the specified post.</returns>
+    /// <response code="200">An object that contains the kind vote the currently logged in user has cast on the specified post.</response>
+    /// <response code="400">The provided ID is not a valid integer.</response>
+    /// <response code="401">The user has not logged in or the session has expired.</response>
+    /// <response code="404">No post with the specified ID exists.</response>
+    [HttpGet("{postId}/votes/mine")]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    [ProducesResponseType(typeof(void), Status401Unauthorized, Application.ProblemJson)]
+    [ProducesResponseType<ProblemDetails>(Status404NotFound, Application.ProblemJson)]
+    [Authorize]
+    public async Task<ActionResult<CurrentUserVoteQueryResponseDto>> GetCurrentUserVote(int postId)
+    {
+        Post? post = await context.Posts
+            .Include(post => post.LikedUsers)
+            .Include(post => post.DislikedUsers)
+            .FirstOrDefaultAsync(post => post.Id == postId);
+        if (post is null)
+        {
+            return Problem($"No post with the ID {postId} exists.", statusCode: Status404NotFound);
+        }
+        User currentUser = (await CitizenProposalApp.User.GetUserFromClaimsPrincipal(context.Users, User))!;
+        if (post.LikedUsers.Any(user => user.Id == currentUser.Id))
+        {
+            return new CurrentUserVoteQueryResponseDto { VoteKind = VoteKind.Like };
+        }
+        if (post.DislikedUsers.Any(user => user.Id == currentUser.Id))
+        {
+            return new CurrentUserVoteQueryResponseDto { VoteKind = VoteKind.Dislike };
+        }
+        return new CurrentUserVoteQueryResponseDto { VoteKind = VoteKind.None };
+    }
+
     private int GetUserId()
     {
         Claim? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
