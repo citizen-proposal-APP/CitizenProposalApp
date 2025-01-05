@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Globalization;
+using System.Text.Json;
 
 namespace CitizenProposalApp;
 
@@ -55,7 +56,7 @@ internal sealed class Program
             .AddHttpClient<IAiService, AiService>(client => client.BaseAddress = new("http://CitizenProposalAppAi:5001/"));
         builder.Services
             .AddControllers(options => options.Filters.Add(new ProducesAttribute(Application.Json)))
-            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
         builder.Services.AddAuthentication().AddScheme<SessionTokenAuthenticationHandlerOptions, SessionTokenAuthenticationHandler>("session", "Session token authentication handler", null);
         WebApplication app = builder.Build(); // It seems like AddAuthorization is automagically called here. Can't find any documentation.
         // UseExceptionHandler is registered before UseDeveloperExceptionPage, so this is only used if the environment is Production to give a ProblemDetails response. At Production, UseDeveloperExceptionPage is used instead to return JSON or HTML.

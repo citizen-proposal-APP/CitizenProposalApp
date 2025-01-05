@@ -26,7 +26,7 @@ export interface UserQueryResponseDto {
      */
     id: number;
     /**
-     * The username.
+     * The username. The max length is 32.
      * @type {string}
      * @memberof UserQueryResponseDto
      */

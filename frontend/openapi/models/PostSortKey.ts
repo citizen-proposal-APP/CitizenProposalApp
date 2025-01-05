@@ -18,8 +18,8 @@
  * @export
  */
 export const PostSortKey = {
-    ByDate: 'ByDate',
-    ById: 'ById'
+    ByDate: 'byDate',
+    ById: 'byId'
 } as const;
 export type PostSortKey = typeof PostSortKey[keyof typeof PostSortKey];
 

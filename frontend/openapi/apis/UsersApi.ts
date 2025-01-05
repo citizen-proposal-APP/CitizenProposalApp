@@ -17,13 +17,22 @@ import * as runtime from '../runtime';
 import type {
   ProblemDetails,
   UserQueryResponseDto,
+  UsersQueryResponseDto,
 } from '../models/index';
 import {
     ProblemDetailsFromJSON,
     ProblemDetailsToJSON,
     UserQueryResponseDtoFromJSON,
     UserQueryResponseDtoToJSON,
+    UsersQueryResponseDtoFromJSON,
+    UsersQueryResponseDtoToJSON,
 } from '../models/index';
+
+export interface ApiUsersGetRequest {
+    keyword: string;
+    start?: number;
+    range?: number;
+}
 
 export interface ApiUsersIdGetRequest {
     id: number;
@@ -67,6 +76,51 @@ export class UsersApi extends runtime.BaseAPI {
      */
     async apiUsersCurrentGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserQueryResponseDto> {
         const response = await this.apiUsersCurrentGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Searches users with a keyword. The result is always sorted ascendingly by the lengths of the usernames.
+     */
+    async apiUsersGetRaw(requestParameters: ApiUsersGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UsersQueryResponseDto>> {
+        if (requestParameters['keyword'] == null) {
+            throw new runtime.RequiredError(
+                'keyword',
+                'Required parameter "keyword" was null or undefined when calling apiUsersGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['start'] != null) {
+            queryParameters['Start'] = requestParameters['start'];
+        }
+
+        if (requestParameters['range'] != null) {
+            queryParameters['Range'] = requestParameters['range'];
+        }
+
+        if (requestParameters['keyword'] != null) {
+            queryParameters['Keyword'] = requestParameters['keyword'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/Users`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UsersQueryResponseDtoFromJSON(jsonValue));
+    }
+
+    /**
+     * Searches users with a keyword. The result is always sorted ascendingly by the lengths of the usernames.
+     */
+    async apiUsersGet(requestParameters: ApiUsersGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UsersQueryResponseDto> {
+        const response = await this.apiUsersGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
