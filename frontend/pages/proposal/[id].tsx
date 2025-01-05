@@ -244,13 +244,13 @@ const proposalSubpage = () => {
             </Title>
             <Flex
               mt={30}
-              gap="md" // 使用 Mantine 的主题间距：'xs', 'sm', 'md', 'lg', 'xl'
-              wrap="wrap" // 自动换行
-              justify="center" // 设置对齐方式
+              gap="md" 
+              wrap="wrap" 
+              justify="center" 
             >
               {relatedPosts.length > 0 ? (
                 relatedPosts.map((proposal) => (
-                  proposal.thumbnail='../mockdata/image/john hutcherson.jpg',
+                  proposal.thumbnail='../logo.png',
                   <ProposalCard
 
                     key={proposal.id}
