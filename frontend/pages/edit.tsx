@@ -4,6 +4,7 @@ import { Proposal } from '@/types/Proposal';
 import { Tag, TagType } from '@/types/Tag';
 import React, { useState, useRef } from 'react';
 import { IconUpload, IconX } from '@tabler/icons-react';
+import { useRouter } from 'next/navigation'
 import { Badge, Button, Card, CheckIcon, Combobox, Container, Grid, Group, Image, MantineProvider, Modal, Pill, PillsInput, rem, ScrollArea, SimpleGrid, Stack, TagsInput, Text, Textarea, Timeline, Title, useCombobox } from '@mantine/core';
 import { useDisclosure, useValidatedState, useViewportSize } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
@@ -15,6 +16,7 @@ import { IconPhoto, IconVideo } from '@tabler/icons-react';
 import { Configuration, AiApi, PostsApi, TagsApi } from '@/openapi';
 
 export default function EditPage() {
+  const router = useRouter()
 	const [titleValue, setTitleValue] = useState<string>("");
 	const [contentValue, setContentValue] = useState<string>("");
   const [fileValue, setFileValue] = useState<File[]>([]);
@@ -25,8 +27,8 @@ export default function EditPage() {
   const [saveModalOpened, { open: openSaveModal, close: closeSaveModal }] = useDisclosure(false);
   const [publishModalOpened, { open: openPublishModal, close: closePublishModal }] = useDisclosure(false);
   const [replaceModalOpened, setReplaceModalOpened] = useState(false);  
-  const [confirmModalOpened, setConfirmModalOpened] = useState(false);  
   /*
+  const [confirmModalOpened, setConfirmModalOpened] = useState(false);  
   const [tagSearch, setTagSearch] = useState('');
   const [tagValue, setTagValue] = useState<any[]>([]);
   */
@@ -157,6 +159,12 @@ export default function EditPage() {
         notifications.show({
           title: '發生未知錯誤',
           message: '請稍候再嘗試'
+        })
+        break
+      case "sucess":
+        notifications.show({
+          title: '成功送出提案',
+          message: ''
         })
         break
   
@@ -293,6 +301,8 @@ export default function EditPage() {
   const publishProposal = async () => {
     try {
       await postsApi.apiPostsPost({title: titleValue, content: contentValue, tags: tagNameValue, attachments: fileValue})
+      handleNotification("sucess")
+      router.push('/')
     } catch (error: any) {
       if (error.response) {
         switch (error.response.status) {
@@ -361,12 +371,6 @@ export default function EditPage() {
         <Group justify="flex-end" gap={"xl"}>
           <Button variant="filled" size={"md"} onClick={replaceFile}>是</Button>
           <Button variant="default" size={"md"} onClick={skipFile}>否</Button>
-        </Group>
-      </Modal>
-      <Modal opened={confirmModalOpened} onClose={() => setConfirmModalOpened(false)} title="成功！" centered size={"lg"}>
-        <Text size={"md"}>提案已送出！</Text>
-        <Group justify="flex-end" gap={"xl"}>
-          <Button variant="filled" size={"md"} onClick={() => setConfirmModalOpened(false)}>確認</Button>
         </Group>
       </Modal>
     <MantineProvider>
