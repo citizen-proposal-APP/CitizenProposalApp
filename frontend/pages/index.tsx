@@ -12,6 +12,7 @@ import { Layout } from '@/components/Layout/Layout';
 import { ProposalCard } from '@/components/ProposalCard/ProposalCard';
 import data from '@/public/mockdata/proposals.json';
 import { ImageCarousel } from '../components/ImageCarousel/ImageCarousel';
+import { useState } from 'react';
 
 const images = [
   '/mockdata/homepage_images/6hJVKZ6.jpg',
@@ -27,6 +28,9 @@ const images = [
 
 export default function HomePage() {
   const items = data.map((item) => <ProposalCard data={item} key={item.id} height="auto" />);
+  const [sortOption, setSortOption] = useState('根據議題 ID 升序');
+  const [tags, setTags] = useState<string[]>([]);
+  const [author, setAuthor] = useState('');
 
   return (
     <Layout
@@ -36,9 +40,9 @@ export default function HomePage() {
             排序結果
           </Title>
           <NativeSelect
-            //  value={value}
-            //  onChange={(event) => setValue(event.currentTarget.value)}
-            data={['根據議題 ID 升序', '根據議題 ID 升序', '根據發佈時間升序', '根據發佈時間降序']}
+            value={sortOption}
+            onChange={(event) => setSortOption(event.currentTarget.value)}
+            data={['根據議題 ID 升序', '根據議題 ID 降序', '根據發佈時間升序', '根據發佈時間降序']}
             mb="xl"
           />
 
@@ -48,6 +52,8 @@ export default function HomePage() {
           <MultiSelect
             placeholder="標籤名稱"
             data={['eee', 'ddd', 'ccc', 'bbb', 'aaa']}
+            value={tags}
+            onChange={setTags}
             limit={5}
             hidePickedOptions
             searchable
@@ -66,6 +72,7 @@ export default function HomePage() {
             searchable
             clearable
             nothingFoundMessage="找不到使用者"
+            onChange={(value) => setAuthor(value || '')}
           />
         </>
       }
@@ -75,7 +82,7 @@ export default function HomePage() {
         <Title order={2} mt="md" mb="md">
           熱門議題
         </Title>
-        <KeywordSearch />
+        <KeywordSearch sortOption={sortOption} tags={tags} author={author} />
         <SimpleGrid cols={{ base: 1, sm: 3 }} mt="md">
           {Array.from({ length: 3 }).map((_, index) => (
             <Stack key={index}>
