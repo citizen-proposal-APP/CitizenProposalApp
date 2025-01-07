@@ -10,9 +10,9 @@ import {
 import { 
   Configuration, PostsApi, UsersApi, 
   AttachmentsApi, PostQueryResponseDto, UserQueryResponseDto, 
-  CommentsQueryResponseDto, VoteCountsQueryResponseDto 
+  CommentsQueryResponseDto, VoteCountsQueryResponseDto ,CurrentUserVoteQueryResponseDto
 } from '@/openapi';
-
+import { VoteKind } from '@/openapi';
 import { Layout } from '../../components/Layout/Layout';
 import { Proposal } from '../../types/Proposal';
 import { Tag, TagType } from '../../types/Tag';
@@ -36,13 +36,13 @@ const proposalSubpage = () => {
   const [proposalData, setProposalData] = useState<PostQueryResponseDto | null>(null);
   const [currentUser, setCurrentUser] = useState<UserQueryResponseDto | null>(null);
   const [attachments, setAttachments] = useState<{ id: number; name: string; blob: Blob; url:string }[]>([]);
-  const [likes,setLike] = useState<VoteCountsQueryResponseDto | null>(null);
   const [comments, setComments] = useState<CommentsQueryResponseDto | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<Proposal[]>([]);
   const [newComment, setNewComment] = useState<string>(''); 
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [likeNum, setLikeNum] = useState<VoteCountsQueryResponseDto | null>(null);
   const maxChars = 200;
 
   //onclick 狀態
@@ -52,6 +52,8 @@ const proposalSubpage = () => {
     setSelectedImage(imageSrc);
     setOpened(true);
   };
+
+  const [likeState, setLikeState] = useState<CurrentUserVoteQueryResponseDto | null>(null);
 
   interface CommonPost {
     id: number;
@@ -99,6 +101,65 @@ const proposalSubpage = () => {
       setIsModalOpen(false); // 即使提交失敗，也關閉 Modal
     }
   };
+  
+  const handleLikeClick = async () => {
+    try {
+      if (likeState?.voteKind === VoteKind.Like) {
+        // 如果已按讚，再次點擊取消讚
+        await postsApi.apiPostsPostIdUnvotePost({ postId: Number(id) });
+        setLikeState({ voteKind: VoteKind.None });
+        setLikeNum((prev) => prev ? { ...prev, likeCount: prev.likeCount - 1 } : null);
+      } else {
+        // 如果未按讚或按了倒讚
+        await postsApi.apiPostsPostIdLikePost( {postId: Number(id) });
+        setLikeState({ voteKind: VoteKind.Like });
+        setLikeNum((prev) =>
+          prev
+            ? {
+                ...prev,
+                likeCount: prev.likeCount + 1,
+                dislikeCount:
+                  likeState?.voteKind === VoteKind.Dislike
+                    ? prev.dislikeCount - 1
+                    : prev.dislikeCount,
+              }
+            : null
+        );
+      }
+    } catch (error) {
+      console.error("按讚失敗：", error);
+    }
+  };
+  
+  const handleDislikeClick = async () => {
+    try {
+      if (likeState?.voteKind === VoteKind.Dislike) {
+        // 如果已倒讚，再次點擊取消倒讚
+        await postsApi.apiPostsPostIdUnvotePost({ postId: Number(id) });
+        setLikeState({ voteKind: VoteKind.None });
+        setLikeNum((prev) => prev ? { ...prev, dislikeCount: prev.dislikeCount - 1 } : null);
+      } else {
+        // 如果未倒讚或按了讚
+        await postsApi.apiPostsPostIdDislikePost({ postId: Number(id) });
+        setLikeState({ voteKind: VoteKind.Dislike });
+        setLikeNum((prev) =>
+          prev
+            ? {
+                ...prev,
+                dislikeCount: prev.dislikeCount + 1,
+                likeCount:
+                  likeState?.voteKind === VoteKind.Like
+                    ? prev.likeCount - 1
+                    : prev.likeCount,
+              }
+            : null
+        );
+      }
+    } catch (error) {
+      console.error("倒讚失敗：", error);
+    }
+  };
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -115,8 +176,6 @@ const proposalSubpage = () => {
         const userResponse = await userApi.apiUsersCurrentGet();
         setCurrentUser(userResponse);
 
-        // const likeResponse = await postsApi.apiPostsPostIdVotesGet({ postId: Number(id) });
-        // setLike(likeResponse);
 
         // 獲取附件資料
         if (proposalResponse.attachments) {
@@ -141,6 +200,12 @@ const proposalSubpage = () => {
           sortDirection: 'ascending',
         });
         setComments(commentsResponse);
+
+        // 獲取按讚相關資料
+        const LikeResponse = await postsApi.apiPostsPostIdVotesGet({ postId: Number(id) });
+        setLikeNum(LikeResponse);
+        const LikeStateResponse = await postsApi.apiPostsPostIdVotesMineGet({ postId: Number(id) });
+        setLikeState(LikeStateResponse);
 
         // 獲取相關貼文資料
         const response1 = await postsApi.apiPostsGet({
@@ -296,8 +361,54 @@ const proposalSubpage = () => {
               )}
             </Flex>
             
-            {/* 按讚或倒讚 */}
-            
+            {/* 按讚或倒讚 需要讀取狀態、數量 */}
+            {/* 沒按讚也沒按倒讚 '../good.png' 和 '../bad.png' */}
+            {/* 按讚變 '../good_triggered.png' 按倒讚變'../bad_triggered.png' 不可共存 */}
+            <Box>
+              <Flex align="center" mt={50} gap={8}>
+                <Image
+                  src={likeState?.voteKind === VoteKind.Like
+                    ? '../good_triggered.png'
+                    : likeState?.voteKind === VoteKind.Dislike
+                    ? '../good.png'
+                    : '../good.png'}
+                  alt="good"
+                  onClick={handleLikeClick}
+                  width={40} // 寬度
+                  height={40} // 高度
+                  fit="contain" // 確保圖片完整顯示
+                />
+                {/* 顯示按讚數量 */}
+                <Text
+                  size="xl" // Mantine 預設較大字體
+                  fw={500} // 半粗體字
+                >
+                  {likeNum?.likeCount}
+                </Text>
+
+                <Image
+                  mt={10}
+                  ml={30}
+                  src={likeState?.voteKind === VoteKind.Like
+                    ? '../bad.png'
+                    : likeState?.voteKind === VoteKind.Dislike
+                    ? '../bad_triggered.png'
+                    : '../bad.png'}
+                  alt="bad"
+                  onClick={handleDislikeClick}
+                  width={40} // 寬度
+                  height={40} // 高度
+                  fit="contain" // 確保圖片完整顯示
+                />
+                {/* 顯示按讚數量 */}
+                <Text
+                  size="xl" // Mantine 預設較大字體
+                  fw={500} // 半粗體字
+                >
+                  {likeNum?.dislikeCount}
+                </Text>
+              </Flex>
+            </Box>
 
 
             <Title order={2} mt={30}>
