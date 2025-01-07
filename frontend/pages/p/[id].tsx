@@ -94,7 +94,7 @@ const proposalSubpage = () => {
       });
   
       // 更新狀態顯示最新的留言
-      setComments(response); // 更新留言狀態為最新留言
+      window.location.reload();
   
     } catch (err) {
       setError('提交評論失敗'); // 發生錯誤時設置錯誤信息
