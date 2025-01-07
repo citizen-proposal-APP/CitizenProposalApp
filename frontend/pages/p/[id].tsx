@@ -143,27 +143,51 @@ const proposalSubpage = () => {
         setComments(commentsResponse);
 
         // 獲取相關貼文資料
-      const response1 = await postsApi.apiPostsGet({
-        range: 2,
-        tag: proposalResponse.tags[0].name,
-      });
-      const response2 = await postsApi.apiPostsGet({
-        range: 1,
-        tag: proposalResponse.author.username,
-      });
+        const response1 = await postsApi.apiPostsGet({
+          sortBy: 'byId',
+          sortDirection: 'ascending',
+          start: 1,
+          range: 10,  // 修改為 10 筆
+          tag: proposalResponse.tags[0].name,
+        });
+        
+        const response2 = await postsApi.apiPostsGet({
+          sortBy: 'byId',
+          sortDirection: 'ascending',
+          start: 1,
+          range: 10,  // 修改為 10 筆
+          tag: proposalResponse.tags[1].name,
+        });
+        
+        // 合併兩個回應並去除重複貼文
+        const allPosts = [
+          ...(response1?.posts ?? []),
+          ...(response2?.posts ?? [])
+        ];
 
-      const mergedPosts: CommonPost[] = [...(response1?.posts?? []), ...(response2?.posts?? [])].map((post) => ({
-        id: post.id,
-        title: post.title,
-        postedTime: new Date(post.postedTime).toISOString(),
-        tags: post.tags.map((tag) => ({ id: tag.id, name: tag.name, tagType: tag.tagType})),
-      }));
+        const currentPostId = proposalResponse.id;
+
+        // 去除重複的貼文，這裡假設 id 是唯一的
+        const uniquePosts = Array.from(new Set(allPosts.map(post => post.id)))
+        .map(id => allPosts.find(post => post.id === id))
+        .filter((post): post is PostQueryResponseDto => post !== undefined && post.id !== currentPostId);
+        
+        // 隨機挑選 3 篇貼文
+        const randomPosts = uniquePosts.sort(() => Math.random() - 0.5).slice(0, 3);
+        
+        // 格式化結果
+        const mergedPosts: CommonPost[] = randomPosts.map((post) => ({
+          id: post.id,
+          title: post.title,
+          postedTime: new Date(post.postedTime).toISOString(),
+          tags: post.tags.map((tag) => ({ id: tag.id, name: tag.name, tagType: tag.tagType })),
+        }));
 
       
       const proposals: Proposal[] = mergedPosts.map((post) => ({
         ...post,
         status: '1',
-        thumbnail: '',
+        thumbnail: '../logo.png',
         
        }));
        setRelatedPosts(proposals);
@@ -205,7 +229,7 @@ const proposalSubpage = () => {
               <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing={{ base: 'md', sm: 'xl' }} verticalSpacing={{ base: 'md', sm: 'xl' }}>
                 {attachments.map((attachment) => (
                   <div key={attachment.id}>
-                    {attachment.name.endsWith('.jpg') || attachment.name.endsWith('.png') || attachment.name.endsWith('.jpeg') ? (
+                    {attachment.name.endsWith('.jpg') || attachment.name.endsWith('.png') || attachment.name.endsWith('.jpeg') || attachment.name.endsWith('.gif')? (
                       <div>
                         <AspectRatio ratio={4 / 3} key={attachment.id} style={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)' }}>
                           <Image src={attachment.url} alt={`Attachment ${attachment.id}`} fit="cover" onClick={() => handleImageClick(attachment.url)} />
@@ -249,16 +273,24 @@ const proposalSubpage = () => {
               justify="center" 
             >
               {relatedPosts.length > 0 ? (
-                relatedPosts.map((proposal) => (
-                  proposal.thumbnail='../logo.png',
-                  <ProposalCard
+                relatedPosts.map((proposal) => {
+                  // 計算寬度
+                  let cardWidth = '30%'; // 默認為三個卡片一行
+                  if (relatedPosts.length === 1) {
+                    cardWidth = '45%'; // 只有一篇，佔滿整行
+                  } else if (relatedPosts.length === 2) {
+                    cardWidth = '50%'; // 兩篇，佔滿整行但留有小空隙
+                  }
 
-                    key={proposal.id}
-                    data={proposal}
-                    height="auto"
-                    width="45%"
-                  />
-                ))
+                  return (
+                    <ProposalCard
+                      key={proposal.id}
+                      data={proposal}
+                      height="auto"
+                      width={cardWidth} // 根據數量動態設置寬度
+                    />
+                  );
+                })
               ) : (
                 <Text>沒有相似的提案</Text>
               )}
