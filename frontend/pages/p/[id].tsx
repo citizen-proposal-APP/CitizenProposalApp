@@ -365,7 +365,7 @@ const proposalSubpage = () => {
             {/* 沒按讚也沒按倒讚 '../good.png' 和 '../bad.png' */}
             {/* 按讚變 '../good_triggered.png' 按倒讚變'../bad_triggered.png' 不可共存 */}
             <Box>
-              <Flex align="center" mt={50} gap={8}>
+              <Flex align="center" mt={50} gap={10}>
                 <Image
                   src={likeState?.voteKind === VoteKind.Like
                     ? '../good_triggered.png'
@@ -382,6 +382,7 @@ const proposalSubpage = () => {
                 <Text
                   size="xl" // Mantine 預設較大字體
                   fw={500} // 半粗體字
+                  style={{ width: 40, textAlign: 'center' }}
                 >
                   {likeNum?.likeCount}
                 </Text>
@@ -404,6 +405,7 @@ const proposalSubpage = () => {
                 <Text
                   size="xl" // Mantine 預設較大字體
                   fw={500} // 半粗體字
+                  style={{ width: 40, textAlign: 'center' }}
                 >
                   {likeNum?.dislikeCount}
                 </Text>
