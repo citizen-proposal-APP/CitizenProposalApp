@@ -9,7 +9,7 @@ namespace CitizenProposalApp;
 public record RegisterRequestDto
 {
     /// <summary>
-    /// The username to use.
+    /// The username to use. The max length is 32.
     /// </summary>
     [MaxLength(32)]
     [BindRequired]

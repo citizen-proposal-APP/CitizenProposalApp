@@ -26,7 +26,7 @@ export interface TagQueryResponseDto {
      */
     id: number;
     /**
-     * The name of this tag.
+     * The name of this tag. The max length is 32.
      * @type {string}
      * @memberof TagQueryResponseDto
      */

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CitizenProposalApp;
 
@@ -15,13 +16,13 @@ public class Post
     public int Id { get; init; }
 
     /// <summary>
-    /// The title of this post.
+    /// The title of this post. The max length is 100.
     /// </summary>
     [MaxLength(100)]
     public required string Title { get; set; }
 
     /// <summary>
-    /// The text of this post.
+    /// The text of this post. The max length is 2000.
     /// </summary>
     [MaxLength(2000)]
     public required string Content { get; set; }
@@ -44,10 +45,21 @@ public class Post
     /// <summary>
     /// The <see cref="User"/> who made this post.
     /// </summary>
+    [InverseProperty(nameof(User.Posts))]
     public required User Author { get; set; }
 
     /// <summary>
     /// The <see cref="Attachment"/>s on this post.
     /// </summary>
     public required ICollection<Attachment> Attachments { get; set; }
+
+    /// <summary>
+    /// The <see cref="User"/>s who liked this post.
+    /// </summary>
+    public required ICollection<User> LikedUsers { get; set; }
+
+    /// <summary>
+    /// The <see cref="User"/>s who disliked this post.
+    /// </summary>
+    public required ICollection<User> DislikedUsers { get; set; }
 }
