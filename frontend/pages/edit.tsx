@@ -1,7 +1,7 @@
 import { Layout } from '@/components/Layout/Layout';
 import { ProposalCard } from '@/components/ProposalCard/ProposalCard';
 import { Proposal } from '@/types/Proposal';
-import { Tag, TagType } from '@/types/Tag';
+import { Tag } from '@/types/Tag';
 import React, { useState, useRef } from 'react';
 import { IconUpload, IconX } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation'
@@ -13,7 +13,7 @@ import '@mantine/dropzone/styles.css';
 import { Notifications, notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 import { IconPhoto, IconVideo } from '@tabler/icons-react';
-import { Configuration, AiApi, PostsApi, TagsApi } from '@/openapi';
+import { Configuration, AiApi, AttachmentsApi, PostsApi, TagsApi } from '@/openapi';
 
 export default function EditPage() {
   const router = useRouter()
@@ -34,8 +34,10 @@ export default function EditPage() {
   */
   const [tagList, setTagList] = useState<any[]>([]);
   const [tagNameValue, setTagNameValue] = useState<string[]>([]);
+  const [similarProposals, setSimilarProposals] = useState<Proposal[]>([])
   const MAX_FILE_SIZE = 50 * 1024 ** 2;
   const WIDTH_OFFSET = 65;
+  const MAX_SIMILAR_PROPOSALS = 10;
   /*
   const MAX_TAGS = 3;
   const MAX_PILL_LENGTH = 10;
@@ -64,6 +66,7 @@ export default function EditPage() {
     },
   });
 
+  /*
   const similarProposals: Proposal[] = [
     {
       id: 0,
@@ -115,6 +118,7 @@ export default function EditPage() {
       ],
     },
   ];
+  */
   
   function inputValidation() {
 		form.isValid() ? nextStep() : handleNotification("text")
@@ -232,6 +236,10 @@ export default function EditPage() {
   function extractTagNames(tags: Tag[]): string[] {
     return tags.map((tag) => tag.name);
   }
+  function updateTags(newTagNames: string[]) {
+    setTagNameValue(newTagNames)
+    updateSimilarProposals()
+  }
   /*
   function findTag(input:string): Tag | undefined {
     return tagList.find((tag) => tag.name == input)
@@ -295,6 +303,7 @@ export default function EditPage() {
   });
 
   const aiApi = new AiApi(conf)
+  const attachmentApi = new AttachmentsApi(conf)
   const postsApi = new PostsApi(conf)
   const tagsApi = new TagsApi(conf)
 
@@ -344,6 +353,46 @@ export default function EditPage() {
     try {
       const response = await aiApi.apiAiGuesstagsGet({title: titleValue})
       setTagNameValue(response)
+      updateSimilarProposals
+    } catch (error) {
+      console.error("錯誤: ", error);
+    }
+  }
+
+  const updateSimilarProposals = () => {
+    setSimilarProposals([])
+    try {
+      tagNameValue.forEach(async tag => {
+        const similarPost:Proposal = {
+          id: -1,
+          status: "published",
+          title: "",
+          thumbnail: "", // url
+          // content: string;
+          postedTime: "",
+          tags: [],}
+        const postResponse = await postsApi.apiPostsGet({keyword: titleValue, tag: tag, isAiEnabled: true})
+        for (let index = 0; index < postResponse.posts.length; index++) {
+          if (similarProposals.length >= MAX_SIMILAR_PROPOSALS) {
+            break
+          }
+          const foundPost = postResponse.posts[index];
+          if ((!similarProposals.some((post) => post.id === foundPost.id))) {
+            similarPost.id = foundPost.id
+            similarPost.title = foundPost.title
+            similarPost.postedTime = foundPost.postedTime.toISOString()
+            similarPost.tags = foundPost.tags
+            if (foundPost.attachments.length >= 1) {
+              const firstAttachment = await attachmentApi.apiAttachmentsIdGet({id: foundPost.attachments[0].id})
+              similarPost.thumbnail = await firstAttachment.text()
+            }
+            else {
+              similarPost.thumbnail = "https://via.placeholder.com/150"
+            }
+            setSimilarProposals((current) => [...current, similarPost])
+          }
+        }
+      });
     } catch (error) {
       console.error("錯誤: ", error);
     }
@@ -553,7 +602,7 @@ export default function EditPage() {
               data={extractTagNames(tagList)}
               clearable
               value={tagNameValue}
-              onChange={setTagNameValue}
+              onChange={(val) => updateTags(val)}
               onSearchChange={(keyword) => searchTagList(keyword)}
             />
             <Group justify="space-between" gap={"xl"} grow>
