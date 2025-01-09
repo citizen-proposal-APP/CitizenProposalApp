@@ -41,7 +41,7 @@ export function ProposalCard({ data, height = '100%', width = 'auto' }: Proposal
       withBorder
       radius="md"
       component="a"
-      href="#"
+      href={'/p/' + data.id}
       className={classes.card}
       h={height}
       w={width}
