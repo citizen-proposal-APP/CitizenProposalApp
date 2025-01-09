@@ -21,6 +21,7 @@ interface ProposalCardProps {
 }
 
 export function ProposalCard({ data, height = '100%', width = 'auto' }: ProposalCardProps) {
+  data.tags.sort((a, b) => (a.tagType === TagType.department ? -1 : 1)); // ensure department tags are displayed first
   const tags = data.tags.slice(0, MAX_TAGS_DISPLAYED).map((tag) => (
     <Badge key={tag.id} tt="none" variant={getTagVariant(tag.tagType)}>
       {tag.tagType !== TagType.topic || tag.name.length <= MAX_PILL_LENGTH
