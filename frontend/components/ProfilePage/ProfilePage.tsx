@@ -95,15 +95,17 @@ const ProfilePage = ({ userId }: ProfilePageProps) => { // 接收 userId 作為�
 
   // 獲取當前登入的使用者資料
   useEffect(() => {
-      usersApi
-        .apiUsersCurrentGet()
-        .then((data) => {
-          setCurrentUser(data); // 設定當前使用者資料
-        })
-        .catch((error) => {
-          console.error('錯誤:', error);
-          setError('無法取得當前使用者資料');
-        });
+    const fetchCurrentUser = async () => {
+      try {
+        const data = await usersApi.apiUsersCurrentGet();
+        setCurrentUser(data); // 設定當前使用者資料
+      } catch (error) {
+        console.error('錯誤:', error);
+        setError('無法取得當前使用者資料');
+      }
+    };
+
+    fetchCurrentUser();
   }, []);
 
   // 檢查資料是否加載完成，還沒加載完成時顯示 loading
@@ -135,10 +137,16 @@ const ProfilePage = ({ userId }: ProfilePageProps) => { // 接收 userId 作為�
   return (
     <Container>
       <Stack gap="md">
-        {user && <UserInfoSection user={user} />}
-        // {user && currentUser?.id === Number(userId) && (  // 只有當前登入的使用者 id 和 profile 頁面的 id 相同時顯示編輯按鈕
-        //   <UserInfoSection user={user} onEdit={() => setIsModalOpen(true)} />
-        // )}
+        {user && (
+          <UserInfoSection
+            user={user}
+            onEdit={() => setIsModalOpen(currentUser?.id === Number(userId))}
+          />
+        )}
+        {/* {user &&
+          currentUser?.id === Number(userId) && ( // 只有當前登入的使用者 id 和 profile 頁面的 id 相同時顯示編輯按鈕
+            <UserInfoSection user={user} onEdit={() => setIsModalOpen(true)} />
+          )} */}
         {isProposalsSet && publishedProposals.length > 0 && (
           <PostSection title="已發表" proposals={publishedProposals} />
         )}
