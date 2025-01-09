@@ -8,7 +8,7 @@ interface User {
 
 interface UserInfoSectionProps {
   user: User;
-  onEdit: () => void; // 新增 onEdit 屬性
+  onEdit?: () => void; // 新增 onEdit 屬性
 }
 
 const UserInfoSection = ({ user, onEdit }: UserInfoSectionProps) => (
@@ -37,20 +37,21 @@ const UserInfoSection = ({ user, onEdit }: UserInfoSectionProps) => (
         </Text>
       </Grid.Col>
 
-      {/* 編輯按鈕區域 */}
-      <Grid.Col
-        span={12}
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: '10px',
-        }}
-      >
-        <Button variant="outline" size="xs" onClick={onEdit}>
-          編輯個人資訊
-        </Button>
-      </Grid.Col>
+      {onEdit && (
+        <Grid.Col
+          span={12}
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: '10px',
+          }}
+        >
+          <Button variant="outline" size="xs" onClick={onEdit}>
+            編輯個人資訊
+          </Button>
+        </Grid.Col>
+      )}
     </Grid>
   </Card>
 );

@@ -140,13 +140,10 @@ const ProfilePage = ({ userId }: ProfilePageProps) => { // 接收 userId 作為�
         {user && (
           <UserInfoSection
             user={user}
-            onEdit={() => setIsModalOpen(currentUser?.id === Number(userId))}
+            // 只有當前登入的使用者 id 和 profile 頁面的 id 相同時顯示編輯按鈕
+            onEdit={currentUser?.id === Number(userId) ? () => setIsModalOpen(true) : undefined}
           />
         )}
-        {/* {user &&
-          currentUser?.id === Number(userId) && ( // 只有當前登入的使用者 id 和 profile 頁面的 id 相同時顯示編輯按鈕
-            <UserInfoSection user={user} onEdit={() => setIsModalOpen(true)} />
-          )} */}
         {isProposalsSet && publishedProposals.length > 0 && (
           <PostSection title="已發表" proposals={publishedProposals} />
         )}
