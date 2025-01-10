@@ -173,8 +173,13 @@ const proposalSubpage = () => {
         setProposalData(proposalResponse);
   
         // 獲取當前用戶資料
-        const userResponse = await userApi.apiUsersCurrentGet();
+      let userResponse: UserQueryResponseDto | null = null;
+      try {
+        userResponse = await userApi.apiUsersCurrentGet();
         setCurrentUser(userResponse);
+      } catch (userError) {
+        console.warn('未登入用戶，無法獲取個人資料');
+      }
 
 
         // 獲取附件資料
@@ -204,8 +209,16 @@ const proposalSubpage = () => {
         // 獲取按讚相關資料
         const LikeResponse = await postsApi.apiPostsPostIdVotesGet({ postId: Number(id) });
         setLikeNum(LikeResponse);
-        const LikeStateResponse = await postsApi.apiPostsPostIdVotesMineGet({ postId: Number(id) });
-        setLikeState(LikeStateResponse);
+
+        if (userResponse) {
+          try {
+            const likeStateResponse = await postsApi.apiPostsPostIdVotesMineGet({ postId: Number(id) });
+            setLikeState(likeStateResponse);
+          } catch (likeError) {
+            console.warn('無法獲取按讚狀態', likeError);
+          }
+        }
+        
 
         // 獲取相關貼文資料
         const response1 = await postsApi.apiPostsGet({
@@ -361,56 +374,72 @@ const proposalSubpage = () => {
               )}
             </Flex>
             
-            {/* 按讚或倒讚 需要讀取狀態、數量 */}
-            {/* 沒按讚也沒按倒讚 '../good.png' 和 '../bad.png' */}
-            {/* 按讚變 '../good_triggered.png' 按倒讚變'../bad_triggered.png' 不可共存 */}
             <Box>
               <Flex align="center" mt={50} gap={10}>
+                {/* 按讚按鈕 */}
                 <Image
-                  src={likeState?.voteKind === VoteKind.Like
-                    ? '../good_triggered.png'
-                    : likeState?.voteKind === VoteKind.Dislike
-                    ? '../good.png'
-                    : '../good.png'}
+                  src={
+                    currentUser
+                      ? likeState?.voteKind === VoteKind.Like
+                        ? '../good_triggered.png'
+                        : '../good.png'
+                      : '../good.png'
+                  }
                   alt="good"
-                  onClick={handleLikeClick}
-                  width={40} // 寬度
-                  height={40} // 高度
-                  fit="contain" // 確保圖片完整顯示
+                  onClick={currentUser ? handleLikeClick : undefined}
+                  width={40}
+                  height={40}
+                  fit="contain"
+                  style={{
+                    cursor: currentUser ? 'pointer' : 'not-allowed', // 改變指標樣式
+                    opacity: currentUser ? 1 : 0.5, // 禁用時降低透明度
+                  }}
                 />
-                {/* 顯示按讚數量 */}
+                {/* 按讚數量 */}
                 <Text
-                  size="xl" // Mantine 預設較大字體
-                  fw={500} // 半粗體字
+                  size="xl"
+                  fw={500}
                   style={{ width: 40, textAlign: 'center' }}
                 >
-                  {likeNum?.likeCount}
+                  {likeNum?.likeCount || 0}
                 </Text>
 
+                {/* 倒讚按鈕 */}
                 <Image
-                  mt={10}
-                  ml={30}
-                  src={likeState?.voteKind === VoteKind.Like
-                    ? '../bad.png'
-                    : likeState?.voteKind === VoteKind.Dislike
-                    ? '../bad_triggered.png'
-                    : '../bad.png'}
+                  src={
+                    currentUser
+                      ? likeState?.voteKind === VoteKind.Dislike
+                        ? '../bad_triggered.png'
+                        : '../bad.png'
+                      : '../bad.png'
+                  }
                   alt="bad"
-                  onClick={handleDislikeClick}
-                  width={40} // 寬度
-                  height={40} // 高度
-                  fit="contain" // 確保圖片完整顯示
+                  onClick={currentUser ? handleDislikeClick : undefined}
+                  width={40}
+                  height={40}
+                  fit="contain"
+                  style={{
+                    cursor: currentUser ? 'pointer' : 'not-allowed', // 改變指標樣式
+                    opacity: currentUser ? 1 : 0.5, // 禁用時降低透明度
+                  }}
                 />
-                {/* 顯示按讚數量 */}
+                {/* 倒讚數量 */}
                 <Text
-                  size="xl" // Mantine 預設較大字體
-                  fw={500} // 半粗體字
+                  size="xl"
+                  fw={500}
                   style={{ width: 40, textAlign: 'center' }}
                 >
-                  {likeNum?.dislikeCount}
+                  {likeNum?.dislikeCount || 0}
                 </Text>
               </Flex>
+              {/* 未登入時的提示 */}
+              {!currentUser && (
+                <Text color="red" mt={10} size="sm">
+                  請登入以使用按讚或倒讚功能
+                </Text>
+              )}
             </Box>
+
 
 
             <Title order={2} mt={30}>
