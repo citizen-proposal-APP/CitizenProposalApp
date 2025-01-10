@@ -1,12 +1,13 @@
 # Citizen Proposal App
 
-- [Backend Development](#backend-development)
-  - [With Visual Studio](#with-visual-studio)
-  - [Without Visual Studio](#without-visual-studio)
-- [Frontend Development](#frontend-development)
-  - [Docker](#docker)
-  - [Components](#components)
-- [AI Development](#ai-development)
+- [Citizen Proposal App](#citizen-proposal-app)
+  - [Backend Development](#backend-development)
+    - [With Visual Studio](#with-visual-studio)
+    - [Without Visual Studio](#without-visual-studio)
+  - [Frontend Development](#frontend-development)
+    - [Docker](#docker)
+    - [Components](#components)
+  - [AI Development](#ai-development)
 
 ## Backend Development
 

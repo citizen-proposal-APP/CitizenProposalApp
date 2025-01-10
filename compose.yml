@@ -19,6 +19,7 @@ services:
     env_file:
       - path: env/backend.env
         required: false
+    profiles: [backend]
   db:
     container_name: CitizenProposalAppDb
     image: mysql:8.0.36 # The current latest supported version by Pomelo.EntityFrameworkCore.MySql

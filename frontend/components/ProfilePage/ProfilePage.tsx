@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Stack, Modal, Button, TextInput, Alert } from '@mantine/core';
+import { Container, Stack, Modal, Button, Text, TextInput, Alert } from '@mantine/core';
 import { useForm } from '@mantine/form'; // 引入 Mantine 的 useForm
 import UserInfoSection from './UserInfoSection';
 import PostSection from './PostSection';
 import { Proposal } from '@/types/Proposal'; // 引入 Proposal 類型
-import { Configuration, UsersApi, PostsApi } from '@/openapi';
+import { Configuration, UsersApi, PostsApi, PostsQueryResponseDto, PostQueryResponseDto } from '@/openapi';
+import { Tag, TagType } from '@/types/Tag';
 
 interface User {
   id: number;
@@ -12,24 +13,44 @@ interface User {
 }
 
 interface ProfilePageProps {
-  userId: string; // 接收 userId 作為屬性
+  userId: string; // 新增 userId 作為屬性
 }
 
+const convertPostToProposal = (post: PostQueryResponseDto): Proposal => {
+  const tags: Tag[] = post.tags.map((tag) => ({
+    id: tag.id,
+    tagType: tag.tagType || TagType.topic,
+    name: tag.name,
+  }));
+
+  return {
+    id: post.id,
+    status: 'published',
+    title: post.title,
+    thumbnail: '',
+    postedTime: post.postedTime instanceof Date
+      ? post.postedTime.toISOString()
+      : post.postedTime,
+    tags: tags,
+  };
+};
+
 const configuration = new Configuration({
-    basePath: 'http://localhost:8080',
-    credentials: 'include',
-  });
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH!,
+  credentials: 'include',
+});
 
-  const usersApi = new UsersApi(configuration);
-  const postsApi = new PostsApi(configuration);
+const usersApi = new UsersApi(configuration);
+const postsApi = new PostsApi(configuration);
 
-const ProfilePage = ({ userId }: ProfilePageProps) => {
+const ProfilePage = ({ userId }: ProfilePageProps) => { // 接收 userId 作為屬性
   const [user, setUser] = useState<User | null>(null);
   const [publishedProposals, setPublishedProposals] = useState<Proposal[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null); // 用來儲存錯誤訊息
+  const [isProposalsSet, setIsProposalsSet] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null); // 儲存當前登入的使用者資料
-  
+
   // 使用 Mantine 的 useForm 來處理表單
   const form = useForm({
     initialValues: {
@@ -40,22 +61,29 @@ const ProfilePage = ({ userId }: ProfilePageProps) => {
     },
   });
 
-  // 獲取指定 userId 的使用者資料
   useEffect(() => {
+    if (!userId) {
+      setError('無效的使用者 ID');
+      return;
+    }
+
     const fetchData = async () => {
       try {
-        // 取得使用者資料
         const userResponse = await usersApi.apiUsersIdGet({ id: Number(userId) });
         setUser({ id: userResponse.id, username: userResponse.username });
         form.setValues({ username: userResponse.username });
 
-        // 根據使用者 username 過濾該使用者發表的文章（假設 author 對應 username）
-        // const postsResponse: PostsQueryResponseDto = await postsApi.apiPostsGet({ author: userResponse.username });
-        
-        // postsResponse.posts 是 PostQueryResponseDto[]
-        // 將之轉換為 Proposal[]
-        // const proposals = (postsResponse.posts || []).map((p) => convertPostToProposal(p));
-        // setPublishedProposals(proposals);
+        const postsResponse: PostsQueryResponseDto = await postsApi.apiPostsGet({ author: userResponse.username });
+        const postIds = postsResponse.posts?.map((post) => post.id) || [];
+
+        const proposals: Proposal[] = [];
+        for (const postId of postIds) {
+          const postDetail: PostQueryResponseDto = await postsApi.apiPostsIdGet({ id: postId });
+          proposals.push(convertPostToProposal(postDetail));
+        }
+
+        setPublishedProposals(proposals);
+        setIsProposalsSet(true);
       } catch (err) {
         console.error('錯誤:', err);
         setError('無法取得使用者或貼文資料');
@@ -64,19 +92,20 @@ const ProfilePage = ({ userId }: ProfilePageProps) => {
 
     fetchData();
   }, [userId]);
-  
 
   // 獲取當前登入的使用者資料
   useEffect(() => {
-      usersApi
-        .apiUsersCurrentGet()
-        .then((data) => {
-          setCurrentUser(data); // 設定當前使用者資料
-        })
-        .catch((error) => {
-          console.error('錯誤:', error);
-          setError('無法取得當前使用者資料');
-        });
+    const fetchCurrentUser = async () => {
+      try {
+        const data = await usersApi.apiUsersCurrentGet();
+        setCurrentUser(data); // 設定當前使用者資料
+      } catch (error) {
+        // console.error('錯誤:', error);
+        // setError('無法取得當前使用者資料');
+      }
+    };
+
+    fetchCurrentUser();
   }, []);
 
   // 檢查資料是否加載完成，還沒加載完成時顯示 loading
@@ -108,10 +137,19 @@ const ProfilePage = ({ userId }: ProfilePageProps) => {
   return (
     <Container>
       <Stack gap="md">
-        {user && currentUser?.id === Number(userId) && (  // 只有當前登入的使用者 id 和 profile 頁面的 id 相同時顯示編輯按鈕
-          <UserInfoSection user={user} onEdit={() => setIsModalOpen(true)} />
+        {user && (
+          <UserInfoSection
+            user={user}
+            // 只有當前登入的使用者 id 和 profile 頁面的 id 相同時顯示編輯按鈕
+            onEdit={currentUser?.id === Number(userId) ? () => setIsModalOpen(true) : undefined}
+          />
         )}
-        {user && <PostSection title="已發表" proposals={publishedProposals} />}
+        {isProposalsSet && publishedProposals.length > 0 && (
+          <PostSection title="已發表" proposals={publishedProposals} />
+        )}
+        {isProposalsSet && publishedProposals.length === 0 && (
+          <Text style={{ textAlign: 'center' }}>該使用者尚未發表任何文章。</Text>
+        )}
 
         <Modal
           opened={isModalOpen}
