@@ -173,13 +173,13 @@ const proposalSubpage = () => {
         setProposalData(proposalResponse);
   
         // 獲取當前用戶資料
-      let userResponse: UserQueryResponseDto | null = null;
-      try {
-        userResponse = await userApi.apiUsersCurrentGet();
-        setCurrentUser(userResponse);
-      } catch (userError) {
-        console.warn('未登入用戶，無法獲取個人資料');
-      }
+        let userResponse: UserQueryResponseDto | null = null;
+        try {
+          userResponse = await userApi.apiUsersCurrentGet();
+          setCurrentUser(userResponse);
+        } catch (userError) {
+          console.warn('未登入用戶，無法獲取個人資料');
+        }
 
 
         // 獲取附件資料
@@ -219,7 +219,6 @@ const proposalSubpage = () => {
           }
         }
         
-
         // 獲取相關貼文資料
         const response1 = await postsApi.apiPostsGet({
           sortBy: 'byId',
@@ -262,15 +261,13 @@ const proposalSubpage = () => {
         }));
 
       
-      const proposals: Proposal[] = mergedPosts.map((post) => ({
-        ...post,
-        status: '1',
-        thumbnail: '../logo.png',
+        const proposals: Proposal[] = mergedPosts.map((post) => ({
+          ...post,
+          status: '1',
+          thumbnail: '../logo.png',
         
        }));
-       setRelatedPosts(proposals);
-      
-
+        setRelatedPosts(proposals);
         setLoading(false);
       } catch (err) {
         setError('無法獲取資料');
@@ -293,28 +290,50 @@ const proposalSubpage = () => {
             <Title order={1} mt="md" size={36}>
               {proposalData.title}
             </Title>
-
-            <Group mt="md">
-              {proposalData.tags.map((tag) => (
-                <Badge key={tag.id} size="lg" color="gray">
-                  {tag.name}
-                </Badge>
-              ))}
-            </Group>
+            
+            {proposalData?.tags && proposalData.tags.length > 0 && (
+              <Group mt="md">
+                {proposalData.tags.map((tag) => (
+                  <Badge key={tag.id} size="lg" color="gray">
+                    {tag.name}
+                  </Badge>
+                ))}
+              </Group>
+            )}
 
             {/* 提案附件 */}
             <Box mt={30}>
-              <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing={{ base: 'md', sm: 'xl' }} verticalSpacing={{ base: 'md', sm: 'xl' }}>
+              <SimpleGrid 
+                cols={{ base: 1, sm: 2, lg: 3 }} 
+                spacing={{ base: 'md', sm: 'xl' }} 
+                verticalSpacing={{ base: 'md', sm: 'xl' }}
+              >
                 {attachments.map((attachment) => (
                   <div key={attachment.id}>
-                    {attachment.name.endsWith('.jpg') || attachment.name.endsWith('.png') || attachment.name.endsWith('.jpeg') || attachment.name.endsWith('.gif')? (
+                    {attachment.name.endsWith('.jpg') || attachment.name.endsWith('.png') || attachment.name.endsWith('.jpeg') || attachment.name.endsWith('.gif') ? (
                       <div>
-                        <AspectRatio ratio={4 / 3} key={attachment.id} style={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)' }}>
-                          <Image src={attachment.url} alt={`Attachment ${attachment.id}`} fit="cover" onClick={() => handleImageClick(attachment.url)} />
+                        <AspectRatio 
+                          ratio={4 / 3} 
+                          key={attachment.id} 
+                          style={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)' }}
+                        >
+                          <Image 
+                            src={attachment.url} 
+                            alt={`Attachment ${attachment.id}`} 
+                            fit="cover" 
+                            onClick={() => handleImageClick(attachment.url)} 
+                          />
                         </AspectRatio>
                       </div>
                     ) : (
-                      <Button variant="outline" component="a" href={attachment.url} target="_blank" rel="noopener noreferrer">
+                      <Button 
+                        variant="outline" 
+                        component="a" 
+                        href={attachment.url} 
+                        download={attachment.name} // 確保下載時保留文件名和副檔名
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                      >
                         {attachment.name} - Download
                       </Button>
                     )}
@@ -322,6 +341,7 @@ const proposalSubpage = () => {
                 ))}
               </SimpleGrid>
             </Box>
+
             <Modal opened={opened} onClose={() => setOpened(false)} size="lg">
               <Image src={selectedImage} alt="Large view" fit="contain" w="100%" h="auto" />
             </Modal>
