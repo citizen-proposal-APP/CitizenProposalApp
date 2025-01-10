@@ -38,37 +38,49 @@ export function KeywordSearch({ sortOption, tags, author }: KeywordSearchProps) 
       }));
   
       let filteredPosts :any = [];
+      if (keyword) {
+        if (AI) {
+          // AI 啟用狀態：呼叫 AI API 生成標籤後進行篩選
+          try {
+            const generatedTags = await aiApi.apiAiGuesstagsGet({ title: keyword });
+            setAiTags(generatedTags || []);
     
-    if (AI) {
-      // AI 啟用狀態：呼叫 AI API 生成標籤後進行篩選
-      try {
-        const generatedTags = await aiApi.apiAiGuesstagsGet({ title: keyword });
-        setAiTags(generatedTags || []);
-
+            filteredPosts = normalizedPosts.filter(post => {
+              // 僅篩選符合 AI 生成標籤的貼文
+              return generatedTags.some(tagName =>
+                post.tags.some(tag => tag.name === tagName)
+              );
+            });
+          } catch (error) {
+            console.error('AI 生成 TAG 時發生錯誤:', error);
+          }
+        } else {
+          // 非 AI 狀態：執行原本的篩選邏輯
+          filteredPosts = normalizedPosts.filter(post => {
+            const titleMatch = post.title?.toLowerCase().includes(keyword.toLowerCase());
+            const contentMatch = post.content?.toLowerCase().includes(keyword.toLowerCase());
+    
+            const tagsMatch = tags.every(tagName =>
+              post.tags.some(tag => tag.name === tagName)
+            );
+    
+            const authorMatch = author ? post.author.username === author : true;
+    
+            return (titleMatch || contentMatch) && tagsMatch && authorMatch;
+          });
+        }
+      } else {
+        // 顯示所有提案並篩選條件
         filteredPosts = normalizedPosts.filter(post => {
-          // 僅篩選符合 AI 生成標籤的貼文
-          return generatedTags.some(tagName =>
+          const tagsMatch = tags.every(tagName =>
             post.tags.some(tag => tag.name === tagName)
           );
+          const authorMatch = author ? post.author.username === author : true;
+
+          return tagsMatch && authorMatch;
         });
-      } catch (error) {
-        console.error('AI 生成 TAG 時發生錯誤:', error);
       }
-    } else {
-      // 非 AI 狀態：執行原本的篩選邏輯
-      filteredPosts = normalizedPosts.filter(post => {
-        const titleMatch = post.title?.toLowerCase().includes(keyword.toLowerCase());
-        const contentMatch = post.content?.toLowerCase().includes(keyword.toLowerCase());
-
-        const tagsMatch = tags.every(tagName =>
-          post.tags.some(tag => tag.name === tagName)
-        );
-
-        const authorMatch = author ? post.author.username === author : true;
-
-        return (titleMatch || contentMatch) && tagsMatch && authorMatch;
-      });
-    }
+      
       // 排序處理
       let sortedPosts = [...filteredPosts];
       if (sortOption === '根據議題 ID 升序') {
@@ -105,17 +117,10 @@ export function KeywordSearch({ sortOption, tags, author }: KeywordSearchProps) 
     const value = event.target.value.trim();
     setKeyword(value);
 
-    if (value) {
-      searchPostsByCondition(value);
-    } else {
-      setSearchResults([]);
-    }
+    searchPostsByCondition(value);
   };
-
   useEffect(() => {
-    if (keyword) {
-      searchPostsByCondition(keyword);
-    }
+    searchPostsByCondition(keyword);
   }, [sortOption, tags, author]);
 
   return (

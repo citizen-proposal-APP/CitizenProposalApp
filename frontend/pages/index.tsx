@@ -132,16 +132,9 @@ export default function HomePage() {
       <Container size="xl">
         <ImageCarousel images={images} />
         <Title order={2} mt="md" mb="md">
-          熱門議題
+          提案
         </Title>
         <KeywordSearch sortOption={sortOption} tags={tagNameValue} author={author} />
-        <SimpleGrid cols={{ base: 1, sm: 3 }} mt="md">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <Stack key={index}>
-              {items.slice((index * items.length) / 3, ((index + 1) * items.length) / 3)}
-            </Stack>
-          ))}
-        </SimpleGrid>
       </Container>
     </Layout>
   );
