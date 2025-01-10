@@ -35,6 +35,8 @@ export default function EditPage() {
   const [tagList, setTagList] = useState<any[]>([]);
   const [tagNameValue, setTagNameValue] = useState<string[]>([]);
   const [similarProposals, setSimilarProposals] = useState<Proposal[]>([])
+  const [imageSourceUrl, setImageSourceUrl] = useState("");
+
   const MAX_FILE_SIZE = 50 * 1024 ** 2;
   const WIDTH_OFFSET = 65;
   const MAX_SIMILAR_PROPOSALS = 10;
@@ -384,10 +386,8 @@ export default function EditPage() {
             similarPost.tags = foundPost.tags
             if (foundPost.attachments.length >= 1) {
               const firstAttachment = await attachmentApi.apiAttachmentsIdGet({id: foundPost.attachments[0].id})
-              similarPost.thumbnail = await firstAttachment.text()
-            }
-            else {
-              similarPost.thumbnail = "https://via.placeholder.com/150"
+              similarPost.thumbnail = URL.createObjectURL(firstAttachment)
+              console.log(similarPost.thumbnail)
             }
             setSimilarProposals((current) => [...current, similarPost])
           }
