@@ -40,7 +40,7 @@ export interface CommentQueryResponseDto {
      */
     parentPostId: number;
     /**
-     * The text of this comment.
+     * The text of this comment. The max length is 200.
      * @type {string}
      * @memberof CommentQueryResponseDto
      */

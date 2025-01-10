@@ -650,6 +650,36 @@ namespace CitizenProposalApp.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PostDislikedUser", b =>
+                {
+                    b.Property<int>("DislikedPostsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DislikedUsersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DislikedPostsId", "DislikedUsersId");
+
+                    b.HasIndex("DislikedUsersId");
+
+                    b.ToTable("PostDislikedUser");
+                });
+
+            modelBuilder.Entity("PostLikedUser", b =>
+                {
+                    b.Property<int>("LikedPostsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LikedUsersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("LikedPostsId", "LikedUsersId");
+
+                    b.HasIndex("LikedUsersId");
+
+                    b.ToTable("PostLikedUser");
+                });
+
             modelBuilder.Entity("PostTag", b =>
                 {
                     b.Property<int>("PostsId")
@@ -928,6 +958,36 @@ namespace CitizenProposalApp.Migrations
                         .IsRequired();
 
                     b.Navigation("TagType");
+                });
+
+            modelBuilder.Entity("PostDislikedUser", b =>
+                {
+                    b.HasOne("CitizenProposalApp.Post", null)
+                        .WithMany()
+                        .HasForeignKey("DislikedPostsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CitizenProposalApp.User", null)
+                        .WithMany()
+                        .HasForeignKey("DislikedUsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PostLikedUser", b =>
+                {
+                    b.HasOne("CitizenProposalApp.Post", null)
+                        .WithMany()
+                        .HasForeignKey("LikedPostsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CitizenProposalApp.User", null)
+                        .WithMany()
+                        .HasForeignKey("LikedUsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PostTag", b =>

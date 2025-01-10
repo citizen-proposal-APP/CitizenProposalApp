@@ -78,5 +78,13 @@ public class CitizenProposalAppDbContext(IConfiguration config) : DbContext
                     Name = id.ToString().ToLowerInvariant()
                 })
         );
+        modelBuilder.Entity<Post>()
+            .HasMany(post => post.LikedUsers)
+            .WithMany(user => user.LikedPosts)
+            .UsingEntity("PostLikedUser");
+        modelBuilder.Entity<Post>()
+            .HasMany(post => post.DislikedUsers)
+            .WithMany(user => user.DislikedPosts)
+            .UsingEntity("PostDislikedUser");
     }
 }
