@@ -100,8 +100,8 @@ const ProfilePage = ({ userId }: ProfilePageProps) => { // 接收 userId 作為�
         const data = await usersApi.apiUsersCurrentGet();
         setCurrentUser(data); // 設定當前使用者資料
       } catch (error) {
-        console.error('錯誤:', error);
-        setError('無法取得當前使用者資料');
+        // console.error('錯誤:', error);
+        // setError('無法取得當前使用者資料');
       }
     };
 
