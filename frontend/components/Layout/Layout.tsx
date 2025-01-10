@@ -36,7 +36,7 @@ export function Layout({ children, aside }: LayoutProps) {
       <AppShell.Aside p="md">{aside}</AppShell.Aside>
 
       <AppShell.Main>
-        <button onClick={() => setAsideOpened(!asideOpened)}>Toggle Aside</button>
+        {aside && <button onClick={() => setAsideOpened(!asideOpened)}>Toggle Aside</button>}
         {/* FIXME: remove this button */}
         {children}
       </AppShell.Main>
