@@ -14,7 +14,12 @@ services:
       - citizen-proposal-app
     ports:
       - 8080:8080
-      - 8081:8081
+    environment:
+      - ASPNETCORE_HTTP_PORTS=8080
+    env_file:
+      - path: env/backend.env
+        required: false
+    profiles: [backend]
   db:
     container_name: CitizenProposalAppDb
     image: mysql:8.0.36 # The current latest supported version by Pomelo.EntityFrameworkCore.MySql
@@ -30,10 +35,21 @@ services:
       - MYSQL_PASSWORD_FILE=/run/secrets/db-password
       - MYSQL_RANDOM_ROOT_PASSWORD=true
     env_file:
-      - env/mysql.env
+      - path: env/mysql.env
+        required: false
     secrets:
       - db-user
       - db-password
+    profiles: [backend]
+  ai:
+    container_name: CitizenProposalAppAi
+    build: AI
+    networks:
+      - citizen-proposal-app
+    ports:
+      - 5001:5001
+    volumes:
+      - vector-db:/app/db
 
 networks:
   citizen-proposal-app:
@@ -44,6 +60,8 @@ volumes:
   mysql-data:
     name: mysql-data # Prevents project prefix
     # I wanted to specify the location of the volume using a bind mount, but that doesn't work on Windows: https://stackoverflow.com/a/50954066/11138778
+  vector-db:
+    name: vector-db
 
 secrets:
   db-password:

@@ -1,0 +1,8 @@
+data/
+svm_training.py
+train_data_generation.py
+vector_db_sync.py
+model/department_label
+model/onnx
+__pycache__
+db/

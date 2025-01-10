@@ -1,0 +1,5 @@
+model/department_label
+model/onnx
+model/topic_label/proposal.index
+model/topic_label/proposal_cluster_labels.pkl
+.env

@@ -55,3 +55,4 @@ $RECYCLE.BIN/
 *.lnk
 
 secrets
+env
