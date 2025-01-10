@@ -1,0 +1,39 @@
+{
+    "title": "【閒聊】台灣人這麼有錢，為什麼平均屋齡會達到33年",
+    "tags": [
+      { "id": 0, "tagType": "topic","name": "社會" },
+      { "id": 1, "tagType": "topic","name": "教育" },
+      { "id": 2, "tagType": "topic","name": "幼兒發展" },
+      { "id": 3, "tagType": "topic","name": "公共議題" },
+      { "id": 4, "tagType": "topic","name": "環境" }
+    ],
+    "content": "不是應該要住全新的\n好彰顯自己的經濟嗎",
+    "user_name": "guo",
+    "user_icon": "mockdata/image/user_icon.gif",
+    "is_like":false,
+    "num_like": 78,
+    "attachments": [
+      { "id": 1, "content": "mockdata/image/attachment_test5.gif" },
+      { "id": 2, "content": "mockdata/image/attachment_test4.gif" },
+      { "id": 3, "content": "mockdata/image/attachment_test3.png" }
+    ],
+    "similar_attachments": [
+      { "id": 1, "content": "mockdata/image/rick astley.jpg", "title": "Rick Astley", "link": "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
+      { "id": 2, "content": "mockdata/image/john hutcherson.jpg", "title": "John Hutcherson", "link": "https://www.youtube.com/watch?v=BbeeuzU5Qc8" },
+      { "id": 3, "content": "mockdata/image/heeeeeeyayayaya.jpg", "title": "heeeeeeyayayaya", "link": "https://www.youtube.com/watch?v=ZZ5LpwO-An4" }
+    ],
+    "comments": [
+      { "id": 1,
+        "name": "醜狗1號",
+        "icon": "mockdata/image/Doge_icon.png",
+        "content": "住古蹟比較了不起"
+      },
+
+      { "id": 2,
+        "name": "醜狗2號",
+        "icon": "mockdata/image/doge_samurai_icon.png",
+        "content": "我住公園笑死"
+      }
+    ]
+
+  }

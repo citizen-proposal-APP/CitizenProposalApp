@@ -16,7 +16,7 @@ public class Tag
     public int Id { get; init; }
 
     /// <summary>
-    /// The name of this tag.
+    /// The name of this tag. The max length is 32.
     /// </summary>
     [MaxLength(32)]
     public required string Name { get; init; }

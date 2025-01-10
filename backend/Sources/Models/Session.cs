@@ -21,7 +21,7 @@ public class Session
     public required User User { get; set; }
 
     /// <summary>
-    /// The session token.
+    /// The session token. The max length is 64.
     /// </summary>
     [MaxLength(64)]
     public required byte[] Token { get; set; }

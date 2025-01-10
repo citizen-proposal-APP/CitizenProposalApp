@@ -30,19 +30,19 @@ public record PostsQueryRequestDto
     public SortDirection SortDirection { get; init; } = SortDirection.Descending;
 
     /// <summary>
-    /// The username of the author of the posts to search. Usernames that have this as their substrings are included in the result. The search is case-insensitive.
+    /// The username of the author of the posts to search. Usernames that have this as their substrings are included in the result. The search is case-insensitive. The max length is 32.
     /// </summary>
     [MaxLength(32)]
     public string? Author { get; init; }
 
     /// <summary>
-    /// The name of the tag of the posts to search. Tag names that have this as their substrings are included in the result. The search is case-insensitive.
+    /// The name of the tag of the posts to search. Tag names that have this as their substrings are included in the result. The search is case-insensitive. The max length is 32.
     /// </summary>
     [MaxLength(32)]
     public string? Tag { get; init; }
 
     /// <summary>
-    /// The title or the content of the posts to search. Posts that have this as their substrings in their titles or contents are included in the result. The search is case-insensitive.
+    /// The title or the content of the posts to search. Posts that have this as their substrings in their titles or contents are included in the result. The search is case-insensitive. The max length is 500.
     /// </summary>
     [MaxLength(500)]
     public string? Keyword { get; init; }

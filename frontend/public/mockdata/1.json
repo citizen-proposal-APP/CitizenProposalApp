@@ -1,0 +1,41 @@
+{
+    "title": "[密技] 義大利麵就應該拌 42 號混凝土",
+    "tags": [
+      { "id": 0, "tagType": "topic","name": "社會" },
+      { "id": 1, "tagType": "topic","name": "教育" },
+      { "id": 2, "tagType": "topic","name": "幼兒發展" },
+      { "id": 3, "tagType": "topic","name": "公共議題" },
+      { "id": 4, "tagType": "topic","name": "環境" }
+    ],
+    "content": "我個人認為\n義大利麵就應該拌 42 號混泥土\n因為這個螺絲釘的長度很容易直接影響到挖掘機的扭矩\n你往裡砸的時候\n一瞬間他就會產生大量的高能蛋白\n俗稱 UFO，會嚴重影響經濟的發展\n以至於對整個太平洋和充電器的核污染\n再或者說\n透過這勾股定理\n很容易推斷出人工飼養的東條英機\n他是可以捕獲野生的三角函數\n所以說\n不管這秦始皇的切面是否具有放射性\n川普的 N 次方是否有沈澱物\n都不會影響到沃爾瑪跟維爾康在南極匯合\n",
+    "user_name": "guo",
+    "user_icon": "mockdata/image/user_icon.gif",
+    "is_like":true,
+    "num_like": 42,
+    "attachments": [
+      { "id": 1, "content": "mockdata/image/attachment_test1.png" },
+      { "id": 2, "content": "mockdata/image/attachment_test2.png" },
+      { "id": 3, "content": "mockdata/image/attachment_test3.png" },
+      { "id": 4, "content": "mockdata/image/attachment_test4.gif" },
+      { "id": 5, "content": "mockdata/image/attachment_test5.gif" }
+    ],
+    "similar_attachments": [
+      { "id": 1, "content": "mockdata/image/rick astley.jpg", "title": "Rick Astley", "link": "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
+      { "id": 2, "content": "mockdata/image/john hutcherson.jpg", "title": "John Hutcherson", "link": "https://www.youtube.com/watch?v=BbeeuzU5Qc8" },
+      { "id": 3, "content": "mockdata/image/heeeeeeyayayaya.jpg", "title": "heeeeeeyayayaya", "link": "https://www.youtube.com/watch?v=ZZ5LpwO-An4" }
+    ],
+    "comments": [
+      { "id": 1,
+        "name": "醜狗1號",
+        "icon": "mockdata/image/Doge_icon.png",
+        "content": "工三小?"
+      },
+
+      { "id": 2,
+        "name": "醜狗2號",
+        "icon": "mockdata/image/doge_samurai_icon.png",
+        "content": "已購買 小孩很愛吃"
+      }
+    ]
+
+  }
