@@ -1,0 +1,181 @@
+[
+  {
+    "id": 11,
+    "status": "published",
+    "title": "推動智慧農業技術以提升農業生產效率",
+    "thumbnail": "https://www.intelligentagri.com.tw/files/file_pool/1/0J171428789231362861/laptop_3a.png",
+    "postedTime": "2024-10-28T14:00:00+08:00",
+    "tags": [
+      { "id": 0, "tagType": "department", "name": "農業部" },
+      { "id": 1, "tagType": "topic", "name": "智慧農業" },
+      { "id": 2, "tagType": "topic", "name": "技術創新" },
+      { "id": 3, "tagType": "topic", "name": "農業生產" }
+    ]
+  },
+  {
+    "id": 12,
+    "status": "published",
+    "title": "加強國防科技人才培育與國防創新",
+    "thumbnail": "https://images.chinatimes.com/newsphoto/2024-11-23/656/20241123000113.jpg",
+    "postedTime": "2024-10-28T14:05:00+08:00",
+    "tags": [
+      { "id": 0, "tagType": "department", "name": "國防部" },
+      { "id": 1, "tagType": "topic", "name": "科技創新" },
+      { "id": 2, "tagType": "topic", "name": "人才培育" },
+      { "id": 3, "tagType": "topic", "name": "國防安全" }
+    ]
+  },
+  {
+    "id": 13,
+    "status": "published",
+    "title": "推動公平競爭以促進市場活力",
+    "thumbnail": "https://q8.itc.cn/q_70/images03/20240126/4c6c1f2d92084d87b4fb71022f7b2cfb.jpeg",
+    "postedTime": "2024-10-28T14:10:00+08:00",
+    "tags": [
+      { "id": 0, "tagType": "department", "name": "公平交易委員會" },
+      { "id": 1, "tagType": "topic", "name": "公平競爭" },
+      { "id": 2, "tagType": "topic", "name": "市場活力" },
+      { "id": 3, "tagType": "topic", "name": "經濟發展" }
+    ]
+  },
+  {
+    "id": 14,
+    "status": "published",
+    "title": "提升公共交通系統的永續性與便利性",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/8/85/Clean_mobility_instead_of_dirty_traffic.jpg",
+    "postedTime": "2024-10-28T14:15:00+08:00",
+    "tags": [
+      { "id": 0, "tagType": "department", "name": "交通部" },
+      { "id": 1, "tagType": "topic", "name": "公共交通" },
+      { "id": 2, "tagType": "topic", "name": "永續發展" },
+      { "id": 3, "tagType": "topic", "name": "城市規劃" }
+    ]
+  },
+  {
+    "id": 15,
+    "status": "published",
+    "title": "加強全民健康促進與疾病預防",
+    "thumbnail": "https://affairs.kh.edu.tw/sites/5755/bulletin_file/image_43/%E7%97%85%E6%AF%92%E6%80%A7%E8%85%B8%E8%83%83%E7%82%8E.jpg",
+    "postedTime": "2024-10-28T14:20:00+08:00",
+    "tags": [
+      { "id": 0, "tagType": "department", "name": "衛生福利部" },
+      { "id": 1, "tagType": "topic", "name": "健康促進" },
+      { "id": 2, "tagType": "topic", "name": "疾病預防" },
+      { "id": 3, "tagType": "topic", "name": "醫療資源" }
+    ]
+  },
+  {
+    "id": 16,
+    "status": "published",
+    "title": "建立更透明的預算執行情況公開機制",
+    "thumbnail": "https://ccw.org.tw/uploads/%E6%9C%80%E6%96%B0%E6%B6%88%E6%81%AF/%E6%9C%83%E5%BE%8C%E6%96%B0%E8%81%9E%E7%A8%BF/2014/140821_1.jpg",
+    "postedTime": "2024-10-28T15:00:00+08:00",
+    "tags": [
+      { "id": 0, "tagType": "department", "name": "行政院主計總處" },
+      { "id": 1, "tagType": "topic", "name": "預算透明" },
+      { "id": 2, "tagType": "topic", "name": "數據公開" },
+      { "id": 3, "tagType": "topic", "name": "民眾參與" }
+    ]
+  },
+  {
+    "id": 17,
+    "status": "published",
+    "title": "改善選舉流程以提高民眾參與率",
+    "thumbnail": "https://imgcdn.cna.com.tw/www/WebPhotos/1024/20221127/2000x2000_wmkn_0655440089128.jpg",
+    "postedTime": "2024-10-28T15:05:00+08:00",
+    "tags": [
+      { "id": 0, "tagType": "department", "name": "中央選舉委員會" },
+      { "id": 1, "tagType": "topic", "name": "選舉流程" },
+      { "id": 2, "tagType": "topic", "name": "民眾參與" },
+      { "id": 3, "tagType": "topic", "name": "選舉公平" }
+    ]
+  },
+  {
+    "id": 18,
+    "status": "published",
+    "title": "推廣環境友善技術以應對氣候變遷",
+    "thumbnail": "https://static.accupass.com/eventbanner/2408160930109372683470.jpg",
+    "postedTime": "2024-10-28T15:10:00+08:00",
+    "tags": [
+      { "id": 0, "tagType": "department", "name": "環境部" },
+      { "id": 1, "tagType": "topic", "name": "氣候變遷" },
+      { "id": 2, "tagType": "topic", "name": "環境保護" },
+      { "id": 3, "tagType": "topic", "name": "綠能技術" }
+    ]
+  },
+  {
+    "id": 19,
+    "status": "published",
+    "title": "強化僑務服務，增進國際交流",
+    "thumbnail": "https://img.ltn.com.tw/Upload/news/600/2017/06/27/2113789_1.jpg",
+    "postedTime": "2024-10-28T15:15:00+08:00",
+    "tags": [
+      { "id": 0, "tagType": "department", "name": "僑務委員會" },
+      { "id": 1, "tagType": "topic", "name": "國際交流" },
+      { "id": 2, "tagType": "topic", "name": "僑務服務" },
+      { "id": 3, "tagType": "topic", "name": "文化連結" }
+    ]
+  },
+  {
+    "id": 20,
+    "status": "published",
+    "title": "支持文化創意產業發展與全球推廣",
+    "thumbnail": "https://www.redhouse.taipei/upload/20210225173837.jpg",
+    "postedTime": "2024-10-28T15:20:00+08:00",
+    "tags": [
+      { "id": 0, "tagType": "department", "name": "文化部" },
+      { "id": 1, "tagType": "topic", "name": "文化創意" },
+      { "id": 2, "tagType": "topic", "name": "產業推廣" },
+      { "id": 3, "tagType": "topic", "name": "國際文化交流" }
+    ]
+  },
+  {
+    "id": 0,
+    "status": "",
+    "title": "相似提案 1",
+    "thumbnail": "https://via.placeholder.com/150",
+    "postedTime": "",
+    "tags": [
+      { "id": 1, "tagType": "department", "name": "交通部" },
+      { "id": 7, "tagType": "topic", "name": "asdfg" }
+    ]
+  },
+  {
+    "id": 1,
+    "status": "",
+    "title": "相似提案 2",
+    "thumbnail": "https://via.placeholder.com/150",
+    "postedTime": "",
+    "tags": [
+      { "id": 2, "tagType": "department", "name": "文化部" },
+      { "id": 5, "tagType": "topic", "name": "文化幣" },
+      { "id": 12, "tagType": "topic", "name": "" }
+    ]
+  },
+  {
+    "id": 2,
+    "status": "",
+    "title": "相似提案 3",
+    "thumbnail": "https://via.placeholder.com/150",
+    "postedTime": "",
+    "tags": [
+      { "id": 3, "tagType": "department", "name": "國防部" }
+    ]
+  },
+  {
+    "id": 3,
+    "status": "",
+    "title": "相似提案 4",
+    "thumbnail": "https://via.placeholder.com/150",
+    "postedTime": "",
+    "tags": [
+      { "id": 4, "tagType": "department", "name": "想不到了" },
+      { "id": 10, "tagType": "topic", "name": "bbbb bbbbbb bbb" },
+      { "id": 6, "tagType": "topic", "name": "食品安全" },
+      { "id": 9, "tagType": "topic", "name": "1234567" },
+      { "id": 8, "tagType": "topic", "name": "還有啥來著" },
+      { "id": 11, "tagType": "topic", "name": "🍌" },
+      { "id": 12, "tagType": "topic", "name": "" }
+    ]
+  }
+]

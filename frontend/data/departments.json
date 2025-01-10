@@ -1,0 +1,112 @@
+[
+  {
+    "link": "https://www.dgbas.gov.tw",
+    "title": "行政院主計總處",
+    "thumbnail": "/departments/ROC_Directorate-General_of_Budget,_Accounting_and_Statistics_Logo.svg"
+  },
+  {
+    "link": "https://www.ftc.gov.tw",
+    "title": "公平交易委員會",
+    "thumbnail": "/departments/ROC_Fair_Trade_Commission_Logo.svg"
+  },
+  {
+    "link": "https://www.cec.gov.tw",
+    "title": "中央選舉委員會",
+    "thumbnail": "/departments/ROC_Central_Election_Commission_Logo.svg",
+    "style": "whiteBg"
+  },
+  {
+    "link": "https://www.dgpa.gov.tw",
+    "title": "行政院人事行政總處",
+    "thumbnail": "/departments/ROC_Directorate-General_of_Personnel_Administration_Logo.svg"
+  },
+  {
+    "link": "https://www.moi.gov.tw",
+    "title": "內政部",
+    "thumbnail": "/departments/ROC_Ministry_of_the_Interior_Seal.svg",
+    "style": "whiteBg"
+  },
+  {
+    "link": "https://www.mohw.gov.tw",
+    "title": "衛生福利部",
+    "thumbnail": "/departments/ROC_Ministry_of_Health_and_Welfare_Seal.svg"
+  },
+  {
+    "link": "https://www.mnd.gov.tw",
+    "title": "國防部",
+    "thumbnail": "/departments/Seal_of_the_Ministry_of_National_Defense_of_the_Republic_of_China.svg"
+  },
+  {
+    "link": "https://www.motc.gov.tw",
+    "title": "交通部",
+    "thumbnail": "/departments/ROC_Ministry_of_Transportation_and_Communications_Emblem.svg"
+  },
+  {
+    "link": "https://www.moa.gov.tw",
+    "title": "農業部",
+    "thumbnail": "/departments/Ministry_of_Agriculture_(Taiwan)_logo.svg"
+  },
+  {
+    "link": "https://www.moj.gov.tw",
+    "title": "法務部",
+    "thumbnail": "/departments/ROC_Ministry_of_Justice_Emblem.svg"
+  },
+  {
+    "link": "https://www.mof.gov.tw",
+    "title": "財政部",
+    "thumbnail": "/departments/ROC_Ministry_of_Finance_Seal.svg"
+  },
+  {
+    "link": "https://www.edu.tw",
+    "title": "教育部",
+    "thumbnail": "/departments/ROC_Ministry_of_Education_Seal.svg"
+  },
+  {
+    "link": "https://www.mofa.gov.tw",
+    "title": "外交部",
+    "thumbnail": "departments/ROC_Ministry_of_Foreign_Affairs_Emblem.svg"
+  },
+  {
+    "link": "https://www.moea.gov.tw",
+    "title": "經濟部",
+    "thumbnail": "/departments/ROC_Ministry_of_Economic_Affairs_Seal_since_2023.svg",
+    "style": "whiteBg"
+  },
+  {
+    "link": "https://www.moc.gov.tw",
+    "title": "文化部",
+    "thumbnail": "/departments/ROC_Ministry_of_Culture_Logo.svg",
+    "style": "whiteBg"
+  },
+  {
+    "link": "https://www.mol.gov.tw",
+    "title": "勞動部",
+    "thumbnail": "/departments/ROC_Ministry_of_Labor_Logo.svg"
+  },
+  {
+    "link": "https://www.moenv.gov.tw",
+    "title": "環境部",
+    "thumbnail": "/departments/ROC_Ministry_of_Environment_Seal.svg"
+  },
+  {
+    "link": "https://www.vac.gov.tw",
+    "title": "國軍退除役官兵輔導委員會",
+    "thumbnail": "/departments/ROC_Veterans_Affairs_Council_Emblem.svg"
+  },
+  {
+    "link": "https://www.ocac.gov.tw",
+    "title": "僑務委員會",
+    "thumbnail": "/departments/ROC_Overseas_Community_Affairs_Council_Flag.svg"
+  },
+  {
+    "link": "https://www.nstc.gov.tw",
+    "title": "國家科學及技術委員會",
+    "thumbnail": "/departments/ROC_National_Science_and_Technology_Council.svg",
+    "style": "whiteBg"
+  },
+  {
+    "link": "https://www.ncc.gov.tw",
+    "title": "國家通訊傳播委員會",
+    "thumbnail": "/departments/ROC_National_Communications_Commission_Seal.svg"
+  }
+]

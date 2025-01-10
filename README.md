@@ -4,10 +4,10 @@
   - [Backend Development](#backend-development)
     - [With Visual Studio](#with-visual-studio)
     - [Without Visual Studio](#without-visual-studio)
-  - [AI Development](#ai-development)
   - [Frontend Development](#frontend-development)
     - [Docker](#docker)
     - [Components](#components)
+  - [AI Development](#ai-development)
 
 ## Backend Development
 
@@ -28,9 +28,9 @@ follow these steps:
    use into `env/mysql.env`. For its syntax, check the
    [docs](https://docs.docker.com/reference/compose-file/services/#env_file-format).
 5. `cd` into the project root and start **only** the DB service with `docker
-   compose up -d db`.
+compose up -d db`.
 6. After a few seconds, check the logs of the DB service with either `docker
-   compose logs` or with the Docker Desktop GUI. You should see the line
+compose logs` or with the Docker Desktop GUI. You should see the line
    `GENERATED ROOT PASSWORD: ...`. This will be the root password of the DB.
 
    Below that, you should see the table:
@@ -104,7 +104,7 @@ and debugging. In that case, follow these steps:
    and `- 8081:8081` under `services.backend.ports` in `compose.yml`. You can
    customize the port number to your liking.
 
-6. Run `docker compose --profile backend up -d` to start the backend app and the DB.
+6. Run `docker compose up backend db -d` to start the backend app and the DB.
 7. After a few seconds, check the logs of the DB service with either `docker
    compose logs` or with the Docker Desktop GUI. You should see the line
    `GENERATED ROOT PASSWORD: ...`. This will be the root password of the DB.
@@ -146,6 +146,39 @@ Note that `docker compose up` won't automatically rebuild images, unlike VS's
 container tools. If you have updated the source code of the backend and want to
 test it, be sure to supply the `--build` option to `docker compose up`.
 
+## Frontend Development
+
+No additional installations are required to make the frontend work. `yarn` is already included with the project.
+
+1. Clone the repository.
+2. Run `yarn install` in `frontend/` to install all dependencies.
+3. Run `yarn dev` in `frontend/` to start the development server.
+
+### Docker
+
+To start only the frontend container, run:
+
+```sh
+docker compose up -d frontend
+```
+
+You should now be able to access the frontend at `localhost:80`.
+
+### Components
+
+| Component     | Description                       | Note                                                              |
+|---------------|-----------------------------------|-------------------------------------------------------------------|
+| ActionToggle  | Color scheme toggle               |                                                                   |
+| HeaderMenu    | Desktop navigation                | This component should not be used directly. Use `Layout` instead. |
+| ImageCarousel | Multiple images                   | The images are displayed in a 16:9 aspect ratio.                  |
+| Layout        | Default layout structure          |                                                                   |
+| LinkCard      | External link                     | Use with `SimpleGrid` or `Container` is recommended.              |
+| Logo          | Logo of the application           |                                                                   |
+| NavbarNested  | Mobile navigation                 | This component should not be used directly. Use `Layout` instead. |
+| ProposalCard  | Unified way to display proposals  | Use with `SimpleGrid` or `Container` is recommended.              |
+| SignIn        | Allows users to sign in           | Includes username and password validation.                        |
+| SignUp        | Allows users to create an account | Includes username, password, and confirm password validation.     |
+
 ## AI Development
 
 To build and deploy the AI container, follow these steps:
@@ -182,31 +215,3 @@ To build and deploy the AI container, follow these steps:
    ```bash
    python3 vector_db_sync.py
    ```
-
-## Frontend Development
-
-No additional installations are required to make the frontend work. `yarn` is already included with the project.
-
-1. Clone the repository.
-2. Run `yarn install` in `frontend/` to install all dependencies.
-3. Run `yarn dev` in `frontend/` to start the development server.
-
-### Docker
-
-To start only the frontend container, run:
-
-```sh
-docker compose up -d frontend
-```
-
-You should now be able to access the frontend at `localhost:80`.
-
-### Components
-
-| Component    | Description              | Note                                                              |
-|--------------|--------------------------|-------------------------------------------------------------------|
-| ActionToggle | Color scheme toggle      |                                                                   |
-| HeaderMenu   | Desktop navigation       | This component should not be used directly. Use `Layout` instead. |
-| Layout       | Default layout structure |                                                                   |
-| Logo         | Logo of the application  |                                                                   |
-| NavbarNested | Mobile navigation        | This component should not be used directly. Use `Layout` instead. |
