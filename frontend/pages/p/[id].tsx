@@ -252,7 +252,7 @@ const proposalSubpage = () => {
       const proposals: Proposal[] = mergedPosts.map((post) => ({
         ...post,
         status: '1',
-        thumbnail: '../logo.png',
+        thumbnail: '../favicon.svg',
         
        }));
        setRelatedPosts(proposals);
