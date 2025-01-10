@@ -1,9 +1,10 @@
 import { Layout } from '@/components/Layout/Layout';
 import { ProposalCard } from '@/components/ProposalCard/ProposalCard';
 import { Proposal } from '@/types/Proposal';
-import { Tag, TagType } from '@/types/Tag';
+import { Tag } from '@/types/Tag';
 import React, { useState, useRef } from 'react';
 import { IconUpload, IconX } from '@tabler/icons-react';
+import { useRouter } from 'next/navigation'
 import { Badge, Button, Card, CheckIcon, Combobox, Container, Grid, Group, Image, MantineProvider, Modal, Pill, PillsInput, rem, ScrollArea, SimpleGrid, Stack, TagsInput, Text, Textarea, Timeline, Title, useCombobox } from '@mantine/core';
 import { useDisclosure, useValidatedState, useViewportSize } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
@@ -12,20 +13,12 @@ import '@mantine/dropzone/styles.css';
 import { Notifications, notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 import { IconPhoto, IconVideo } from '@tabler/icons-react';
+import { Configuration, AiApi, AttachmentsApi, PostsApi, TagsApi } from '@/openapi';
 
 export default function EditPage() {
-  /*
-	const [{ value: titleValue, valid: titleValid }, setTitleValue] = useValidatedState(
-    '',
-    (val) => val.length > 0 && val.length <= 100,
-    true
-  );
-	const [{ value: contentValue, valid: contentValid }, setContentValue] = useValidatedState(
-    '',
-    (val) => val.length > 0 && val.length <= 2000,
-    true
-  );
-  */
+  const router = useRouter()
+	const [titleValue, setTitleValue] = useState<string>("");
+	const [contentValue, setContentValue] = useState<string>("");
   const [fileValue, setFileValue] = useState<File[]>([]);
   const [replacingQueue, setReplacingQueue] = useState<File[]>([]);
   const [currentReplacingFile, setCurrentReplacingFile] = useState<File | null>(null);
@@ -35,12 +28,16 @@ export default function EditPage() {
   const [publishModalOpened, { open: openPublishModal, close: closePublishModal }] = useDisclosure(false);
   const [replaceModalOpened, setReplaceModalOpened] = useState(false);  
   /*
+  const [confirmModalOpened, setConfirmModalOpened] = useState(false);  
   const [tagSearch, setTagSearch] = useState('');
   const [tagValue, setTagValue] = useState<any[]>([]);
-  const [tagNameValue, setTagNameValue] = useState<string[]>([]);
   */
+  const [tagList, setTagList] = useState<any[]>([]);
+  const [tagNameValue, setTagNameValue] = useState<string[]>([]);
+  const [similarProposals, setSimilarProposals] = useState<Proposal[]>([])
   const MAX_FILE_SIZE = 50 * 1024 ** 2;
   const WIDTH_OFFSET = 65;
+  const MAX_SIMILAR_PROPOSALS = 10;
   /*
   const MAX_TAGS = 3;
   const MAX_PILL_LENGTH = 10;
@@ -50,46 +47,26 @@ export default function EditPage() {
   const timelineProgress = onFirstStep ? 0 : 1
   const { height, width } = useViewportSize();
 
-  const form = useForm<{ title: string; content: string }>({
+  const form = useForm({
     mode: 'uncontrolled',
     validateInputOnChange: true,
     validateInputOnBlur: true,
     initialValues: { title: '', content: '' },
-    validate: (values) => ({
-      title: values.title.length == 0 
+    validate: {
+      title: () => titleValue.length == 0 
         ? '此欄位為必填' 
-        : values.title.length > 100
+        : titleValue.length > 100
           ? '此欄位字數不得超過100字'
           : null,
-      content: values.content.length == 0 
+      content: () => contentValue.length == 0 
         ? '此欄位為必填' 
-        : values.content.length > 2000
+        : contentValue.length > 2000
           ? '此欄位字數不得超過2000字'
           : null,
-    }),
+    },
   });
 
-  
-  const tagList = [
-    { id: 1, tagType: TagType.department, name: "交通部" },
-    { id: 2, tagType: TagType.department, name: "文化部" },
-    { id: 3, tagType: TagType.department, name: "國防部" },
-    { id: 4, tagType: TagType.department, name: "想不到了" },
-    { id: 5, tagType: TagType.topic, name: "文化幣" },
-    { id: 6, tagType: TagType.topic, name: "食品安全" },
-    { id: 7, tagType: TagType.topic, name: "asdfg" },
-    { id: 8, tagType: TagType.topic, name: "還有啥來著" },
-    { id: 9, tagType: TagType.topic, name: "1234567" },
-    { id: 10, tagType: TagType.topic, name: "bbbb bbbbbb bbb" },
-    { id: 11, tagType: TagType.topic, name: "🍌" },
-    { id: 12, tagType: TagType.topic, name: "" },
-  ];
-  const autoTags = [
-    tagList[2],
-    tagList[5],
-    tagList[7],
-    tagList[8],
-  ];
+  /*
   const similarProposals: Proposal[] = [
     {
       id: 0,
@@ -141,6 +118,7 @@ export default function EditPage() {
       ],
     },
   ];
+  */
   
   function inputValidation() {
 		form.isValid() ? nextStep() : handleNotification("text")
@@ -166,16 +144,34 @@ export default function EditPage() {
       case "text":
         notifications.show({
           title: '無法送出',
-          message: '請依照要求填寫必填欄位！'
+          message: '請依照要求填寫必填欄位'
         })
         break;
       case "file":
         notifications.show({
           title: '檔案無法上傳',
-          message: '請確認欲上傳檔案之大小和格式！'
+          message: '請確認欲上傳檔案之大小和格式'
         })
         break
-    
+      case "sighin":
+        notifications.show({
+          title: '尚未登入',
+          message: '請先登入後即可發布提案'
+        })
+        break
+      case "unknown":
+        notifications.show({
+          title: '發生未知錯誤',
+          message: '請稍候再嘗試'
+        })
+        break
+      case "sucess":
+        notifications.show({
+          title: '成功送出提案',
+          message: ''
+        })
+        break
+  
       default:
         break;
     }
@@ -240,6 +236,10 @@ export default function EditPage() {
   function extractTagNames(tags: Tag[]): string[] {
     return tags.map((tag) => tag.name);
   }
+  function updateTags(newTagNames: string[]) {
+    setTagNameValue(newTagNames)
+    updateSimilarProposals()
+  }
   /*
   function findTag(input:string): Tag | undefined {
     return tagList.find((tag) => tag.name == input)
@@ -297,13 +297,114 @@ export default function EditPage() {
     ));
 	*/
 
+  const conf = new Configuration({
+    basePath: process.env.NEXT_PUBLIC_BASE_PATH!,
+    credentials: 'include',
+  });
+
+  const aiApi = new AiApi(conf)
+  const attachmentApi = new AttachmentsApi(conf)
+  const postsApi = new PostsApi(conf)
+  const tagsApi = new TagsApi(conf)
+
+  const publishProposal = async () => {
+    try {
+      await postsApi.apiPostsPost({title: titleValue, content: contentValue, tags: tagNameValue, attachments: fileValue})
+      handleNotification("sucess")
+      router.push('/')
+    } catch (error: any) {
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            console.error('錯誤: 格式不符', error.response.data)
+            handleNotification("text")
+            break;
+          case 401:
+            console.error('錯誤: 使用者未登入', error.response.data)
+            handleNotification("sighin")
+            break;
+          
+          default:
+            console.error('錯誤: 未知錯誤', error.response.data)
+            handleNotification("unknown")
+            break;
+        }
+      }
+    } finally {
+      closePublishModal();
+    }
+  };
+
+  const searchTagList = async (keyword: string) => {
+    if (keyword.length == 0) {
+      setTagList([])
+    }
+    else {
+      try {
+        const response = await tagsApi.apiTagsGet({keyword: keyword})
+        setTagList(response.tags)
+      } catch (error) {
+        console.error("錯誤: ", error);
+      }
+    }
+  }
+
+  const autoGenerateTags = async () => {
+    try {
+      const response = await aiApi.apiAiGuesstagsGet({title: titleValue})
+      setTagNameValue(response)
+      updateSimilarProposals
+    } catch (error) {
+      console.error("錯誤: ", error);
+    }
+  }
+
+  const updateSimilarProposals = () => {
+    setSimilarProposals([])
+    try {
+      tagNameValue.forEach(async tag => {
+        const similarPost:Proposal = {
+          id: -1,
+          status: "published",
+          title: "",
+          thumbnail: "", // url
+          // content: string;
+          postedTime: "",
+          tags: [],}
+        const postResponse = await postsApi.apiPostsGet({keyword: titleValue, tag: tag, isAiEnabled: true})
+        for (let index = 0; index < postResponse.posts.length; index++) {
+          if (similarProposals.length >= MAX_SIMILAR_PROPOSALS) {
+            break
+          }
+          const foundPost = postResponse.posts[index];
+          if ((!similarProposals.some((post) => post.id === foundPost.id))) {
+            similarPost.id = foundPost.id
+            similarPost.title = foundPost.title
+            similarPost.postedTime = foundPost.postedTime.toISOString()
+            similarPost.tags = foundPost.tags
+            if (foundPost.attachments.length >= 1) {
+              const firstAttachment = await attachmentApi.apiAttachmentsIdGet({id: foundPost.attachments[0].id})
+              similarPost.thumbnail = await firstAttachment.text()
+            }
+            else {
+              similarPost.thumbnail = "https://via.placeholder.com/150"
+            }
+            setSimilarProposals((current) => [...current, similarPost])
+          }
+        }
+      });
+    } catch (error) {
+      console.error("錯誤: ", error);
+    }
+  }
+
 	return (
     <Layout>
       <Notifications position="top-right" zIndex={1000}/>
       <Modal opened={publishModalOpened} onClose={closePublishModal} title="送出確認" centered size={"lg"}>
         <Text size={"md"}>確認送出提案？</Text>
         <Group justify="flex-end" gap={"xl"}>
-          <Button variant="filled" size={"md"}>是</Button>
+          <Button variant="filled" size={"md"} onClick={() => publishProposal()}>是</Button>
           <Button variant="default" size={"md"} onClick={closePublishModal}>否</Button>
         </Group>
       </Modal>
@@ -351,26 +452,28 @@ export default function EditPage() {
               </Title>
               <Textarea 
                 placeholder="請輸入主題，100字以內，必填" 
-                required
                 radius={"lg"}
                 size={"lg"}
                 autosize
                 minRows={2}
                 key={form.key('title')}
                 {...form.getInputProps('title')}
+                value={titleValue}
+                onChange={(event) => setTitleValue(event.currentTarget.value)}
               />
               <Title size="lg">
                 提案內容或建議事項（必填）
               </Title>
               <Textarea 
                 placeholder="請輸入內容或建議事項，2000字以內，必填" 
-                required
                 radius={"lg"}
                 size={"lg"}
                 autosize
                 minRows={10}
                 key={form.key('content')}
                 {...form.getInputProps('content')}
+                value={contentValue}
+                onChange={(event) => setContentValue(event.currentTarget.value)}
               />
               <Title size="lg">
                 上傳附件（支援圖片、影像格式）
@@ -497,9 +600,14 @@ export default function EditPage() {
               size={"lg"}
               placeholder="請輸入關鍵字，並選取推薦標籤"
               data={extractTagNames(tagList)}
-              defaultValue={extractTagNames(autoTags)}
               clearable
+              value={tagNameValue}
+              onChange={(val) => updateTags(val)}
+              onSearchChange={(keyword) => searchTagList(keyword)}
             />
+            <Group justify="space-between" gap={"xl"} grow>
+              <Button variant="filled" size="lg" onClick={autoGenerateTags}>自動生成標籤</Button>
+            </Group>
             <Title size="lg">
               或許你想看看...？
             </Title>
