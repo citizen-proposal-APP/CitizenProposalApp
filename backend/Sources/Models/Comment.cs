@@ -29,7 +29,7 @@ public class Comment
     public required User Author { get; set; }
 
     /// <summary>
-    /// The text of this comment.
+    /// The text of this comment. The max length is 200.
     /// </summary>
     [MaxLength(200)]
     public required string Content { get; set; }

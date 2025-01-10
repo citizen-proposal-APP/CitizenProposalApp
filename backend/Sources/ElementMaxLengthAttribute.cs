@@ -23,7 +23,7 @@ internal sealed class ElementMaxLengthAttribute(int length) : MaxLengthAttribute
             return false;
         }
         int index = 0;
-        foreach (object obj in (IEnumerable)value)
+        foreach (object? obj in (IEnumerable)value)
         {
             if (!base.IsValid(obj))
             {

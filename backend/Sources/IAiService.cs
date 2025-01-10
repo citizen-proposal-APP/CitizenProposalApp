@@ -31,4 +31,19 @@ public interface IAiService
     /// <param name="postCount">Max number of <see cref="Post.Id"/>s to return. The return value may contain less IDs than <paramref name="postCount"/>.</param>
     /// <returns>A <see cref="IEnumerable{T}"/> of <see cref="Post.Id"/>s sorted from the most similiar to the least similiar to <paramref name="title"/>. <see langword="null"/> is the AI service is unavailable.</returns>
     public Task<IEnumerable<int>?> SearchPostIdsByTitle(string title, int postCount);
+
+    /// <summary>
+    /// Checks if a <see langword="string"/> contains inappropriate content using AI.
+    /// </summary>
+    /// <param name="text">The text to check.</param>
+    /// <returns><see langword="false"/> if the text is inappropriate. <see langword="null"/> is the AI service is unavailable.</returns>
+    public Task<bool?> CheckTextSafety(string text);
+
+    /// <summary>
+    /// Checks if an image contains inappropriate content using AI.
+    /// </summary>
+    /// <param name="image">The image to check.</param>
+    /// <param name="filename">The filename of the <paramref name="image"/>. Usually used to extract the Content-Type of the image for the AI service.</param>
+    /// <returns><see langword="false"/> if the image is inappropriate. <see langword="null"/> is the AI service is unavailable.</returns>
+    public Task<bool?> CheckImageSafety(byte[] image, string filename);
 }

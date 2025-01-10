@@ -8,7 +8,7 @@ namespace CitizenProposalApp;
 public record CommentSubmissionDto
 {
     /// <summary>
-    /// The content of the comment.
+    /// The content of the comment. The max length is 200.
     /// </summary>
     [MaxLength(200)]
     public required string Content { get; init; }

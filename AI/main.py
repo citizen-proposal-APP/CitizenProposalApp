@@ -1,20 +1,20 @@
-from fastapi import FastAPI, HTTPException, Response, Form
+from fastapi import FastAPI, HTTPException, Response, Form, File, UploadFile
 from pydantic import BaseModel, Field
 from typing import List, Optional, Annotated, Dict
 import logging
 from contextlib import asynccontextmanager
-# from classifier import index_rank, get_tags, embed, save_db
-from classifier import Ranker
+from classifier import Ranker, Moderator
 
-ranker = {}
+context = {}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    ranker[0] = Ranker("model", "db")
-    print("Server init successfully.")
+    context[0] = Ranker("model", "db")
+    context[1] = Moderator("model")
+    print("Server launched successfully.")
     yield
     print("Shutdown event triggered, saving database...")
-    await ranker[0].save_db()
+    await context[0].save_db()
     print("exit gracefully...")
 
 app = FastAPI(
@@ -69,6 +69,13 @@ class EmbeddingRequest(BaseModel):
     id: int = Field(..., gt=0, description="Id of the Post. Must not be empty.")
     text: str = Field(..., description="Post title to embed. Nust not be empty.")
 
+class ModerationRequest(BaseModel):
+    text: str = Field(..., description="Any text")
+
+class ModerationReponse(BaseModel):
+    flag: bool = Field(..., description="if input content is unsafe, flag will be True, otherwise False")
+
+
 # API Endpoints
 @app.post("/classify", response_model=ClassifyResponse, summary="Classify a Text", tags=["Classification"])
 async def classify(request: Annotated[ClassifyRequest, Form()]):
@@ -86,7 +93,7 @@ async def classify(request: Annotated[ClassifyRequest, Form()]):
         raise HTTPException(status_code=400, detail="Text cannot be empty or whitespace only.")
 
     try:
-        department_label, topic_label = ranker[0].get_tags(text)
+        department_label, topic_label = context[0].get_tags(text)
         topic_label = [topic_label] if topic_label != None else None
         department_label = [department_label]
         # department_label, department_label_id, topic_label, topic_label_id = get_tags(text)
@@ -113,7 +120,7 @@ async def add(request: Annotated[EmbeddingRequest, Form()]):
     text = request.text
     
     try:
-        ranker[0].embed(id, text)
+        context[0].embed(id, text)
         # embed(id, text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
@@ -138,7 +145,7 @@ async def rank(request: Annotated[RankRequest, Form()]):
         raise HTTPException(status_code=400, detail="Query string cannot be empty or whitespace only.")
 
     try:
-        results, distances = ranker[0].index_rank(query, topk)
+        results, distances = context[0].index_rank(query, topk)
         distances[distances < 0] = 0
         ranked_results = [RankedResult(index=int(idx), distance=float(dis)) for idx, dis in zip(results, distances)]
     except Exception as e:
@@ -146,6 +153,31 @@ async def rank(request: Annotated[RankRequest, Form()]):
 
     return RankResponse(ranked_results=ranked_results)
 
+@app.post("/text-moderation", response_model=ModerationReponse, summary="Check whether a string is safe", tags=["Moderation"])
+async def text_moderation(request: Annotated[ModerationRequest, Form()]):
+    text = request.text
+    
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Query string cannot be empty or whitespace only.")
+    
+    # try:
+    flag = context[1].text_moderation(text)
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=f"{e}")
+    
+    return ModerationReponse(flag=flag)
+
+@app.post("/image-moderation", response_model=ModerationReponse, summary="Check whether an image is safe", tags=["Moderation"])
+async def image_moderation(file: UploadFile = File(...)):
+    try:
+        image_bytes = await file.read()
+        flag = context[1].image_moderation(image_bytes)
+    except Exception as e:
+        raise  HTTPException(status_code=500, detail=f"{e}")
+    
+    return ModerationReponse(flag=flag)
+        
+
 # python3 -m uvicorn main:app --port 5002
 # sudo docker buildx build -t machine-learning .
-# sudo docker run -it -p 5001:5001 --rm machine-learning
+# docker run -it -p 5001:5001 -v vector-db:/app/db -d machine-learning

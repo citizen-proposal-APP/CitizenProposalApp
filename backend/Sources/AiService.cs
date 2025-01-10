@@ -6,6 +6,8 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Globalization;
+using Microsoft.AspNetCore.StaticFiles;
+using System.Net.Mime;
 
 namespace CitizenProposalApp;
 
@@ -63,5 +65,43 @@ internal sealed class AiService(HttpClient httpClient) : IAiService
             return null;
         }
         return responseObject.RankedResults.OrderBy(result => result.Distance).Select(result => result.PostId);
+    }
+
+    public async Task<bool?> CheckTextSafety(string text)
+    {
+        using FormUrlEncodedContent formContent = new(new Dictionary<string, string>
+        {
+            { "text", text }
+        });
+        HttpResponseMessage response = await httpClient.PostAsync(new Uri("text-moderation", UriKind.Relative), formContent);
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
+        AiModerationResponseDto? responseObject = await JsonSerializer.DeserializeAsync<AiModerationResponseDto>(await response.Content.ReadAsStreamAsync());
+        if (responseObject is null)
+        {
+            return null;
+        }
+        return !responseObject.IsUnsafe;
+    }
+    public async Task<bool?> CheckImageSafety(byte[] image, string filename)
+    {
+        using MultipartFormDataContent formContent = [];
+        using ByteArrayContent imageContent = new(image);
+        new FileExtensionContentTypeProvider().TryGetContentType(filename, out string? contentType);
+        imageContent.Headers.ContentType = new(contentType ?? MediaTypeNames.Application.Octet);
+        formContent.Add(imageContent, "file", filename);
+        HttpResponseMessage response = await httpClient.PostAsync(new Uri("image-moderation", UriKind.Relative), formContent);
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
+        AiModerationResponseDto? responseObject = await JsonSerializer.DeserializeAsync<AiModerationResponseDto>(await response.Content.ReadAsStreamAsync());
+        if (responseObject is null)
+        {
+            return null;
+        }
+        return !responseObject.IsUnsafe;
     }
 }

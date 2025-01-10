@@ -1,4 +1,5 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Konscious.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static Microsoft.AspNetCore.Http.StatusCodes;
 using static System.Net.Mime.MediaTypeNames;
+using static System.StringComparison;
 
 namespace CitizenProposalApp;
 
@@ -126,6 +128,30 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
         return mapper.Map<User, UserQueryResponseDto>(user);
     }
 
+    /// <summary>
+    /// Searches users with a keyword. The result is always sorted ascendingly by the lengths of the usernames.
+    /// </summary>
+    /// <param name="parameters">The query parameters to use.</param>
+    /// <returns>The users that contain the given keyword.</returns>
+    /// <response code="200">An object that contains the total number of users in the database that contain the given keyword in their usernames and an array of those users. The array can be empty if no usernames contains the given keyword.</response>
+    [HttpGet]
+    [ProducesResponseType(Status200OK)]
+    [ProducesResponseType<ProblemDetails>(Status400BadRequest, Application.ProblemJson)]
+    public async Task<ActionResult<UsersQueryResponseDto>> GetUsersByParameters([FromQuery] UsersQueryRequestDto parameters)
+    {
+        IQueryable<User> usersResult = context.Users
+            .Where(user => user.Username.Contains(parameters.Keyword, InvariantCultureIgnoreCase))
+            .OrderBy(user => user.Username.Length)
+            .Skip(parameters.Start)
+            .Take(parameters.Range);
+        UsersQueryResponseDto result = new()
+        {
+            Count = await usersResult.CountAsync(),
+            Users = usersResult.ProjectTo<UserQueryResponseDto>(mapper.ConfigurationProvider)
+        };
+        return result;
+    }
+
     private static async Task<byte[]> HashPassword(string password, byte[] salt, int memorySize, int iterations, int degreeOfParallelism)
     {
         using Argon2id argon2Id = new(Encoding.UTF8.GetBytes(password))
@@ -169,7 +195,9 @@ public class UsersController(CitizenProposalAppDbContext context, TimeProvider t
             Loginable = true,
             Posts = [],
             Sessions = [],
-            Comments = []
+            Comments = [],
+            LikedPosts = [],
+            DislikedPosts = []
         };
         context.Users.Add(newUser);
         await context.SaveChangesAsync();

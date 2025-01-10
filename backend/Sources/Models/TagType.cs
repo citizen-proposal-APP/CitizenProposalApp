@@ -13,7 +13,7 @@ public class TagType
     public TagTypeId Id { get; init; }
 
     /// <summary>
-    /// The name of the tag type.
+    /// The name of the tag type. The max length is 32.
     /// </summary>
     [MaxLength(32)]
     public required string Name { get; init; }
