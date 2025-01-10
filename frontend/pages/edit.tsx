@@ -311,9 +311,17 @@ export default function EditPage() {
 
   const publishProposal = async () => {
     try {
-      await postsApi.apiPostsPost({title: titleValue, content: contentValue, tags: tagNameValue, attachments: fileValue})
-      handleNotification("sucess")
-      router.push('/')
+      closePublishModal();
+      const legalTitle = await aiApi.apiAiChecktextGet({text: titleValue})
+      const legalContent = await aiApi.apiAiChecktextGet({text: contentValue})
+      if (legalTitle.isSafe && legalContent.isSafe) {
+        await postsApi.apiPostsPost({title: titleValue, content: contentValue, tags: tagNameValue, attachments: fileValue})
+        handleNotification("sucess")
+        router.push('/')
+      }
+      else {
+        window.alert("含有非法輸入")
+      }
     } catch (error: any) {
       if (error.response) {
         switch (error.response.status) {
@@ -332,8 +340,6 @@ export default function EditPage() {
             break;
         }
       }
-    } finally {
-      closePublishModal();
     }
   };
 
