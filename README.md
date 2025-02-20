@@ -93,7 +93,7 @@ and debugging. In that case, follow these steps:
    ConnectionStrings__CitizenProposalApp=Server=CitizenProposalAppDb;Database=CitizenProposalApp;Uid=<your username>;Pwd=<your password>
    ```
 
-   If you also want to set up HTTPS, and the following two more lines:
+   If you also want to set up HTTPS, add the following two more lines:
 
    ```plaintext
    ASPNETCORE_Kestrel__Certificates__Default__Path=/app/DevelopmentCertificateDoNotUseForProduction.pfx
